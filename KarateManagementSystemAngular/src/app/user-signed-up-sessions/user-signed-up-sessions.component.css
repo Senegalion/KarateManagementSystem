@@ -1,0 +1,167 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9; /* Ensure white background for container */
+  color: #000000; /* Ensure black text color */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  text-align: center; /* Center-align text */
+}
+
+.calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.calendar-table th, .calendar-table td {
+  border: 1px solid #ccc;
+  width: 14.28%;
+  vertical-align: top;
+  padding: 10px;
+  height: 100px;
+}
+
+.calendar-day {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.calendar-session {
+  background-color: #e3f2fd;
+  margin-top: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.today {
+  background-color: #ffeb3b;
+}
+
+.training-session {
+  border: 1px solid #ccc;
+  padding: 20px; /* Increase padding for better visual spacing */
+  margin-bottom: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9; /* Light background color for better contrast */
+  color: #000; /* Ensure text color is black */
+  text-align: center; /* Center-align text */
+}
+
+.training-session p {
+  margin: 10px 0; /* Add margin for better spacing */
+}
+
+.training-session button {
+  margin-top: 10px;
+  margin-right: 5px;
+  padding: 10px 20px; /* Add padding for better button size */
+  border: none;
+  border-radius: 5px;
+  color: #fff; /* White text color */
+  font-size: 16px; /* Increase font size */
+  cursor: pointer;
+}
+
+.training-session .btn-sign-up {
+  background-color: #44bd32; /* Green background for "Sign Up" button */
+}
+
+.training-session .btn-withdraw {
+  background-color: #e74c3c; /* Red background for "Withdraw" button */
+}
+
+.training-session .btn-feedback {
+  background-color: #3498db; /* Blue background for "Feedback" button */
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+select {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Feedback section styles */
+.feedback {
+  background-color: #ffffff;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: left; /* Align feedback text to the left */
+}
+
+.feedback-comment {
+  font-size: 1.1em;
+  margin-bottom: 5px;
+}
+
+.feedback-rating {
+  color: #ffcc00; /* Gold color for stars */
+}
+
+.feedback-rating i {
+  font-size: 1.2em; /* Increase star size */
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+.btn-withdraw {
+  background-color: #d32f2f;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-withdraw:hover {
+  background-color: #c62828;
+}
+
+.btn-danger:active {
+  background-color: #b71c1c;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-feedback {
+  background-color: #29b6f6;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-feedback:hover {
+  background-color: #039be5;
+}
+
+.btn-feedback:active {
+  background-color: #0288d1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}

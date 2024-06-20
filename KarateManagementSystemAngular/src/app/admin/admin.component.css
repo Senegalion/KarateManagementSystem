@@ -1,0 +1,28 @@
+.nav-buttons {
+  display: flex;
+  /*flex-direction: column;*/
+  align-items: center;
+  justify-content: center;
+  height: 50vh; /* Full viewport height to center vertically */
+  gap: 20px; /* Space between the buttons */
+}
+
+.nav-btn {
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  padding: 20px 40px; /* Increased padding for bigger buttons */
+  font-size: 24px; /* Larger font size */
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.nav-btn:hover {
+  background-color: #3e8e41;
+}
+
+.nav-btn:active {
+  background-color: #3e8e41;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}

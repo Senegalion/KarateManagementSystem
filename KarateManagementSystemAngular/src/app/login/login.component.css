@@ -1,0 +1,74 @@
+.container-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  background-color: #202020;
+  color: #ffffff;
+}
+
+.logged-in-container {
+  text-align: center;
+  font-size: 1.2em;
+}
+
+.form-container {
+  max-width: 350px;
+  padding: 20px;
+  background-color: #282c34;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #44bd32;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.btn-success {
+  width: 87%;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #28a745;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: center;
+  display: block;
+  text-decoration: none;
+}
+
+.error {
+  color: #ff4d4d;
+  font-size: 0.9em;
+}
+
+.alert.alert-danger {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #ff4d4d;
+  color: #ffffff;
+  border-radius: 4px;
+  text-align: center;
+}

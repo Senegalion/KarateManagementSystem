@@ -1,0 +1,88 @@
+<div>
+  <div *ngIf="isSuccessful; else signupForm" class="success-message">
+    <h2>Registration Successful!</h2>
+    <p>You will be redirected to the home page shortly.</p>
+  </div>
+
+  <ng-template #signupForm>
+    <div class="container">
+      <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <br />
+          <input type="text" class="form-control" id="name" name="name" [(ngModel)]="form.name" required>
+        </div>
+        <div class="form-group">
+          <label for="surname">Surname</label>
+          <br />
+          <input type="text" class="form-control" id="surname" name="surname" [(ngModel)]="form.surname" required>
+        </div>
+        <div class="form-group">
+          <label for="dateOfBirth">Date of Birth</label>
+          <br />
+          <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" [(ngModel)]="form.dateOfBirth" required>
+        </div>
+        <div class="form-group">
+          <label for="city">City</label>
+          <br />
+          <input type="text" class="form-control" id="city" name="city" [(ngModel)]="form.city">
+        </div>
+        <div class="form-group">
+          <label for="street">Street</label>
+          <br />
+          <input type="text" class="form-control" id="street" name="street" [(ngModel)]="form.street">
+        </div>
+        <div class="form-group">
+          <label for="number">Number</label>
+          <br />
+          <input type="text" class="form-control" id="number" name="number" [(ngModel)]="form.number">
+        </div>
+        <div class="form-group">
+          <label for="postalCode">Postal Code</label>
+          <br />
+          <input type="text" class="form-control" id="postalCode" name="postalCode" [(ngModel)]="form.postalCode">
+        </div>
+        <div class="form-group">
+          <label for="pesel">PESEL</label>
+          <br />
+          <input type="text" class="form-control" id="pesel" name="pesel" [(ngModel)]="form.pesel" minlength="11" maxlength="11">
+        </div>
+        <div class="form-group">
+          <label for="karateClubName">Karate Club Name</label>
+          <br />
+          <select class="form-control" id="karateClubName" name="karateClubName" [(ngModel)]="form.karateClubName" required>
+            <option *ngFor="let club of karateClubs" [value]="club">{{ club }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="karateRank">Karate Rank</label>
+          <br />
+          <select class="form-control" id="karateRank" name="karateRank" [(ngModel)]="form.karateRank" required>
+            <option *ngFor="let rank of karateRanks" [value]="rank">{{ rank }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <br />
+          <input type="email" class="form-control" id="email" name="email" [(ngModel)]="form.email" required>
+        </div>
+        <div class="form-group">
+          <label for="password" id="password">Password</label>
+          <br />
+          <input type="password" class="form-control" name="password" [(ngModel)]="form.password" #password="ngModel"
+                 required minlength="6" />
+          <div *ngIf="registerForm.submitted && password.invalid">
+            <div *ngIf="['password.errors?.required']">Password is required</div>
+            <div *ngIf="['password.errors?.minlength']">Password must be at least 6 characters</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <button class="btn btn-primary">Register</button>
+          <div *ngIf="registerForm.submitted && isSignUpFailed" class="alert alert-warning">
+            Signup failed!<br/>{{errorMessage}}
+          </div>
+        </div>
+      </form>
+    </div>
+  </ng-template>
+</div>

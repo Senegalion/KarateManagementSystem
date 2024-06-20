@@ -1,0 +1,40 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  color: #000; /* Set text color to black */
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.training-session {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9; /* Light background color for better contrast */
+  color: #000; /* Ensure text color is black */
+}
+
+.training-session p {
+  margin: 0;
+}
+
+.training-session button {
+  margin-top: 10px;
+  margin-right: 5px;
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+select {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+}

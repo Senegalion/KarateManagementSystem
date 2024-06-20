@@ -1,0 +1,72 @@
+.welcome-container {
+  text-align: center;
+  margin-top: 50px;
+  color: #000000;
+}
+
+.photos-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.photo {
+  width: 200px;
+  height: auto;
+  border-radius: 8px;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+.logged-in-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 50vh;
+}
+
+.image-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.side-photo {
+  width: 300px;
+  height: auto;
+  border-radius: 8px;
+}
+
+.logout-container {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #000000;
+}
+
+.logout-message {
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.btn-logout {
+  padding: 15px 30px;
+  font-size: 1.5em;
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-logout:hover {
+  background-color: #c0392b;
+}

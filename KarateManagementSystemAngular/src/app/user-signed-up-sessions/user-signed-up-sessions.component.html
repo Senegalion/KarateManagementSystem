@@ -1,0 +1,42 @@
+<div class="container">
+  <h2>Training Sessions Calendar</h2>
+  <table class="calendar-table">
+    <thead>
+    <tr>
+      <th *ngFor="let day of days">{{ day }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let week of calendar">
+      <td *ngFor="let day of week" [ngClass]="{'today': isToday(day.date)}">
+        <div class="calendar-day">
+          <span *ngIf="day.date">{{ day.date | date: 'd' }}</span>
+          <div *ngFor="let session of day.sessions" class="calendar-session">
+            <p>{{ session.date | date: 'shortTime' }} - {{ session.description }}</p>
+            <button (click)="viewFeedback(session)" class="btn btn-feedback btn-sm">View Feedback</button>
+<!--            <ng-container *ngIf="isUserSignedUp(session.id!)">-->
+              <ng-container *ngIf="!hasUserFeedback(session.id!); else cannotWithdraw">
+                <button (click)="withdraw(session.id!)" class="btn btn-withdraw btn-sm">Withdraw</button>
+              </ng-container>
+              <ng-template #cannotWithdraw>
+                <p class="cannot-withdraw-msg">You cannot withdraw from this training session anymore.</p>
+              </ng-template>
+<!--            </ng-container>-->
+            <div *ngIf="selectedSession && selectedSession.id === session.id">
+              <h3>Feedback</h3>
+              <div *ngFor="let feedback of session.feedbacks" class="feedback">
+                <p class="feedback-comment">{{ feedback.comment }}</p>
+                <p class="feedback-rating">
+                  <ng-container *ngFor="let star of getStars(feedback.starRating)">
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                  </ng-container>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

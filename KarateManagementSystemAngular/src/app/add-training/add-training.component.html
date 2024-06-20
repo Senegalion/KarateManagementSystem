@@ -1,0 +1,52 @@
+<div class="container">
+  <h2>Add Training Session</h2>
+  <form (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="date">Start Date and Time:</label>
+      <input type="datetime-local" id="date" [(ngModel)]="trainingSession.date" name="date" required>
+    </div>
+    <div class="form-group">
+      <label for="description">Description:</label>
+      <textarea id="description" [(ngModel)]="trainingSession.description" name="description" class="form-control" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Session</button>
+  </form>
+</div>
+
+<div class="container">
+  <h2>Training Sessions Calendar</h2>
+  <table class="calendar-table">
+    <thead>
+    <tr>
+      <th *ngFor="let day of days">{{ day }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let week of calendar">
+      <td *ngFor="let day of week" [ngClass]="{'today': isToday(day.date)}">
+        <div class="calendar-day">
+          <span *ngIf="day.date">{{ day.date | date: 'd' }}</span>
+          <div *ngFor="let session of day.sessions" class="calendar-session">
+            <p>{{ session.date | date: 'shortTime' }} - {{ session.description }}</p>
+            <button (click)="deleteTrainingSession(session.id!)" class="btn btn-danger btn-sm">Delete</button>
+            <button (click)="viewMembers(session)" class="btn btn-info btn-sm">Show Members</button>
+            <div *ngIf="selectedSession && selectedSession.id === session.id">
+              <h3>Members</h3>
+              <div *ngFor="let user of session.users">
+                <p>{{ user.name }} {{ user.surname }} <button (click)="selectUser(user)" class="btn btn-info">Give Feedback</button></p>
+                <div *ngIf="selectedUser && selectedUser.id === user.id">
+                  <textarea [(ngModel)]="feedback.comment" placeholder="Feedback"></textarea>
+                  <select [(ngModel)]="feedback.starRating">
+                    <option *ngFor="let rating of [1, 2, 3, 4, 5]" [value]="rating">{{rating}}</option>
+                  </select>
+                  <button (click)="addFeedback()" class="btn btn-success">Submit Feedback</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

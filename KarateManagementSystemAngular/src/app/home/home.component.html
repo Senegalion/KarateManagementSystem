@@ -1,0 +1,28 @@
+<div class="navLinks">
+  <div *ngIf="info.token != '{}'; else loggedOut">
+    <div class="photos-container">
+      <img src="https://s3.eu-west-2.amazonaws.com/standfirst-designweek-production/uploads/2013/12/Sorry-1002x1430.jpg"
+           alt="Not for you" class="photo">
+    </div>
+    <a class="btn" [routerLink]="['/user']">Go back to User page</a>
+  </div>
+</div>
+<ng-template #loggedOut>
+  <div class="welcome-container">
+    <div class="photos-container">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrsf4fPQ6N-ZN9WlKoSxw_LrIbTGFHP0t_bw&s"
+           alt="Karate" class="photo">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkQXO5kqWXo1NI_TQkTV9vF6VQLHCTCRdBEg&s"
+           alt="Karate" class="photo">
+    </div>
+
+    <h2>Welcome to the Karate Management System</h2>
+    <p>Join us to experience the best Karate training sessions.</p>
+    <p>Login or Sign Up to get started!</p>
+    <div class="navLinks">
+      <a class="btn" [routerLink]="['/auth/login']">Login</a>
+      <a class="btn" [routerLink]="['/signup']">Sign Up</a>
+      <!--      <a class="btn" [routerLink]="['/home']">Home Page</a>-->
+    </div>
+  </div>
+</ng-template>

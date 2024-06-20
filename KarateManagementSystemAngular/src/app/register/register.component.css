@@ -1,0 +1,22 @@
+.form-group {
+  width: 100%;
+  padding: 1px;
+  margin: 1px 0;
+  border: none;
+  border-radius: 4px;
+  background-color: #282c34;
+  color: #ffffff;
+  box-sizing: border-box;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 6px;
+  margin: 5px 0;
+  border: none;
+  border-radius: 4px;
+  background-color: #44bd32;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: bold;
+}

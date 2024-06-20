@@ -1,0 +1,8 @@
+<div>
+  <h2>Feedback for Training Session</h2>
+  <ul>
+    <li *ngFor="let feedback of feedbackList">
+      {{ feedback.comment }} - Rating: {{ feedback.starRating }}
+    </li>
+  </ul>
+</div>

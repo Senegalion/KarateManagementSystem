@@ -1,0 +1,26 @@
+<div class="container">
+  <h2>Admin Dashboard</h2>
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+  <div class="btn-group-container">
+    <div class="btn-group">
+      <button (click)="loadUsers()" class="btn btn-primary">All Users</button>
+      <button (click)="loadUsersByRole()" class="btn btn-info">By Role</button>
+      <button (click)="loadUsersByRank()" class="btn btn-success">By Rank</button>
+    </div>
+  </div>
+  <div *ngIf="users && users.length > 0; else noUsers">
+    <ul class="list-group">
+      <li *ngFor="let user of users" class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <strong>Name:</strong> {{ user?.name }} {{ user?.surname }}<br>
+          <strong>Role:</strong> {{ getUserRoles(user) }}<br>
+          <strong>Rank:</strong> {{ user?.karateRank }}<br>
+        </div>
+        <button (click)="deleteUser(user.id)" class="btn btn-danger">Delete</button>
+      </li>
+    </ul>
+  </div>
+  <ng-template #noUsers>
+    <p>No users available.</p>
+  </ng-template>
+</div>
