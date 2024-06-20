@@ -20,7 +20,7 @@ KarateManagementSystem is a web application that combines a Java Spring backend 
 
 - **Frontend**
   - Angular
-  - HTML, CSS, JavaScript
+  - HTML, CSS, TypeScript
 
 ## Setup and Installation
 
