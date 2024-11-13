@@ -3,9 +3,9 @@ package com.example.karatemanagementsystem.controllers;
 import com.example.karatemanagementsystem.model.Feedback;
 import com.example.karatemanagementsystem.model.TrainingSession;
 import com.example.karatemanagementsystem.model.User;
-import com.example.karatemanagementsystem.repository.FeedbackRepository;
-import com.example.karatemanagementsystem.repository.TrainingSessionRepository;
-import com.example.karatemanagementsystem.repository.UserRepository;
+import com.example.karatemanagementsystem.service.FeedbackService;
+import com.example.karatemanagementsystem.service.TrainingSessionService;
+import com.example.karatemanagementsystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,26 +21,26 @@ import java.util.stream.Collectors;
 @RequestMapping("/users")
 public class UserRESTController {
 
-    private final UserRepository userRepository;
-    private final TrainingSessionRepository trainingSessionRepository;
-    private final FeedbackRepository feedbackRepository;
+    private final UserService userService;
+    private final TrainingSessionService trainingSessionService;
+    private final FeedbackService feedbackService;
 
     @Autowired
-    public UserRESTController(UserRepository userRepository, TrainingSessionRepository trainingSessionRepository, FeedbackRepository feedbackRepository) {
-        this.userRepository = userRepository;
-        this.trainingSessionRepository = trainingSessionRepository;
-        this.feedbackRepository = feedbackRepository;
+    public UserRESTController(UserService userService, TrainingSessionService trainingSessionService, FeedbackService feedbackService) {
+        this.userService = userService;
+        this.trainingSessionService = trainingSessionService;
+        this.feedbackService = feedbackService;
     }
 
     @GetMapping("/trainings")
     public List<TrainingSession> getAvailableTrainingSessions() {
-        return trainingSessionRepository.findAll();
+        return trainingSessionService.getAllTrainingSessions();
     }
 
     @PostMapping("/trainings/{id}/signup")
     public ResponseEntity<?> signUpForTraining(@PathVariable("id") long trainingId) {
         User user = getCurrentUser();
-        TrainingSession trainingSession = trainingSessionRepository.findById(trainingId).orElse(null);
+        TrainingSession trainingSession = trainingSessionService.getTrainingSessionById(trainingId).orElse(null);
         if (trainingSession == null) {
             return new ResponseEntity<>("Training session not found", HttpStatus.NOT_FOUND);
         }
@@ -51,15 +51,15 @@ public class UserRESTController {
 
         trainingSession.getUsers().add(user);
         user.getTrainingSessions().add(trainingSession);
-        userRepository.save(user);
-        trainingSessionRepository.save(trainingSession);
+        userService.saveUser(user);
+        trainingSessionService.saveTrainingSession(trainingSession);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/trainings/{id}/withdraw")
     public ResponseEntity<?> withdrawFromTraining(@PathVariable("id") long trainingId) {
         User user = getCurrentUser();
-        TrainingSession trainingSession = trainingSessionRepository.findById(trainingId).orElse(null);
+        TrainingSession trainingSession = trainingSessionService.getTrainingSessionById(trainingId).orElse(null);
 
         if (trainingSession == null) {
             return new ResponseEntity<>("Training session not found", HttpStatus.NOT_FOUND);
@@ -71,20 +71,20 @@ public class UserRESTController {
 
         trainingSession.getUsers().remove(user);
         user.getTrainingSessions().remove(trainingSession);
-        userRepository.save(user);
-        trainingSessionRepository.save(trainingSession);
+        userService.saveUser(user);
+        trainingSessionService.saveTrainingSession(trainingSession);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/trainings/{id}/feedback")
     public List<Feedback> getFeedbackForTraining(@PathVariable("id") long trainingId) {
         User currentUser = getCurrentUser();
-        TrainingSession trainingSession = trainingSessionRepository.findById(trainingId).orElse(null);
+        TrainingSession trainingSession = trainingSessionService.getTrainingSessionById(trainingId).orElse(null);
         if (trainingSession == null) {
             throw new RuntimeException("Training session not found");
         }
 
-        return feedbackRepository.findByTrainingSession(trainingSession).stream()
+        return feedbackService.getFeedbackByTrainingSession(trainingSession).stream()
                 .filter(feedback -> feedback.getUser().getId().equals(currentUser.getId()))
                 .collect(Collectors.toList());
     }
@@ -103,7 +103,7 @@ public class UserRESTController {
 
     private User getCurrentUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userRepository.findByEmail(userDetails.getUsername())
+        User user = userService.getUserByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         System.out.println("Current user: " + user.getEmail());
         return user;
