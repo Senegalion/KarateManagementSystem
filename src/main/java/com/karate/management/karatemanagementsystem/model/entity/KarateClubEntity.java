@@ -1,6 +1,6 @@
 package com.karate.management.karatemanagementsystem.model.entity;
 
-import com.karate.management.karatemanagementsystem.model.data.KarateClubNames;
+import com.karate.management.karatemanagementsystem.model.data.KarateClubName;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,7 +17,7 @@ public class KarateClubEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "name", unique = true, nullable = false)
-    private KarateClubNames name;
+    private KarateClubName name;
 
     @OneToMany(mappedBy = "karateClub")
     private Set<UserEntity> userEntities;
