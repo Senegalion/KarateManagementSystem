@@ -1,8 +1,5 @@
 package com.karate.management.karatemanagementsystem.model.dto;
 
-import com.karate.management.karatemanagementsystem.model.data.KarateClubName;
-import com.karate.management.karatemanagementsystem.model.data.KarateRank;
-import com.karate.management.karatemanagementsystem.model.entity.RoleName;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.karate.management.karatemanagementsystem.infrastructure.jwt;
+package com.karate.management.karatemanagementsystem.infrastructure.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

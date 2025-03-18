@@ -1,7 +1,10 @@
 package com.karate.management.karatemanagementsystem.controller.rest;
 
+import com.karate.management.karatemanagementsystem.infrastructure.security.jwt.JwtAuthenticatorService;
+import com.karate.management.karatemanagementsystem.model.dto.LoginResponseDto;
 import com.karate.management.karatemanagementsystem.model.dto.RegisterUserDto;
 import com.karate.management.karatemanagementsystem.model.dto.RegistrationResultDto;
+import com.karate.management.karatemanagementsystem.model.dto.TokenRequestDto;
 import com.karate.management.karatemanagementsystem.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthRESTController {
     private final AuthService authService;
+    private final JwtAuthenticatorService jwtAuthenticatorService;
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
@@ -29,5 +33,11 @@ public class AuthRESTController {
                                 registerUserDto.karateRank(), registerUserDto.role(), encodedPassword)
                 );
         return ResponseEntity.status(HttpStatus.CREATED).body(registrationResultDto);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> authenticateAndGenerateToken(@Valid @RequestBody TokenRequestDto tokenRequestDto) {
+        final LoginResponseDto loginResponseDto = jwtAuthenticatorService.authenticateAndGenerateToken(tokenRequestDto);
+        return ResponseEntity.ok(loginResponseDto);
     }
 }

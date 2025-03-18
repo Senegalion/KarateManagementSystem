@@ -2,7 +2,9 @@ package com.karate.management.karatemanagementsystem.service;
 
 import com.karate.management.karatemanagementsystem.model.dto.RegisterUserDto;
 import com.karate.management.karatemanagementsystem.model.dto.RegistrationResultDto;
+import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
 import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
+import com.karate.management.karatemanagementsystem.model.repository.KarateClubRepository;
 import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
 import com.karate.management.karatemanagementsystem.service.exception.InvalidUserCredentialsException;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,6 +26,9 @@ class AuthServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private KarateClubRepository karateClubRepository;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -29,24 +36,26 @@ class AuthServiceTest {
 
     @Test
     void testRegisterUser_withValidData() {
+        // given
         RegisterUserDto validDto = RegisterUserDto.builder()
                 .username("testUser")
-                .karateClubName("DOJO")
-                .karateRank("BLACK")
+                .karateClubName("LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO")
+                .karateRank("KYU_10")
                 .role("USER")
                 .password("password123")
                 .build();
+        KarateClubEntity karateClubEntity = new KarateClubEntity();
+        when(karateClubRepository.findByName(any())).thenReturn(Optional.of(karateClubEntity));
 
         UserEntity savedUser = new UserEntity();
         savedUser.setUserId(1L);
         savedUser.setUsername("testUser");
-
         when(userRepository.save(any(UserEntity.class))).thenReturn(savedUser);
 
-        // When
+        // when
         RegistrationResultDto result = authService.register(validDto);
 
-        // Then
+        // then
         assertNotNull(result);
         assertEquals(1L, result.userId());
         assertEquals("testUser", result.username());
@@ -55,16 +64,16 @@ class AuthServiceTest {
 
     @Test
     void testRegisterUser_withNullUsername() {
-        // Given
+        // given
         RegisterUserDto invalidDto = RegisterUserDto.builder()
                 .username(null)
-                .karateClubName("DOJO")
-                .karateRank("BLACK")
+                .karateClubName("LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO")
+                .karateRank("KYU_10")
                 .role("USER")
                 .password("password123")
                 .build();
 
-        // When + Then
+        // when && then
         InvalidUserCredentialsException exception = assertThrows(InvalidUserCredentialsException.class, () -> {
             authService.register(invalidDto);
         });
@@ -73,16 +82,16 @@ class AuthServiceTest {
 
     @Test
     void testRegisterUser_withInvalidKarateClubName() {
-        // Given
+        // given
         RegisterUserDto invalidDto = RegisterUserDto.builder()
                 .username("testUser")
                 .karateClubName("INVALID_CLUB")
-                .karateRank("BLACK")
+                .karateRank("KYU_10")
                 .role("USER")
                 .password("password123")
                 .build();
 
-        // When + Then
+        // when && then
         InvalidUserCredentialsException exception = assertThrows(InvalidUserCredentialsException.class, () -> {
             authService.register(invalidDto);
         });
@@ -91,16 +100,16 @@ class AuthServiceTest {
 
     @Test
     void testRegisterUser_withInvalidKarateRank() {
-        // Given
+        // given
         RegisterUserDto invalidDto = RegisterUserDto.builder()
                 .username("testUser")
-                .karateClubName("DOJO")
+                .karateClubName("LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO")
                 .karateRank("INVALID_RANK")
                 .role("USER")
                 .password("password123")
                 .build();
 
-        // When + Then
+        // when && then
         InvalidUserCredentialsException exception = assertThrows(InvalidUserCredentialsException.class, () -> {
             authService.register(invalidDto);
         });
@@ -109,16 +118,16 @@ class AuthServiceTest {
 
     @Test
     void testRegisterUser_withInvalidRole() {
-        // Given
+        // given
         RegisterUserDto invalidDto = RegisterUserDto.builder()
                 .username("testUser")
-                .karateClubName("DOJO")
-                .karateRank("BLACK")
+                .karateClubName("LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO")
+                .karateRank("KYU_10")
                 .role("INVALID_ROLE")
                 .password("password123")
                 .build();
 
-        // When + Then
+        // when && then
         InvalidUserCredentialsException exception = assertThrows(InvalidUserCredentialsException.class, () -> {
             authService.register(invalidDto);
         });
@@ -127,16 +136,16 @@ class AuthServiceTest {
 
     @Test
     void testRegisterUser_withNullRole() {
-        // Given
+        // given
         RegisterUserDto invalidDto = RegisterUserDto.builder()
                 .username("testUser")
-                .karateClubName("DOJO")
-                .karateRank("BLACK")
+                .karateClubName("LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO")
+                .karateRank("KYU_10")
                 .role(null)
                 .password("password123")
                 .build();
 
-        // When + Then
+        // when && then
         InvalidUserCredentialsException exception = assertThrows(InvalidUserCredentialsException.class, () -> {
             authService.register(invalidDto);
         });
@@ -145,16 +154,16 @@ class AuthServiceTest {
 
     @Test
     void testRegisterUser_withNullPassword() {
-        // Given
+        // given
         RegisterUserDto invalidDto = RegisterUserDto.builder()
                 .username("testUser")
-                .karateClubName("DOJO")
-                .karateRank("BLACK")
+                .karateClubName("LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO")
+                .karateRank("KYU_10")
                 .role("USER")
                 .password(null)
                 .build();
 
-        // When + Then
+        // when && then
         InvalidUserCredentialsException exception = assertThrows(InvalidUserCredentialsException.class, () -> {
             authService.register(invalidDto);
         });

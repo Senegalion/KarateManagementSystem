@@ -1,7 +1,9 @@
-package com.karate.management.karatemanagementsystem.infrastructure.jwt;
+package com.karate.management.karatemanagementsystem.infrastructure.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.karate.management.karatemanagementsystem.model.dto.LoginResponseDto;
+import com.karate.management.karatemanagementsystem.model.dto.TokenRequestDto;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,19 +15,19 @@ import java.time.*;
 
 @Component
 @AllArgsConstructor
-public class JwtAuthenticator {
+public class JwtAuthenticatorService {
     private final AuthenticationManager authenticationManager;
     private final Clock clock;
     private final JwtConfigurationProperties jwtConfigurationProperties;
 
-    public JwtResponseDto authenticateAndGenerateToken(TokenRequestDto tokenRequestDto) {
+    public LoginResponseDto authenticateAndGenerateToken(TokenRequestDto tokenRequestDto) {
         Authentication authenticate = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(tokenRequestDto.username(), tokenRequestDto.password())
         );
         User user = (User) authenticate.getPrincipal();
         String token = createToken(user);
         String username = user.getUsername();
-        return JwtResponseDto.builder()
+        return LoginResponseDto.builder()
                 .username(username)
                 .token(token)
                 .build();

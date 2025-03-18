@@ -2,6 +2,7 @@ package com.karate.management.karatemanagementsystem.service.mapper;
 
 import com.karate.management.karatemanagementsystem.model.data.KarateClubName;
 import com.karate.management.karatemanagementsystem.model.data.KarateRank;
+import com.karate.management.karatemanagementsystem.model.data.RoleName;
 import com.karate.management.karatemanagementsystem.model.dto.RegisterUserDto;
 import com.karate.management.karatemanagementsystem.model.entity.*;
 import com.karate.management.karatemanagementsystem.model.repository.KarateClubRepository;
@@ -12,9 +13,9 @@ import java.util.Set;
 
 @AllArgsConstructor
 public class UserMapper {
-    private static KarateClubRepository karateClubRepository;
+    private final KarateClubRepository karateClubRepository;
 
-    public static UserEntity mapFromUserDto(RegisterUserDto registerUserDto) {
+    public UserEntity mapFromUserDto(RegisterUserDto registerUserDto) {
         KarateClubEntity karateClubEntity = karateClubRepository.findByName(KarateClubName.valueOf(registerUserDto.karateClubName()))
                 .orElseThrow(() -> new IllegalArgumentException("Karate club not found"));
         RoleName roleName = RoleName.valueOf(registerUserDto.role());

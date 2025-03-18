@@ -1,5 +1,6 @@
-package com.karate.management.karatemanagementsystem.infrastructure.jwt;
+package com.karate.management.karatemanagementsystem.infrastructure.security.jwt;
 
+import com.karate.management.karatemanagementsystem.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,8 +32,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(LoginAndRegisterFacade loginAndRegisterFacade) {
-        return new LoginUserDetailsService(loginAndRegisterFacade);
+    public UserDetailsService userDetailsService(AuthService authService) {
+        return new LoginUserDetailsService(authService);
     }
 
     @Bean
@@ -40,12 +41,12 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .antMatchers("/swagger-ui/**").permitAll()
-                        .antMatchers("/v3/api-docs").permitAll()
-                        .antMatchers("/webjars/**").permitAll()
-                        .antMatchers("/token/**").permitAll()
-                        .antMatchers("/register/**").permitAll()
-                        .antMatchers("/swagger-resources/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs").permitAll()
+                        .requestMatchers("/webjars/**").permitAll()
+                        .requestMatchers("/login/**").permitAll()
+                        .requestMatchers("/register/**").permitAll()
+                        .requestMatchers("/swagger-resources/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

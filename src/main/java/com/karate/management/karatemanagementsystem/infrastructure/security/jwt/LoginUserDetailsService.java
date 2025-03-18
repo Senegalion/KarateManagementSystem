@@ -1,5 +1,6 @@
-package com.karate.management.karatemanagementsystem.infrastructure.jwt;
+package com.karate.management.karatemanagementsystem.infrastructure.security.jwt;
 
+import com.karate.management.karatemanagementsystem.model.dto.UserDto;
 import com.karate.management.karatemanagementsystem.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;

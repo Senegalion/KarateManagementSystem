@@ -1,6 +1,6 @@
 package com.karate.management.karatemanagementsystem;
 
-import com.karate.management.karatemanagementsystem.infrastructure.jwt.JwtConfigurationProperties;
+import com.karate.management.karatemanagementsystem.infrastructure.security.jwt.JwtConfigurationProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

@@ -1,5 +1,6 @@
 package com.karate.management.karatemanagementsystem.model.entity;
 
+import com.karate.management.karatemanagementsystem.model.data.RoleName;
 import jakarta.persistence.*;
 import lombok.Data;
 
