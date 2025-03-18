@@ -17,3 +17,8 @@ spring:
       ddl-auto: update
     show-sql: true
 
+auth:
+  jwt:
+    secretKey: ${JWT_SECRET}
+    expirationDays: 30
+    issuer: karate-management-system-backend
