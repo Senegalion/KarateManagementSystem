@@ -50,12 +50,12 @@ class AuthRESTControllerIT {
     void setUp() {
         postgres.start();
 
-        KarateClubEntity clubEntity = karateClubRepository.findByName(KarateClubName.LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO)
-                .orElseGet(() -> {
-                    KarateClubEntity newClub = new KarateClubEntity();
-                    newClub.setName(KarateClubName.LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO);
-                    return karateClubRepository.saveAndFlush(newClub);
-                });
+        karateClubRepository.deleteAll();
+        karateClubRepository.flush();
+
+        KarateClubEntity clubEntity = new KarateClubEntity();
+        clubEntity.setName(KarateClubName.LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO);
+        karateClubRepository.saveAndFlush(clubEntity);
     }
 
     @AfterEach
@@ -67,6 +67,10 @@ class AuthRESTControllerIT {
     void should_return_201_created_when_user_registers_with_correct_data() throws Exception {
         RegisterUserDto registerUserDto = new RegisterUserDto(
                 "testUser1",
+                "someCity",
+                "someStreet",
+                "1",
+                "12-345",
                 "LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO",
                 "KYU_10",
                 "USER",
@@ -83,7 +87,9 @@ class AuthRESTControllerIT {
     @Test
     void should_return_400_bad_request_when_user_registered_with_invalid_data() throws Exception {
         // given
-        RegisterUserDto invalidUserDto = new RegisterUserDto(null, "INVALID_CLUB", "KYU_10", "USER", "password123");
+        RegisterUserDto invalidUserDto = new RegisterUserDto(null, "someCity",
+                "someStreet", "1", "12-345", "INVALID_CLUB",
+                "KYU_10", "USER", "password123");
 
         // when & then
         mockMvc.perform(post("/auth/register")
@@ -97,6 +103,10 @@ class AuthRESTControllerIT {
         // given
         RegisterUserDto registerUserDto = new RegisterUserDto(
                 "testUser2",
+                "someCity",
+                "someStreet",
+                "1",
+                "12-345",
                 "LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO",
                 "KYU_10",
                 "USER",

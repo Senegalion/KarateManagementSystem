@@ -4,10 +4,7 @@ import com.karate.management.karatemanagementsystem.model.data.KarateClubName;
 import com.karate.management.karatemanagementsystem.model.data.KarateRank;
 import com.karate.management.karatemanagementsystem.model.data.RoleName;
 import com.karate.management.karatemanagementsystem.model.dto.RegisterUserDto;
-import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
-import com.karate.management.karatemanagementsystem.model.entity.RoleEntity;
-import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
-import com.karate.management.karatemanagementsystem.model.entity.UserRoleEntity;
+import com.karate.management.karatemanagementsystem.model.entity.*;
 import com.karate.management.karatemanagementsystem.model.repository.KarateClubRepository;
 import com.karate.management.karatemanagementsystem.service.exception.InvalidUserCredentialsException;
 import lombok.AllArgsConstructor;
@@ -38,6 +35,15 @@ public class UserMapper {
                 .karateRank(KarateRank.valueOf(registerUserDto.karateRank()))
                 .userRoleEntities(userRoleEntities)
                 .password(registerUserDto.password())
+                .addressEntity(AddressEntity.builder()
+                        .city(registerUserDto.city())
+                        .street(registerUserDto.street())
+                        .number(registerUserDto.number())
+                        .postalCode(registerUserDto.postalCode())
+                        .build())
+                .feedbackEntities(new HashSet<>())
+                .userRoleEntities(new HashSet<>())
+                .userTrainingSessionEntities(new HashSet<>())
                 .build();
     }
 }

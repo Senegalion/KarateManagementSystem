@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -27,7 +28,7 @@ public class UserEntity implements UserDetails {
     @Column(name = "username", unique = true, nullable = false)
     private String username;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "karate_club_id")
     private KarateClubEntity karateClub;
 
@@ -38,21 +39,21 @@ public class UserEntity implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @OneToOne(fetch = FetchType.EAGER, mappedBy = "userEntity")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private AddressEntity addressEntity;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userEntity")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FeedbackEntity> feedbackEntities;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userEntity")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRoleEntity> userRoleEntities;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userEntity")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserTrainingSessionEntity> userTrainingSessionEntities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return List.of();
     }
 
     @Override

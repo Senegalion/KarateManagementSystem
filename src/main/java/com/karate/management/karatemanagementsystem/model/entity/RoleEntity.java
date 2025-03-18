@@ -19,6 +19,6 @@ public class RoleEntity {
     @Column(name = "name", unique = true, nullable = false)
     private RoleName name;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "roleEntity")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "roleEntity")
     private Set<UserRoleEntity> userRoleEntities;
 }
