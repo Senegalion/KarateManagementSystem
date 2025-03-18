@@ -6,6 +6,7 @@ import com.karate.management.karatemanagementsystem.model.data.RoleName;
 import com.karate.management.karatemanagementsystem.model.dto.RegisterUserDto;
 import com.karate.management.karatemanagementsystem.model.dto.RegistrationResultDto;
 import com.karate.management.karatemanagementsystem.model.dto.UserDto;
+import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
 import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
 import com.karate.management.karatemanagementsystem.model.repository.KarateClubRepository;
 import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
@@ -14,6 +15,7 @@ import com.karate.management.karatemanagementsystem.service.mapper.UserMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -21,11 +23,17 @@ public class AuthService {
     private final UserRepository userRepository;
     private final KarateClubRepository karateClubRepository;
 
+    @Transactional
     public RegistrationResultDto register(RegisterUserDto registerUserDto) {
         validateRegistrationData(registerUserDto);
 
         UserMapper userMapper = new UserMapper(karateClubRepository);
         UserEntity user = userMapper.mapFromUserDto(registerUserDto);
+        KarateClubEntity karateClub = karateClubRepository.findByName(KarateClubName.valueOf(registerUserDto.karateClubName()))
+                .orElseThrow(() -> new InvalidUserCredentialsException("Karate club not found"));
+
+        user.setKarateClub(karateClub);
+
         UserEntity savedUser = userRepository.save(user);
 
         return RegistrationResultDto.builder()

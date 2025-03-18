@@ -4,8 +4,12 @@ import com.karate.management.karatemanagementsystem.model.data.KarateClubName;
 import com.karate.management.karatemanagementsystem.model.data.KarateRank;
 import com.karate.management.karatemanagementsystem.model.data.RoleName;
 import com.karate.management.karatemanagementsystem.model.dto.RegisterUserDto;
-import com.karate.management.karatemanagementsystem.model.entity.*;
+import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
+import com.karate.management.karatemanagementsystem.model.entity.RoleEntity;
+import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
+import com.karate.management.karatemanagementsystem.model.entity.UserRoleEntity;
 import com.karate.management.karatemanagementsystem.model.repository.KarateClubRepository;
+import com.karate.management.karatemanagementsystem.service.exception.InvalidUserCredentialsException;
 import lombok.AllArgsConstructor;
 
 import java.util.HashSet;
@@ -17,7 +21,7 @@ public class UserMapper {
 
     public UserEntity mapFromUserDto(RegisterUserDto registerUserDto) {
         KarateClubEntity karateClubEntity = karateClubRepository.findByName(KarateClubName.valueOf(registerUserDto.karateClubName()))
-                .orElseThrow(() -> new IllegalArgumentException("Karate club not found"));
+                .orElseThrow(() -> new InvalidUserCredentialsException("Karate club not found"));
         RoleName roleName = RoleName.valueOf(registerUserDto.role());
         RoleEntity roleEntity = new RoleEntity();
         roleEntity.setName(roleName);
