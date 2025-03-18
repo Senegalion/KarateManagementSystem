@@ -1,3 +1,5 @@
+server:
+  port: 8082
 spring:
   application:
     name: KarateManagementSystem
@@ -6,8 +8,9 @@ spring:
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
-    jpa:
-      database-platform: org.hibernate.dialect.PostgreSQLDialect
-      hibernate:
-        ddl-auto: update
-      show-sql: true
+  jpa:
+    open-in-view:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
