@@ -18,15 +18,7 @@ public class AuthService {
     private final UserRepository userRepository;
 
     public RegistrationResultDto register(RegisterUserDto registerUserDto) {
-        if (registerUserDto.username() == null || registerUserDto.password() == null
-                || registerUserDto.karateClubName() == null || registerUserDto.karateRank() == null
-                || registerUserDto.role() == null) {
-            throw new InvalidUserCredentialsException("User data cannot be null");
-        }
-
-        validateKarateClubName(registerUserDto.karateClubName());
-        validateKarateRank(registerUserDto.karateRank());
-        validateRole(registerUserDto.role());
+        validateRegistrationData(registerUserDto);
 
         UserEntity user = UserMapper.mapFromUserDto(registerUserDto);
         UserEntity savedUser = userRepository.save(user);
@@ -35,6 +27,22 @@ public class AuthService {
                 .userId(savedUser.getUserId())
                 .username(registerUserDto.username())
                 .build();
+    }
+
+    private static void validateWhetherRegistrationDataAreNull(RegisterUserDto registerUserDto) {
+        if (registerUserDto.username() == null || registerUserDto.password() == null
+                || registerUserDto.karateClubName() == null || registerUserDto.karateRank() == null
+                || registerUserDto.role() == null) {
+            throw new InvalidUserCredentialsException("User data cannot be null");
+        }
+    }
+
+    private void validateRegistrationData(RegisterUserDto registerUserDto) {
+        validateWhetherRegistrationDataAreNull(registerUserDto);
+
+        validateKarateClubName(registerUserDto.karateClubName());
+        validateKarateRank(registerUserDto.karateRank());
+        validateRole(registerUserDto.role());
     }
 
     private void validateKarateClubName(String karateClubName) {

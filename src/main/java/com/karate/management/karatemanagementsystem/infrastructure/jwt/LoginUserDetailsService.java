@@ -1,5 +1,6 @@
 package com.karate.management.karatemanagementsystem.infrastructure.jwt;
 
+import com.karate.management.karatemanagementsystem.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.User;
@@ -10,11 +11,11 @@ import java.util.Collections;
 
 @AllArgsConstructor
 public class LoginUserDetailsService implements UserDetailsService {
-    private final LoginAndRegisterFacade loginAndRegisterFacade;
+    private final AuthService authService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws BadCredentialsException {
-        UserDto userFound = loginAndRegisterFacade.findByUsername(username);
+        UserDto userFound = authService.findByUsername(username);
         return getUser(userFound);
     }
 
