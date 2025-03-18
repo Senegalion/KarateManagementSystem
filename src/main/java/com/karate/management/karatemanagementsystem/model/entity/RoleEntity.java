@@ -14,8 +14,9 @@ public class RoleEntity {
     @Column(name = "role_id")
     private Long roleId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "name", unique = true, nullable = false)
-    private String name;
+    private RoleName name;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "roleEntity")
     private Set<UserRoleEntity> userRoleEntities;

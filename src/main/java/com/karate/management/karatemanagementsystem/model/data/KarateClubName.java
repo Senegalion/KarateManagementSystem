@@ -1,6 +1,6 @@
 package com.karate.management.karatemanagementsystem.model.data;
 
-public enum KarateClubNames {
+public enum KarateClubName {
     LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO,
     PIASECZYNSKI_KLUB_OKINAWA_SHORIN_RYU_KARATE,
     WOLOMINSKI_KLUB_SHORIN_RYU_KARATE,
