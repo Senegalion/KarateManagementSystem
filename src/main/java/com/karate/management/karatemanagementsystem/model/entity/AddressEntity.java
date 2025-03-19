@@ -1,15 +1,21 @@
 package com.karate.management.karatemanagementsystem.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "addresses")
 public class AddressEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "address_id")
     private Long addressId;
 
     @Column(name = "city", nullable = false)
@@ -25,6 +31,6 @@ public class AddressEntity {
     private String postalCode;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", unique = true)
     private UserEntity userEntity;
 }

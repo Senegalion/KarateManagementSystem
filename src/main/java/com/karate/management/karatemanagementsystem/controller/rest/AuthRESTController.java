@@ -29,8 +29,12 @@ public class AuthRESTController {
         String encodedPassword = passwordEncoder.encode(registerUserDto.password());
         RegistrationResultDto registrationResultDto =
                 authService.register(
-                        new RegisterUserDto(registerUserDto.username(), registerUserDto.karateClubName(),
-                                registerUserDto.karateRank(), registerUserDto.role(), encodedPassword)
+                        new RegisterUserDto(
+                                registerUserDto.username(), registerUserDto.city(),
+                                registerUserDto.street(), registerUserDto.number(),
+                                registerUserDto.postalCode(), registerUserDto.karateClubName(),
+                                registerUserDto.karateRank(), registerUserDto.role(), encodedPassword
+                        )
                 );
         return ResponseEntity.status(HttpStatus.CREATED).body(registrationResultDto);
     }

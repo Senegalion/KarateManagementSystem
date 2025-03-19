@@ -9,6 +9,18 @@ public record RegisterUserDto(
         @NotNull(message = "{username.not.null}")
         @NotEmpty(message = "{username.not.empty}")
         String username,
+        @NotNull(message = "{city.not.null}")
+        @NotEmpty(message = "{city.not.empty}")
+        String city,
+        @NotNull(message = "{street.not.null}")
+        @NotEmpty(message = "{street.not.empty}")
+        String street,
+        @NotNull(message = "{number.not.null}")
+        @NotEmpty(message = "{number.not.empty}")
+        String number,
+        @NotNull(message = "{postalCode.not.null}")
+        @NotEmpty(message = "{postalCode.not.empty}")
+        String postalCode,
         @NotNull(message = "{karateClubName.not.null}")
         @NotEmpty(message = "{karateClubName.not.empty}")
         String karateClubName,

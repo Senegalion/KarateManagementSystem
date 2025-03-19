@@ -19,15 +19,15 @@ public class TrainingSessionEntity {
     @Column(name = "training_session_id")
     private Long trainingSessionId;
 
-    @Column(name = "username", nullable = false)
+    @Column(name = "date", nullable = false)
     private LocalDateTime date;
 
     @Column(name = "description", nullable = false)
     private String description;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "trainingSessionEntity")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "trainingSessionEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FeedbackEntity> feedbackEntities;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "trainingSessionEntity")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "trainingSessionEntity")
     private Set<UserTrainingSessionEntity> userTrainingSessionEntities;
 }
