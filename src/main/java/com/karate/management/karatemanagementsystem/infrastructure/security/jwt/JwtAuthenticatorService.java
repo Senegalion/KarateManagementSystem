@@ -8,10 +8,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.time.*;
+import java.util.List;
 
 @Component
 @AllArgsConstructor
@@ -39,9 +41,12 @@ public class JwtAuthenticatorService {
         Instant now = LocalDateTime.now(clock).toInstant(ZoneOffset.UTC);
         Instant expiresAt = now.plus(Duration.ofDays(jwtConfigurationProperties.expirationDays()));
         String issuer = jwtConfigurationProperties.issuer();
+        List<String> roles = user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
         return JWT.create()
                 .withSubject(user.getUsername())
-                .withClaim("role", "admin")
+                .withClaim("role", roles)
                 .withIssuedAt(now)
                 .withExpiresAt(expiresAt)
                 .withIssuer(issuer)

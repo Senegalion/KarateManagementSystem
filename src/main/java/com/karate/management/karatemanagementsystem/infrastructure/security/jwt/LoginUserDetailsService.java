@@ -4,11 +4,14 @@ import com.karate.management.karatemanagementsystem.model.dto.UserDto;
 import com.karate.management.karatemanagementsystem.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class LoginUserDetailsService implements UserDetailsService {
@@ -21,10 +24,14 @@ public class LoginUserDetailsService implements UserDetailsService {
     }
 
     private User getUser(UserDto userDto) {
+        List<GrantedAuthority> authorities = userDto.roles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .collect(Collectors.toList());
+
         return new User(
                 userDto.username(),
                 userDto.password(),
-                Collections.emptyList()
+                authorities
         );
     }
 }

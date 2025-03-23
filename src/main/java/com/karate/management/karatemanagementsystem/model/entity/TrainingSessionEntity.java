@@ -28,6 +28,6 @@ public class TrainingSessionEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "trainingSessionEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FeedbackEntity> feedbackEntities;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "trainingSessionEntity")
-    private Set<UserTrainingSessionEntity> userTrainingSessionEntities;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "trainingSessionEntities")
+    private Set<UserEntity> userEntities;
 }

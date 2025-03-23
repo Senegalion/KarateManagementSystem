@@ -2,9 +2,12 @@ package com.karate.management.karatemanagementsystem.service;
 
 import com.karate.management.karatemanagementsystem.model.dto.RegisterUserDto;
 import com.karate.management.karatemanagementsystem.model.dto.RegistrationResultDto;
+import com.karate.management.karatemanagementsystem.model.dto.UserDto;
 import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
+import com.karate.management.karatemanagementsystem.model.entity.RoleEntity;
 import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
 import com.karate.management.karatemanagementsystem.model.repository.KarateClubRepository;
+import com.karate.management.karatemanagementsystem.model.repository.RoleRepository;
 import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
 import com.karate.management.karatemanagementsystem.service.exception.InvalidUserCredentialsException;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,6 +32,9 @@ class AuthServiceTest {
 
     @Mock
     private KarateClubRepository karateClubRepository;
+
+    @Mock
+    private RoleRepository roleRepository;
 
     @BeforeEach
     void setUp() {
@@ -45,11 +52,14 @@ class AuthServiceTest {
                 .password("password123")
                 .build();
         KarateClubEntity karateClubEntity = new KarateClubEntity();
+        RoleEntity roleEntity = new RoleEntity();
         when(karateClubRepository.findByName(any())).thenReturn(Optional.of(karateClubEntity));
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(roleEntity));
 
         UserEntity savedUser = new UserEntity();
         savedUser.setUserId(1L);
         savedUser.setUsername("testUser");
+        savedUser.setRoleEntities(Set.of());
         when(userRepository.save(any(UserEntity.class))).thenReturn(savedUser);
 
         // when
@@ -168,5 +178,24 @@ class AuthServiceTest {
             authService.register(invalidDto);
         });
         assertEquals("User data cannot be null", exception.getMessage());
+    }
+
+    @Test
+    void testFindByUsername_withExistingUser() {
+        // given
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUserId(1L);
+        userEntity.setUsername("testUser");
+        userEntity.setPassword("password123");
+        userEntity.setRoleEntities(Set.of());
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(userEntity));
+
+        // when
+        UserDto result = authService.findByUsername("testUser");
+
+        // then
+        assertNotNull(result);
+        assertEquals("testUser", result.username());
+        assertEquals("password123", result.password());
     }
 }
