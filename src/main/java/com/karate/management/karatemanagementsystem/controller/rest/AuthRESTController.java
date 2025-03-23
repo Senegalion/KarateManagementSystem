@@ -1,10 +1,7 @@
 package com.karate.management.karatemanagementsystem.controller.rest;
 
 import com.karate.management.karatemanagementsystem.infrastructure.security.jwt.JwtAuthenticatorService;
-import com.karate.management.karatemanagementsystem.model.dto.LoginResponseDto;
-import com.karate.management.karatemanagementsystem.model.dto.RegisterUserDto;
-import com.karate.management.karatemanagementsystem.model.dto.RegistrationResultDto;
-import com.karate.management.karatemanagementsystem.model.dto.TokenRequestDto;
+import com.karate.management.karatemanagementsystem.model.dto.*;
 import com.karate.management.karatemanagementsystem.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -41,6 +38,7 @@ public class AuthRESTController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> authenticateAndGenerateToken(@Valid @RequestBody TokenRequestDto tokenRequestDto) {
+        UserDto byUsername = authService.findByUsername(tokenRequestDto.username());
         final LoginResponseDto loginResponseDto = jwtAuthenticatorService.authenticateAndGenerateToken(tokenRequestDto);
         return ResponseEntity.ok(loginResponseDto);
     }

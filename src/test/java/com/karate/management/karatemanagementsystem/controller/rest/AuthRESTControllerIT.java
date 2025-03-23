@@ -2,10 +2,13 @@ package com.karate.management.karatemanagementsystem.controller.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karate.management.karatemanagementsystem.model.data.KarateClubName;
+import com.karate.management.karatemanagementsystem.model.data.RoleName;
 import com.karate.management.karatemanagementsystem.model.dto.RegisterUserDto;
 import com.karate.management.karatemanagementsystem.model.dto.TokenRequestDto;
 import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
+import com.karate.management.karatemanagementsystem.model.entity.RoleEntity;
 import com.karate.management.karatemanagementsystem.model.repository.KarateClubRepository;
+import com.karate.management.karatemanagementsystem.model.repository.RoleRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +43,9 @@ class AuthRESTControllerIT {
     @Autowired
     private KarateClubRepository karateClubRepository;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
     @Container
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:15.12"))
             .withDatabaseName("testdb")
@@ -49,14 +55,27 @@ class AuthRESTControllerIT {
     @BeforeEach
     void setUp() {
         postgres.start();
-
         karateClubRepository.deleteAll();
         karateClubRepository.flush();
 
         KarateClubEntity clubEntity = new KarateClubEntity();
         clubEntity.setName(KarateClubName.LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO);
         karateClubRepository.saveAndFlush(clubEntity);
+
+        roleRepository.deleteAll();
+        roleRepository.flush();
+
+        RoleEntity userRole = new RoleEntity();
+        userRole.setName(RoleName.ROLE_USER);
+        roleRepository.save(userRole);
+
+        RoleEntity adminRole = new RoleEntity();
+        adminRole.setName(RoleName.ROLE_ADMIN);
+        roleRepository.save(adminRole);
+
+        roleRepository.flush();
     }
+
 
     @AfterEach
     void tearDown() {
@@ -65,6 +84,7 @@ class AuthRESTControllerIT {
 
     @Test
     void should_return_201_created_when_user_registers_with_correct_data() throws Exception {
+        // given
         RegisterUserDto registerUserDto = new RegisterUserDto(
                 "testUser1",
                 "someCity",
@@ -77,6 +97,7 @@ class AuthRESTControllerIT {
                 "password123"
         );
 
+        // when & then
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerUserDto)))

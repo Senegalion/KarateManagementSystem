@@ -7,32 +7,43 @@ import com.karate.management.karatemanagementsystem.model.dto.RegisterUserDto;
 import com.karate.management.karatemanagementsystem.model.dto.RegistrationResultDto;
 import com.karate.management.karatemanagementsystem.model.dto.UserDto;
 import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
+import com.karate.management.karatemanagementsystem.model.entity.RoleEntity;
 import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
 import com.karate.management.karatemanagementsystem.model.repository.KarateClubRepository;
+import com.karate.management.karatemanagementsystem.model.repository.RoleRepository;
 import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
 import com.karate.management.karatemanagementsystem.service.exception.InvalidUserCredentialsException;
 import com.karate.management.karatemanagementsystem.service.mapper.UserMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
     private final KarateClubRepository karateClubRepository;
+    private final RoleRepository roleRepository;
 
     @Transactional
     public RegistrationResultDto register(RegisterUserDto registerUserDto) {
         validateRegistrationData(registerUserDto);
 
-        UserMapper userMapper = new UserMapper(karateClubRepository);
-        UserEntity user = userMapper.mapFromUserDto(registerUserDto);
         KarateClubEntity karateClub = karateClubRepository.findByName(KarateClubName.valueOf(registerUserDto.karateClubName()))
                 .orElseThrow(() -> new InvalidUserCredentialsException("Karate club not found"));
 
+        RoleEntity roleEntity = roleRepository.findByName(RoleName.valueOf("ROLE_" + registerUserDto.role().toUpperCase()))
+                .orElseThrow(() -> new InvalidUserCredentialsException("Role not found"));
+
+        UserMapper userMapper = new UserMapper(karateClubRepository, roleRepository);
+        UserEntity user = userMapper.mapFromUserDto(registerUserDto);
         user.setKarateClub(karateClub);
+
+        user.getRoleEntities().add(roleEntity);
 
         UserEntity savedUser = userRepository.save(user);
 
@@ -76,15 +87,26 @@ public class AuthService {
 
     private void validateRole(String role) {
         try {
-            RoleName.valueOf(role);
+            RoleName.valueOf("ROLE_" + role.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new InvalidUserCredentialsException(String.format("Invalid Role: [%s]", role));
         }
     }
 
+    @Transactional
     public UserDto findByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .map(user -> new UserDto(user.getUserId(), user.getUsername(), user.getPassword()))
-                .orElseThrow(() -> new BadCredentialsException("User not found"));
+        UserEntity userEntity = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        Set<RoleName> roles = userEntity.getRoleEntities().stream()
+                .map(RoleEntity::getName)
+                .collect(Collectors.toSet());
+
+        return new UserDto(
+                userEntity.getUserId(),
+                userEntity.getUsername(),
+                userEntity.getPassword(),
+                roles
+        );
     }
 }

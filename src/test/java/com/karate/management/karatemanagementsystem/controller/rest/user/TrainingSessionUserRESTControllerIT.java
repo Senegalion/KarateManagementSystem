@@ -3,6 +3,7 @@ package com.karate.management.karatemanagementsystem.controller.rest.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karate.management.karatemanagementsystem.model.entity.TrainingSessionEntity;
 import com.karate.management.karatemanagementsystem.model.repository.TrainingSessionRepository;
+import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
 import com.karate.management.karatemanagementsystem.service.TrainingSessionService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -41,6 +42,9 @@ class TrainingSessionUserRESTControllerIT {
 
     @Autowired
     private TrainingSessionRepository trainingSessionRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private TrainingSessionService trainingSessionService;
@@ -94,4 +98,26 @@ class TrainingSessionUserRESTControllerIT {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
+
+//    @Test
+//    @WithMockUser()
+//    void should_return_200_ok_and_current_user_details_when_user_is_authenticated() throws Exception {
+//        // given & when & then
+//        mockMvc.perform(get("/users/me")
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.username").value("testUser"));
+//    }
+//
+//    @Test
+//    @WithMockUser(username = "unknownUser")
+//    void should_throw_username_not_found_exception_when_user_does_not_exist() throws Exception {
+//        // given
+//        userRepository.deleteAll();
+//
+//        // when & then
+//        mockMvc.perform(get("/users/me")
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isNotFound());
+//    }
 }
