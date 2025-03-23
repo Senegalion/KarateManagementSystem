@@ -1,5 +1,6 @@
 package com.karate.management.karatemanagementsystem.controller.rest;
 
+import com.karate.management.karatemanagementsystem.controller.exception.UsernameWhileTryingToLogInNotFoundException;
 import com.karate.management.karatemanagementsystem.infrastructure.security.jwt.JwtAuthenticatorService;
 import com.karate.management.karatemanagementsystem.model.dto.*;
 import com.karate.management.karatemanagementsystem.service.AuthService;
@@ -7,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,9 +39,13 @@ public class AuthRESTController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> authenticateAndGenerateToken(@Valid @RequestBody TokenRequestDto tokenRequestDto) {
-        UserDto byUsername = authService.findByUsername(tokenRequestDto.username());
-        final LoginResponseDto loginResponseDto = jwtAuthenticatorService.authenticateAndGenerateToken(tokenRequestDto);
-        return ResponseEntity.ok(loginResponseDto);
+    public ResponseEntity<LoginResponseDto> authenticateAndGenerateToken(@Valid @RequestBody TokenRequestDto tokenRequestDto) throws UsernameWhileTryingToLogInNotFoundException {
+        try {
+            UserDto byUsername = authService.findByUsername(tokenRequestDto.username());
+            final LoginResponseDto loginResponseDto = jwtAuthenticatorService.authenticateAndGenerateToken(tokenRequestDto);
+            return ResponseEntity.ok(loginResponseDto);
+        } catch (UsernameNotFoundException exception) {
+            throw new UsernameWhileTryingToLogInNotFoundException("Invalid username or password");
+        }
     }
 }
