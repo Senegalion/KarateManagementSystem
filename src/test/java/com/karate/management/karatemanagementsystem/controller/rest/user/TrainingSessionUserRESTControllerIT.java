@@ -136,8 +136,8 @@ class TrainingSessionUserRESTControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "testUser")
-    void shouldRegisterUserToTrainingSession() throws Exception {
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_return_ok_200_when_user_registers_for_training_session() throws Exception {
         // given
         UserEntity testUser = new UserEntity();
         testUser.setUsername("testuser");
@@ -157,5 +157,43 @@ class TrainingSessionUserRESTControllerIT {
         Optional<UserEntity> updatedUser = userRepository.findById(testUser.getUserId());
         assertThat(updatedUser).isPresent();
         assertThat(updatedUser.get().getTrainingSessionEntities()).contains(testSession);
+    }
+
+    @Test
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_return_404_not_found_when_user_tries_to_register_for_training_session_that_has_not_been_found() throws Exception {
+        // given
+        long nonExistingSessionId = 999L;
+
+        // when & then
+        mockMvc.perform(post("/users/trainings/signup/{sessionId}", nonExistingSessionId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Training session not found"));
+    }
+
+    @Test
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_return_409_conflict_when_user_tries_to_register_for_training_session_that_has_earlier_registered() throws Exception {
+        // given
+        UserEntity testUser = new UserEntity();
+        testUser.setUsername("testUser");
+        testUser.setPassword("password");
+        testUser = userRepository.save(testUser);
+
+        TrainingSessionEntity testSession = new TrainingSessionEntity();
+        testSession.setDate(LocalDateTime.now().plusDays(1));
+        testSession.setDescription("Test Training Session");
+        testSession.getUserEntities().add(testUser);
+        testUser.getTrainingSessionEntities().add(testSession);
+
+        trainingSessionRepository.save(testSession);
+        userRepository.save(testUser);
+
+        // when & then
+        mockMvc.perform(post("/users/trainings/signup/{sessionId}", testSession.getTrainingSessionId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict())
+                .andExpect(content().string("User is already signed up for this session"));
     }
 }
