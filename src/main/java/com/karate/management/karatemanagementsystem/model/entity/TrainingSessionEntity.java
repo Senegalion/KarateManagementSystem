@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -29,5 +30,5 @@ public class TrainingSessionEntity {
     private Set<FeedbackEntity> feedbackEntities;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "trainingSessionEntities")
-    private Set<UserEntity> userEntities;
+    private Set<UserEntity> userEntities = new HashSet<>();
 }

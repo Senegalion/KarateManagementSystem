@@ -1,6 +1,7 @@
 package com.karate.management.karatemanagementsystem.controller.exception;
 
 import com.karate.management.karatemanagementsystem.service.exception.TrainingSessionNotFoundException;
+import com.karate.management.karatemanagementsystem.service.exception.UserAlreadySignedUpException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +13,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @Slf4j
 public class GlobalExceptionHandler {
     @ExceptionHandler(TrainingSessionNotFoundException.class)
-    public ResponseEntity<String> handleEmptyResultDataAccessException(TrainingSessionNotFoundException ex) {
+    public ResponseEntity<String> handleTrainingSessionNotFoundException(TrainingSessionNotFoundException ex) {
         log.error("No training sessions found: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No training sessions found");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Training session not found");
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
@@ -27,5 +28,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleUsernameNotFoundWhileTryingToLogInException(UsernameWhileTryingToLogInNotFoundException ex) {
         log.error("Username does not exist in database: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Username does not exist");
+    }
+
+    @ExceptionHandler(UserAlreadySignedUpException.class)
+    public ResponseEntity<String> handleUserAlreadySignedUpException(UserAlreadySignedUpException ex) {
+        log.error("Username has already signed up to this training session: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("User is already signed up for this session");
     }
 }
