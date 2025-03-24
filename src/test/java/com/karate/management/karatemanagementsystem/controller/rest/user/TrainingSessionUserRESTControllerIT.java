@@ -1,10 +1,6 @@
 package com.karate.management.karatemanagementsystem.controller.rest.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.karate.management.karatemanagementsystem.model.data.KarateClubName;
-import com.karate.management.karatemanagementsystem.model.data.KarateRank;
-import com.karate.management.karatemanagementsystem.model.entity.AddressEntity;
-import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
 import com.karate.management.karatemanagementsystem.model.entity.TrainingSessionEntity;
 import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
 import com.karate.management.karatemanagementsystem.model.repository.TrainingSessionRepository;
@@ -27,9 +23,12 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -134,5 +133,29 @@ class TrainingSessionUserRESTControllerIT {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Username does not exist"));
+    }
+
+    @Test
+    @WithMockUser(username = "testUser")
+    void shouldRegisterUserToTrainingSession() throws Exception {
+        // given
+        UserEntity testUser = new UserEntity();
+        testUser.setUsername("testuser");
+        testUser.setPassword("password");
+        testUser = userRepository.save(testUser);
+
+        TrainingSessionEntity testSession = new TrainingSessionEntity();
+        testSession.setDate(LocalDateTime.now().plusDays(1));
+        testSession.setDescription("Test Training Session");
+        testSession = trainingSessionRepository.save(testSession);
+
+        // when & then
+        mockMvc.perform(post("/users/trainings/signup/{sessionId}", testSession.getTrainingSessionId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Optional<UserEntity> updatedUser = userRepository.findById(testUser.getUserId());
+        assertThat(updatedUser).isPresent();
+        assertThat(updatedUser.get().getTrainingSessionEntities()).contains(testSession);
     }
 }
