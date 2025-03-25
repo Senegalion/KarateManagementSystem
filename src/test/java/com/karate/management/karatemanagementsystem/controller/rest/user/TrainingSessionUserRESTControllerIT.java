@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -108,7 +109,7 @@ class TrainingSessionUserRESTControllerIT {
         mockMvc.perform(get("/users/trainings")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Training session not found"));
+                .andExpect(content().string("No training sessions found"));
     }
 
     @Test
@@ -130,7 +131,7 @@ class TrainingSessionUserRESTControllerIT {
 
     @Test
     @WithMockUser(username = "unknownUser", roles = "USER")
-    void should_throw_username_not_found_exception_when_user_does_not_exist() throws Exception {
+    void should_return_404_not_found_and_throw_username_not_found_exception_when_user_does_not_exist() throws Exception {
         // given
         userRepository.deleteAll();
 
@@ -303,4 +304,56 @@ class TrainingSessionUserRESTControllerIT {
                 .andExpect(status().isConflict())
                 .andExpect(content().string("User has not been signed up for this session"));
     }
+
+    @Test
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_return_200_ok_and_user_training_sessions_when_sessions_exist() throws Exception {
+        // given
+        UserEntity testUser = new UserEntity();
+        testUser.setUsername("testUser");
+        testUser.setPassword("password");
+        userRepository.save(testUser);
+
+        TrainingSessionEntity session1 = new TrainingSessionEntity();
+        session1.setDescription("User's Session 1");
+        session1.setDate(LocalDateTime.of(2025, 3, 18, 20, 0, 0));
+        session1.getUserEntities().add(testUser);
+
+        TrainingSessionEntity session2 = new TrainingSessionEntity();
+        session2.setDescription("User's Session 2");
+        session2.setDate(LocalDateTime.of(2025, 3, 20, 20, 0, 0));
+        session2.getUserEntities().add(testUser);
+
+        trainingSessionRepository.saveAll(List.of(session1, session2));
+
+        testUser.getTrainingSessionEntities().add(session1);
+        testUser.getTrainingSessionEntities().add(session2);
+        userRepository.save(testUser);
+
+        // when & then
+        mockMvc.perform(get("/users/trainings/my")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2))) // Check the array size
+                .andExpect(jsonPath("$[*].description", containsInAnyOrder("User's Session 1", "User's Session 2"))) // Order doesn't matter
+                .andExpect(jsonPath("$[*].date", containsInAnyOrder("2025-03-18T20:00:00", "2025-03-20T20:00:00"))) // Order doesn't matter
+                .andExpect(header().string("Content-Type", "application/json"));
+    }
+
+    @Test
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_return_404_not_found_when_user_has_no_training_sessions() throws Exception {
+        // given
+        UserEntity testUser = new UserEntity();
+        testUser.setUsername("testUser");
+        testUser.setPassword("password");
+        userRepository.save(testUser);
+
+        // when & then
+        mockMvc.perform(get("/users/trainings/my")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("No training sessions found"));
+    }
+
 }

@@ -21,7 +21,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -177,5 +179,53 @@ class TrainingSessionServiceTest {
 
         // when & then
         assertThrows(UserNotSignedUpException.class, () -> trainingSessionService.withdrawFromTrainingSession(1L));
+    }
+
+    @Test
+    void should_return_user_training_sessions() {
+        // given
+        UserEntity user = new UserEntity();
+        user.setUsername("testUser");
+
+        TrainingSessionEntity session1 = new TrainingSessionEntity();
+        session1.setTrainingSessionId(1L);
+        session1.setDescription("Session 1");
+        LocalDateTime date1 = LocalDateTime.of(2025, 3, 18, 20, 0, 0);
+        session1.setDate(date1);
+
+        TrainingSessionEntity session2 = new TrainingSessionEntity();
+        session2.setTrainingSessionId(2L);
+        session2.setDescription("Session 2");
+        LocalDateTime date2 = LocalDateTime.of(2025, 3, 20, 20, 0, 0);
+        session2.setDate(date2);
+
+        user.setTrainingSessionEntities(Set.of(session1, session2));
+
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+
+        // when
+        List<TrainingSessionDto> result = trainingSessionService.getUserTrainingSessions();
+
+        // then
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertThat(result)
+                .containsExactlyInAnyOrder(
+                        new TrainingSessionDto(1L, date1, "Session 1"),
+                        new TrainingSessionDto(2L, date2, "Session 2")
+                );
+    }
+
+    @Test
+    void should_return_empty_set_when_user_has_not_signed_up_for_any_training_session() {
+        // given
+        UserEntity user = new UserEntity();
+        user.setUsername("testUser");
+        user.setTrainingSessionEntities(Set.of());
+
+        when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(user));
+
+        // when & then
+        assertThrows(TrainingSessionNotFoundException.class, () -> trainingSessionService.getUserTrainingSessions());
     }
 }

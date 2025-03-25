@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -36,6 +37,21 @@ public class TrainingSessionService {
         return trainingSessions.stream()
                 .map(TrainingSessionMapper::mapToTrainingSessionDto)
                 .toList();
+    }
+
+    @Transactional
+    public List<TrainingSessionDto> getUserTrainingSessions() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (user.getTrainingSessionEntities().isEmpty()) {
+            throw new TrainingSessionNotFoundException("No training sessions found");
+        }
+        return user.getTrainingSessionEntities().stream()
+                .map(TrainingSessionMapper::mapToTrainingSessionDto)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -91,5 +107,4 @@ public class TrainingSessionService {
                 .description(session.getDescription())
                 .build();
     }
-
 }
