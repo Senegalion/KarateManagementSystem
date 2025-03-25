@@ -1,6 +1,7 @@
 package com.karate.management.karatemanagementsystem.controller.rest.user;
 
 import com.karate.management.karatemanagementsystem.model.dto.trainingsession.TrainingSessionDto;
+import com.karate.management.karatemanagementsystem.model.dto.trainingsession.TrainingSessionRegistrationResponseDto;
 import com.karate.management.karatemanagementsystem.model.dto.user.UserDetailsDto;
 import com.karate.management.karatemanagementsystem.service.user.TrainingSessionService;
 import com.karate.management.karatemanagementsystem.service.user.UserService;

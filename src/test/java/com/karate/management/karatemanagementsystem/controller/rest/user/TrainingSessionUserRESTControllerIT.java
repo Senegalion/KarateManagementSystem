@@ -1,6 +1,7 @@
 package com.karate.management.karatemanagementsystem.controller.rest.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.karate.management.karatemanagementsystem.model.dto.trainingsession.TrainingSessionRegistrationResponseDto;
 import com.karate.management.karatemanagementsystem.model.entity.TrainingSessionEntity;
 import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
 import com.karate.management.karatemanagementsystem.model.repository.TrainingSessionRepository;
