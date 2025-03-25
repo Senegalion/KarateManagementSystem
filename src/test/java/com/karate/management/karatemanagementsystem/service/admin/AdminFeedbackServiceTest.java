@@ -21,7 +21,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class FeedbackServiceTest {
+class AdminFeedbackServiceTest {
     @Mock
     private UserRepository userRepository;
 
@@ -32,7 +32,7 @@ class FeedbackServiceTest {
     private FeedbackRepository feedbackRepository;
 
     @InjectMocks
-    private FeedbackService feedbackService;
+    private AdminFeedbackService adminFeedbackService;
 
     private UserEntity user;
     private TrainingSessionEntity session;
@@ -62,7 +62,7 @@ class FeedbackServiceTest {
         when(feedbackRepository.save(any(FeedbackEntity.class))).thenReturn(new FeedbackEntity(1L, user, session, "Great session!", 5));
 
         // when
-        FeedbackResponseDto feedbackResponse = feedbackService.addFeedbackToUserForTrainingSession(1L, 1L, feedbackRequestDto);
+        FeedbackResponseDto feedbackResponse = adminFeedbackService.addFeedbackToUserForTrainingSession(1L, 1L, feedbackRequestDto);
 
         // then
         assertNotNull(feedbackResponse);
@@ -79,7 +79,7 @@ class FeedbackServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(UsernameNotFoundException.class, () -> feedbackService.addFeedbackToUserForTrainingSession(1L, 1L, feedbackRequestDto));
+        assertThrows(UsernameNotFoundException.class, () -> adminFeedbackService.addFeedbackToUserForTrainingSession(1L, 1L, feedbackRequestDto));
     }
 
     @Test
@@ -91,7 +91,7 @@ class FeedbackServiceTest {
         when(trainingSessionRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(TrainingSessionNotFoundException.class, () -> feedbackService.addFeedbackToUserForTrainingSession(1L, 1L, feedbackRequestDto));
+        assertThrows(TrainingSessionNotFoundException.class, () -> adminFeedbackService.addFeedbackToUserForTrainingSession(1L, 1L, feedbackRequestDto));
     }
 
     @Test
@@ -105,6 +105,6 @@ class FeedbackServiceTest {
         when(trainingSessionRepository.findById(2L)).thenReturn(Optional.of(sessionNotEnrolled));
 
         // when & then
-        assertThrows(TrainingSessionNotFoundException.class, () -> feedbackService.addFeedbackToUserForTrainingSession(1L, 2L, feedbackRequestDto));
+        assertThrows(TrainingSessionNotFoundException.class, () -> adminFeedbackService.addFeedbackToUserForTrainingSession(1L, 2L, feedbackRequestDto));
     }
 }

@@ -1,9 +1,11 @@
 package com.karate.management.karatemanagementsystem.controller.rest.user;
 
+import com.karate.management.karatemanagementsystem.model.dto.feedback.FeedbackResponseDto;
 import com.karate.management.karatemanagementsystem.model.dto.trainingsession.TrainingSessionDto;
 import com.karate.management.karatemanagementsystem.model.dto.trainingsession.TrainingSessionRegistrationResponseDto;
 import com.karate.management.karatemanagementsystem.model.dto.user.UserDetailsDto;
 import com.karate.management.karatemanagementsystem.service.user.TrainingSessionService;
+import com.karate.management.karatemanagementsystem.service.user.UserFeedbackService;
 import com.karate.management.karatemanagementsystem.service.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,9 +17,10 @@ import java.util.List;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/users")
-public class TrainingSessionUserRESTController {
+public class UserRESTController {
     private final TrainingSessionService trainingSessionService;
     private final UserService userService;
+    private final UserFeedbackService userFeedbackService;
 
     @GetMapping("/me")
     public ResponseEntity<UserDetailsDto> getCurrentUserInfo() {
@@ -49,5 +52,11 @@ public class TrainingSessionUserRESTController {
         TrainingSessionRegistrationResponseDto trainingSessionRegistrationResponseDto =
                 trainingSessionService.withdrawFromTrainingSession(sessionId);
         return ResponseEntity.ok(trainingSessionRegistrationResponseDto);
+    }
+
+    @GetMapping("/trainings/{sessionId}/feedback")
+    public ResponseEntity<FeedbackResponseDto> getFeedbackForTrainingSession(@PathVariable Long sessionId) {
+        FeedbackResponseDto feedbackResponse = userFeedbackService.getFeedbackForSession(sessionId);
+        return ResponseEntity.ok(feedbackResponse);
     }
 }

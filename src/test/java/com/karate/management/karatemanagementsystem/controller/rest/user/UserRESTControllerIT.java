@@ -1,9 +1,12 @@
 package com.karate.management.karatemanagementsystem.controller.rest.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.karate.management.karatemanagementsystem.model.dto.feedback.FeedbackResponseDto;
 import com.karate.management.karatemanagementsystem.model.dto.trainingsession.TrainingSessionRegistrationResponseDto;
+import com.karate.management.karatemanagementsystem.model.entity.FeedbackEntity;
 import com.karate.management.karatemanagementsystem.model.entity.TrainingSessionEntity;
 import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
+import com.karate.management.karatemanagementsystem.model.repository.FeedbackRepository;
 import com.karate.management.karatemanagementsystem.model.repository.TrainingSessionRepository;
 import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
 import org.junit.jupiter.api.*;
@@ -38,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TrainingSessionUserRESTControllerIT {
+class UserRESTControllerIT {
     @Autowired
     private MockMvc mockMvc;
 
@@ -50,6 +53,9 @@ class TrainingSessionUserRESTControllerIT {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private FeedbackRepository feedbackRepository;
 
     @Container
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:15.12"))
@@ -357,4 +363,122 @@ class TrainingSessionUserRESTControllerIT {
                 .andExpect(content().string("No training sessions found"));
     }
 
+    @Test
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_return_200_ok_and_feedback_when_user_is_enrolled() throws Exception {
+        // given
+        UserEntity testUser = new UserEntity();
+        testUser.setUsername("testUser");
+        testUser.setPassword("password");
+        userRepository.save(testUser);
+
+        TrainingSessionEntity trainingSession = new TrainingSessionEntity();
+        trainingSession.setDescription("Sample Training");
+        trainingSession.setDate(LocalDateTime.of(2025, 3, 20, 18, 0));
+        trainingSession.getUserEntities().add(testUser);
+        trainingSessionRepository.save(trainingSession);
+
+        testUser.getTrainingSessionEntities().add(trainingSession);
+        userRepository.save(testUser);
+
+        FeedbackEntity feedback = new FeedbackEntity();
+        feedback.setTrainingSessionEntity(trainingSession);
+        feedback.setComment("Great session!");
+        feedback.setStarRating(5);
+        feedback.setUserEntity(testUser);
+        feedbackRepository.save(feedback);
+
+        // when
+        ResultActions perform = mockMvc.perform(get("/users/trainings/" + trainingSession.getTrainingSessionId() + "/feedback")
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        String json = perform.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        FeedbackResponseDto feedbackResponseDto = objectMapper.readValue(json, FeedbackResponseDto.class);
+        assertAll(
+                () -> assertThat(feedbackResponseDto).isNotNull(),
+                () -> assertThat(Objects.requireNonNull(feedbackResponseDto).comment()).isEqualTo("Great session!"),
+                () -> assertThat(Objects.requireNonNull(feedbackResponseDto).starRating()).isEqualTo(5)
+        );
+    }
+
+    @Test
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_return_409_conflict_when_user_is_not_enrolled_in_training() throws Exception {
+        // given
+        UserEntity testUser = new UserEntity();
+        testUser.setUsername("testUser");
+        testUser.setPassword("password");
+        userRepository.save(testUser);
+
+        TrainingSessionEntity otherSession = new TrainingSessionEntity();
+        otherSession.setDescription("Other Training");
+        otherSession.setDate(LocalDateTime.of(2025, 4, 10, 18, 0));
+        trainingSessionRepository.save(otherSession);
+
+        // when & then
+        ResultActions perform = mockMvc.perform(get("/users/trainings/" + otherSession.getTrainingSessionId() + "/feedback")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string("User has not been signed up for this session"));
+    }
+
+    @Test
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_return_404_not_found_when_feedback_does_not_exist() throws Exception {
+        // given
+        UserEntity testUser = new UserEntity();
+        testUser.setUsername("testUser");
+        testUser.setPassword("password");
+        userRepository.save(testUser);
+
+        TrainingSessionEntity trainingSession = new TrainingSessionEntity();
+        trainingSession.setDescription("Sample Training");
+        trainingSession.setDate(LocalDateTime.of(2025, 3, 20, 18, 0));
+        trainingSession.getUserEntities().add(testUser);
+        trainingSessionRepository.save(trainingSession);
+
+        testUser.getTrainingSessionEntities().add(trainingSession);
+        userRepository.save(testUser);
+
+        // when & then
+        mockMvc.perform(get("/users/trainings/" + trainingSession.getTrainingSessionId() + "/feedback")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Feedback not found for this session"));
+    }
+
+    @Test
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_return_404_not_found_when_training_session_does_not_exist() throws Exception {
+        // given
+        UserEntity testUser = new UserEntity();
+        testUser.setUsername("testUser");
+        testUser.setPassword("password");
+        userRepository.save(testUser);
+
+        // when & then
+        mockMvc.perform(get("/users/trainings/9999/feedback")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Training session not found"));
+    }
+
+    @Test
+    void should_return_401_unauthorized_when_user_is_not_authenticated() throws Exception {
+        // given
+        UserEntity testUser = new UserEntity();
+        testUser.setUsername("testUser");
+        testUser.setPassword("password");
+        userRepository.save(testUser);
+
+        TrainingSessionEntity trainingSession = new TrainingSessionEntity();
+        trainingSession.setDescription("Sample Training");
+        trainingSession.setDate(LocalDateTime.of(2025, 3, 20, 18, 0));
+        trainingSession.getUserEntities().add(testUser);
+        trainingSessionRepository.save(trainingSession);
+
+        mockMvc.perform(get("/users/trainings/" + trainingSession.getTrainingSessionId() + "/feedback")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
 }
