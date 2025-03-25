@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TrainingSessionNotFoundException.class)
     public ResponseEntity<String> handleTrainingSessionNotFoundException(TrainingSessionNotFoundException ex) {
         log.error("No training sessions found: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Training session not found");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)

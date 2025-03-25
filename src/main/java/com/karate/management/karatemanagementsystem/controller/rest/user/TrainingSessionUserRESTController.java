@@ -18,16 +18,22 @@ public class TrainingSessionUserRESTController {
     private final TrainingSessionService trainingSessionService;
     private final UserService userService;
 
+    @GetMapping("/me")
+    public ResponseEntity<UserDetailsDto> getCurrentUserInfo() {
+        UserDetailsDto userDetailsDto = userService.getCurrentUserInfo();
+        return new ResponseEntity<>(userDetailsDto, HttpStatus.OK);
+    }
+
     @GetMapping("/trainings")
     public ResponseEntity<List<TrainingSessionDto>> getAllTrainingSessions() {
         List<TrainingSessionDto> trainingSessions = trainingSessionService.getAllTrainingSessions();
         return ResponseEntity.ok(trainingSessions);
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<UserDetailsDto> getCurrentUserInfo() {
-        UserDetailsDto userDetailsDto = userService.getCurrentUserInfo();
-        return new ResponseEntity<>(userDetailsDto, HttpStatus.OK);
+    @GetMapping("/trainings/my")
+    public ResponseEntity<List<TrainingSessionDto>> getUserTrainingSessions() {
+        List<TrainingSessionDto> trainingSessions = trainingSessionService.getUserTrainingSessions();
+        return ResponseEntity.ok(trainingSessions);
     }
 
     @PostMapping("/trainings/signup/{sessionId}")
