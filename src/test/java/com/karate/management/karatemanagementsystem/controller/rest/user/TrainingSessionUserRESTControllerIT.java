@@ -28,8 +28,7 @@ import java.util.Objects;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -223,5 +222,85 @@ class TrainingSessionUserRESTControllerIT {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict())
                 .andExpect(content().string("User is already signed up for this session"));
+    }
+
+    @Test
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_return_ok_200_when_user_withdraws_from_training_session() throws Exception {
+        // given
+        UserEntity testUser = new UserEntity();
+        testUser.setUsername("testUser");
+        testUser.setPassword("password");
+        UserEntity savedUser = userRepository.save(testUser);
+
+        TrainingSessionEntity testSession = new TrainingSessionEntity();
+        testSession.setDate(LocalDateTime.now().plusDays(1));
+        testSession.setDescription("Test Training Session");
+        TrainingSessionEntity savedSession = trainingSessionRepository.save(testSession);
+
+        savedSession.getUserEntities().add(savedUser);
+        savedUser.getTrainingSessionEntities().add(savedSession);
+        userRepository.save(savedUser);
+        trainingSessionRepository.save(savedSession);
+
+        // when
+        ResultActions performWithdrawFromTrainingSession = mockMvc.perform(delete("/users/trainings/withdraw/{sessionId}", testSession.getTrainingSessionId())
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        MvcResult resultForWithdrawFromTrainingSession = performWithdrawFromTrainingSession
+                .andExpect(status().isOk())
+                .andReturn();
+        String json = resultForWithdrawFromTrainingSession.getResponse().getContentAsString();
+        TrainingSessionRegistrationResponseDto responseDto = objectMapper.readValue(json, TrainingSessionRegistrationResponseDto.class);
+
+        assertAll(
+                () -> assertThat(responseDto).isNotNull(),
+                () -> assertThat(responseDto.message()).isEqualTo("Successfully withdrawn from the training session"),
+                () -> assertThat(responseDto.date()).isEqualTo(testSession.getDate().truncatedTo(ChronoUnit.MINUTES)),
+                () -> assertThat(responseDto.description()).isEqualTo(testSession.getDescription())
+        );
+
+        UserEntity updatedUser = userRepository.findByIdWithTrainingSessions(testUser.getUserId()).orElseThrow();
+        assertThat(updatedUser.getTrainingSessionEntities()).isEmpty();
+    }
+
+    @Test
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_return_404_when_user_tries_to_withdraw_from_non_existing_session() throws Exception {
+        // given
+        long nonExistingSessionId = 999L;
+
+        UserEntity testUser = new UserEntity();
+        testUser.setUsername("testUser");
+        testUser.setPassword("password");
+        userRepository.save(testUser);
+
+        // when & then
+        mockMvc.perform(delete("/users/trainings/withdraw/{sessionId}", nonExistingSessionId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Training session not found"));
+    }
+
+    @Test
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_return_409_when_user_tries_to_withdraw_without_being_signed_up() throws Exception {
+        // given
+        UserEntity testUser = new UserEntity();
+        testUser.setUsername("testUser");
+        testUser.setPassword("password");
+        testUser = userRepository.save(testUser);
+
+        TrainingSessionEntity testSession = new TrainingSessionEntity();
+        testSession.setDate(LocalDateTime.now().plusDays(1));
+        testSession.setDescription("Test Training Session");
+        testSession = trainingSessionRepository.save(testSession);
+
+        // when & then
+        mockMvc.perform(delete("/users/trainings/withdraw/{sessionId}", testSession.getTrainingSessionId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict())
+                .andExpect(content().string("User has not been signed up for this session"));
     }
 }

@@ -57,6 +57,9 @@ dependencies {
     implementation group: 'com.auth0', name: 'java-jwt', version: '4.4.0'
 }
 
-tasks.named('test') {
+test {
     useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }

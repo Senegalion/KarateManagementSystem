@@ -2,12 +2,18 @@ package com.karate.management.karatemanagementsystem.model.entity;
 
 import com.karate.management.karatemanagementsystem.model.data.RoleName;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "roles")
 public class RoleEntity {
     @Id

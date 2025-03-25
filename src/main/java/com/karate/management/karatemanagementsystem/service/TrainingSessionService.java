@@ -8,6 +8,7 @@ import com.karate.management.karatemanagementsystem.model.repository.TrainingSes
 import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
 import com.karate.management.karatemanagementsystem.service.exception.TrainingSessionNotFoundException;
 import com.karate.management.karatemanagementsystem.service.exception.UserAlreadySignedUpException;
+import com.karate.management.karatemanagementsystem.service.exception.UserNotSignedUpException;
 import com.karate.management.karatemanagementsystem.service.mapper.TrainingSessionMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -16,7 +17,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -24,6 +24,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TrainingSessionService {
     public static final String SUCCESSFULLY_SIGNED_UP_FOR_THE_TRAINING_SESSION = "Successfully signed up for the training session";
+    public static final String SUCCESSFULLY_WITHDRAWN_FROM_THE_TRAINING_SESSION = "Successfully withdrawn from the training session";
     private final TrainingSessionRepository trainingSessionRepository;
     private final UserRepository userRepository;
 
@@ -57,12 +58,38 @@ public class TrainingSessionService {
         userRepository.save(user);
         trainingSessionRepository.save(session);
 
-        LocalDateTime truncatedDate = session.getDate().truncatedTo(ChronoUnit.MINUTES);
-
         return TrainingSessionRegistrationResponseDto.builder()
                 .message(SUCCESSFULLY_SIGNED_UP_FOR_THE_TRAINING_SESSION)
-                .date(truncatedDate)
+                .date(session.getDate().truncatedTo(ChronoUnit.MINUTES))
                 .description(session.getDescription())
                 .build();
     }
+
+    @Transactional
+    public TrainingSessionRegistrationResponseDto withdrawFromTrainingSession(Long sessionId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        TrainingSessionEntity session = trainingSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new TrainingSessionNotFoundException("Training session not found"));
+
+        if (!user.getTrainingSessionEntities().contains(session)) {
+            throw new UserNotSignedUpException("User is not signed up for this session");
+        }
+
+        user.getTrainingSessionEntities().remove(session);
+        session.getUserEntities().remove(user);
+
+        userRepository.save(user);
+        trainingSessionRepository.save(session);
+
+        return TrainingSessionRegistrationResponseDto.builder()
+                .message(SUCCESSFULLY_WITHDRAWN_FROM_THE_TRAINING_SESSION)
+                .date(session.getDate().truncatedTo(ChronoUnit.MINUTES))
+                .description(session.getDescription())
+                .build();
+    }
+
 }

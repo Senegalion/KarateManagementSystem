@@ -36,4 +36,11 @@ public class TrainingSessionUserRESTController {
                 trainingSessionService.signUpForTrainingSession(sessionId);
         return ResponseEntity.ok(trainingSessionRegistrationResponseDto);
     }
+
+    @DeleteMapping("/trainings/withdraw/{sessionId}")
+    public ResponseEntity<TrainingSessionRegistrationResponseDto> signOutFromTrainingSession(@PathVariable Long sessionId) {
+        TrainingSessionRegistrationResponseDto trainingSessionRegistrationResponseDto =
+                trainingSessionService.withdrawFromTrainingSession(sessionId);
+        return ResponseEntity.ok(trainingSessionRegistrationResponseDto);
+    }
 }

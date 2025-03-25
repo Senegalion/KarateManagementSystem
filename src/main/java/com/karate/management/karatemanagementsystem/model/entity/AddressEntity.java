@@ -1,13 +1,11 @@
 package com.karate.management.karatemanagementsystem.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -30,7 +28,6 @@ public class AddressEntity {
     @Column(name = "postal_code", nullable = false)
     private String postalCode;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", unique = true)
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "addressEntity")
     private UserEntity userEntity;
 }
