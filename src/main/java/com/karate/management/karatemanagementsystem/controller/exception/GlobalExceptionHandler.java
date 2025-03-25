@@ -2,6 +2,7 @@ package com.karate.management.karatemanagementsystem.controller.exception;
 
 import com.karate.management.karatemanagementsystem.service.exception.TrainingSessionNotFoundException;
 import com.karate.management.karatemanagementsystem.service.exception.UserAlreadySignedUpException;
+import com.karate.management.karatemanagementsystem.service.exception.UserNotSignedUpException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,5 +35,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleUserAlreadySignedUpException(UserAlreadySignedUpException ex) {
         log.error("Username has already signed up to this training session: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body("User is already signed up for this session");
+    }
+
+    @ExceptionHandler(UserNotSignedUpException.class)
+    public ResponseEntity<String> handleUserHasNotBeenSignedUpException(UserNotSignedUpException ex) {
+        log.error("Username has not been signed up for this training session: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("User has not been signed up for this session");
     }
 }
