@@ -1,6 +1,6 @@
 package com.karate.management.karatemanagementsystem.model.entity;
 
-import com.karate.management.karatemanagementsystem.model.data.KarateClubName;
+import com.karate.management.karatemanagementsystem.model.staticdata.KarateClubName;
 import jakarta.persistence.*;
 import lombok.*;
 

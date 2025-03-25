@@ -1,8 +1,12 @@
 package com.karate.management.karatemanagementsystem.controller.rest;
 
-import com.karate.management.karatemanagementsystem.controller.exception.UsernameWhileTryingToLogInNotFoundException;
+import com.karate.management.karatemanagementsystem.service.exception.UsernameWhileTryingToLogInNotFoundException;
 import com.karate.management.karatemanagementsystem.infrastructure.security.jwt.JwtAuthenticatorService;
-import com.karate.management.karatemanagementsystem.model.dto.*;
+import com.karate.management.karatemanagementsystem.model.dto.login.LoginResponseDto;
+import com.karate.management.karatemanagementsystem.model.dto.login.TokenRequestDto;
+import com.karate.management.karatemanagementsystem.model.dto.registration.RegisterUserDto;
+import com.karate.management.karatemanagementsystem.model.dto.registration.RegistrationResultDto;
+import com.karate.management.karatemanagementsystem.model.dto.user.UserDto;
 import com.karate.management.karatemanagementsystem.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

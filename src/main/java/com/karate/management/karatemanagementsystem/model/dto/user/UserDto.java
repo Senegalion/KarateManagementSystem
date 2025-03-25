@@ -1,6 +1,6 @@
-package com.karate.management.karatemanagementsystem.model.dto;
+package com.karate.management.karatemanagementsystem.model.dto.user;
 
-import com.karate.management.karatemanagementsystem.model.data.RoleName;
+import com.karate.management.karatemanagementsystem.model.staticdata.RoleName;
 
 import java.util.Set;
 

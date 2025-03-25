@@ -1,4 +1,4 @@
-package com.karate.management.karatemanagementsystem.model.dto;
+package com.karate.management.karatemanagementsystem.model.dto.login;
 
 import lombok.Builder;
 

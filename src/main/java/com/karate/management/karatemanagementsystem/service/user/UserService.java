@@ -1,6 +1,6 @@
-package com.karate.management.karatemanagementsystem.service;
+package com.karate.management.karatemanagementsystem.service.user;
 
-import com.karate.management.karatemanagementsystem.model.dto.UserDetailsDto;
+import com.karate.management.karatemanagementsystem.model.dto.user.UserDetailsDto;
 import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
 import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
 import com.karate.management.karatemanagementsystem.service.mapper.UserMapper;

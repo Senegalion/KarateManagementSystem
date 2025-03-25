@@ -3,6 +3,7 @@ package com.karate.management.karatemanagementsystem.controller.exception;
 import com.karate.management.karatemanagementsystem.service.exception.TrainingSessionNotFoundException;
 import com.karate.management.karatemanagementsystem.service.exception.UserAlreadySignedUpException;
 import com.karate.management.karatemanagementsystem.service.exception.UserNotSignedUpException;
+import com.karate.management.karatemanagementsystem.service.exception.UsernameWhileTryingToLogInNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

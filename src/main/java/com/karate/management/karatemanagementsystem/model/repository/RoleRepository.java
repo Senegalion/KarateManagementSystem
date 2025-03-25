@@ -1,6 +1,6 @@
 package com.karate.management.karatemanagementsystem.model.repository;
 
-import com.karate.management.karatemanagementsystem.model.data.RoleName;
+import com.karate.management.karatemanagementsystem.model.staticdata.RoleName;
 import com.karate.management.karatemanagementsystem.model.entity.RoleEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

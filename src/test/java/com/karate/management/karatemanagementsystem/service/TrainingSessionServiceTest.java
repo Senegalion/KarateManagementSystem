@@ -1,7 +1,7 @@
 package com.karate.management.karatemanagementsystem.service;
 
 import com.karate.management.karatemanagementsystem.controller.rest.user.TrainingSessionRegistrationResponseDto;
-import com.karate.management.karatemanagementsystem.model.dto.TrainingSessionDto;
+import com.karate.management.karatemanagementsystem.model.dto.trainingsession.TrainingSessionDto;
 import com.karate.management.karatemanagementsystem.model.entity.TrainingSessionEntity;
 import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
 import com.karate.management.karatemanagementsystem.model.repository.TrainingSessionRepository;
@@ -9,6 +9,7 @@ import com.karate.management.karatemanagementsystem.model.repository.UserReposit
 import com.karate.management.karatemanagementsystem.service.exception.TrainingSessionNotFoundException;
 import com.karate.management.karatemanagementsystem.service.exception.UserAlreadySignedUpException;
 import com.karate.management.karatemanagementsystem.service.exception.UserNotSignedUpException;
+import com.karate.management.karatemanagementsystem.service.user.TrainingSessionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
