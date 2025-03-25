@@ -73,7 +73,7 @@ class TrainingSessionUserRESTControllerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "testUser", roles = "USER")
     void should_return_200_ok_and_all_training_sessions_when_sessions_exist() throws Exception {
         // given
         TrainingSessionEntity session1 = new TrainingSessionEntity();
@@ -100,7 +100,7 @@ class TrainingSessionUserRESTControllerIT {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(username = "testUser", roles = "USER")
     void should_return_404_not_found_when_no_sessions_exist() throws Exception {
         // given
         trainingSessionRepository.deleteAll();

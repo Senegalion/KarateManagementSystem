@@ -30,6 +30,10 @@ public class TrainingSessionService {
     private final UserRepository userRepository;
 
     public List<TrainingSessionDto> getAllTrainingSessions() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new UsernameNotFoundException("User not found");
+        }
         List<TrainingSessionEntity> trainingSessions = trainingSessionRepository.findAll();
         if (trainingSessions.isEmpty()) {
             throw new TrainingSessionNotFoundException("No training sessions found");

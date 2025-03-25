@@ -49,6 +49,7 @@ class TrainingSessionServiceTest {
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn("testUser");
+        when(authentication.isAuthenticated()).thenReturn(true);
     }
 
     @Test
