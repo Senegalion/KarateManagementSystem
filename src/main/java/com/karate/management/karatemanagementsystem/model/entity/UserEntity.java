@@ -14,10 +14,10 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "users")
 public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,6 +59,7 @@ public class UserEntity implements UserDetails {
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "training_session_id")}
     )
+    @Builder.Default
     private Set<TrainingSessionEntity> trainingSessionEntities = new HashSet<>();
 
     @Override
