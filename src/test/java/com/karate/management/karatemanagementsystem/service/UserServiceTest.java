@@ -1,11 +1,12 @@
 package com.karate.management.karatemanagementsystem.service;
 
-import com.karate.management.karatemanagementsystem.model.data.KarateRank;
-import com.karate.management.karatemanagementsystem.model.dto.UserDetailsDto;
+import com.karate.management.karatemanagementsystem.model.staticdata.KarateRank;
+import com.karate.management.karatemanagementsystem.model.dto.user.UserDetailsDto;
 import com.karate.management.karatemanagementsystem.model.entity.AddressEntity;
 import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
 import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
 import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
+import com.karate.management.karatemanagementsystem.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +24,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.util.HashSet;
 import java.util.Optional;
 
-import static com.karate.management.karatemanagementsystem.model.data.KarateClubName.LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO;
+import static com.karate.management.karatemanagementsystem.model.staticdata.KarateClubName.LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 

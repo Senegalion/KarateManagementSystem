@@ -1,6 +1,6 @@
 package com.karate.management.karatemanagementsystem.model.entity;
 
-import com.karate.management.karatemanagementsystem.model.data.RoleName;
+import com.karate.management.karatemanagementsystem.model.staticdata.RoleName;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

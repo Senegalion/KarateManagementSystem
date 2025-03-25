@@ -1,6 +1,6 @@
 package com.karate.management.karatemanagementsystem.service.mapper;
 
-import com.karate.management.karatemanagementsystem.model.dto.TrainingSessionDto;
+import com.karate.management.karatemanagementsystem.model.dto.trainingsession.TrainingSessionDto;
 import com.karate.management.karatemanagementsystem.model.entity.TrainingSessionEntity;
 
 public class TrainingSessionMapper {

@@ -1,6 +1,6 @@
-package com.karate.management.karatemanagementsystem.model.dto;
+package com.karate.management.karatemanagementsystem.model.dto.user;
 
-import com.karate.management.karatemanagementsystem.model.data.KarateRank;
+import com.karate.management.karatemanagementsystem.model.staticdata.KarateRank;
 import com.karate.management.karatemanagementsystem.model.entity.AddressEntity;
 import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
 import lombok.Builder;

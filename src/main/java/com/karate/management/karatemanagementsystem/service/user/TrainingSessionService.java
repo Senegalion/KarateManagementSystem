@@ -1,7 +1,7 @@
-package com.karate.management.karatemanagementsystem.service;
+package com.karate.management.karatemanagementsystem.service.user;
 
-import com.karate.management.karatemanagementsystem.controller.rest.user.TrainingSessionRegistrationResponseDto;
-import com.karate.management.karatemanagementsystem.model.dto.TrainingSessionDto;
+import com.karate.management.karatemanagementsystem.model.dto.trainingsession.TrainingSessionRegistrationResponseDto;
+import com.karate.management.karatemanagementsystem.model.dto.trainingsession.TrainingSessionDto;
 import com.karate.management.karatemanagementsystem.model.entity.TrainingSessionEntity;
 import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
 import com.karate.management.karatemanagementsystem.model.repository.TrainingSessionRepository;

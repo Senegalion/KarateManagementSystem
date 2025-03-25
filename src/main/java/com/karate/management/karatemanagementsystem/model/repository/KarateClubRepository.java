@@ -1,6 +1,6 @@
 package com.karate.management.karatemanagementsystem.model.repository;
 
-import com.karate.management.karatemanagementsystem.model.data.KarateClubName;
+import com.karate.management.karatemanagementsystem.model.staticdata.KarateClubName;
 import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

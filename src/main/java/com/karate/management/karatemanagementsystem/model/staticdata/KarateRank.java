@@ -1,4 +1,4 @@
-package com.karate.management.karatemanagementsystem.model.data;
+package com.karate.management.karatemanagementsystem.model.staticdata;
 
 public enum KarateRank {
     KYU_10,

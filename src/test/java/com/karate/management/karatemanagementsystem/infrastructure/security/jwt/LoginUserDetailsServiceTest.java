@@ -1,6 +1,6 @@
 package com.karate.management.karatemanagementsystem.infrastructure.security.jwt;
 
-import com.karate.management.karatemanagementsystem.model.dto.UserDto;
+import com.karate.management.karatemanagementsystem.model.dto.user.UserDto;
 import com.karate.management.karatemanagementsystem.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,11 +1,11 @@
 package com.karate.management.karatemanagementsystem.service;
 
-import com.karate.management.karatemanagementsystem.model.data.KarateClubName;
-import com.karate.management.karatemanagementsystem.model.data.KarateRank;
-import com.karate.management.karatemanagementsystem.model.data.RoleName;
-import com.karate.management.karatemanagementsystem.model.dto.RegisterUserDto;
-import com.karate.management.karatemanagementsystem.model.dto.RegistrationResultDto;
-import com.karate.management.karatemanagementsystem.model.dto.UserDto;
+import com.karate.management.karatemanagementsystem.model.staticdata.KarateClubName;
+import com.karate.management.karatemanagementsystem.model.staticdata.KarateRank;
+import com.karate.management.karatemanagementsystem.model.staticdata.RoleName;
+import com.karate.management.karatemanagementsystem.model.dto.registration.RegisterUserDto;
+import com.karate.management.karatemanagementsystem.model.dto.registration.RegistrationResultDto;
+import com.karate.management.karatemanagementsystem.model.dto.user.UserDto;
 import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
 import com.karate.management.karatemanagementsystem.model.entity.RoleEntity;
 import com.karate.management.karatemanagementsystem.model.entity.UserEntity;

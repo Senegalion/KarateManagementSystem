@@ -1,4 +1,4 @@
-package com.karate.management.karatemanagementsystem.model.data;
+package com.karate.management.karatemanagementsystem.model.staticdata;
 
 public enum KarateClubName {
     LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO,

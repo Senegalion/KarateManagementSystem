@@ -1,9 +1,10 @@
 package com.karate.management.karatemanagementsystem.controller.rest.user;
 
-import com.karate.management.karatemanagementsystem.model.dto.TrainingSessionDto;
-import com.karate.management.karatemanagementsystem.model.dto.UserDetailsDto;
-import com.karate.management.karatemanagementsystem.service.TrainingSessionService;
-import com.karate.management.karatemanagementsystem.service.UserService;
+import com.karate.management.karatemanagementsystem.model.dto.trainingsession.TrainingSessionDto;
+import com.karate.management.karatemanagementsystem.model.dto.trainingsession.TrainingSessionRegistrationResponseDto;
+import com.karate.management.karatemanagementsystem.model.dto.user.UserDetailsDto;
+import com.karate.management.karatemanagementsystem.service.user.TrainingSessionService;
+import com.karate.management.karatemanagementsystem.service.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,10 +1,10 @@
 package com.karate.management.karatemanagementsystem.controller.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.karate.management.karatemanagementsystem.model.data.KarateClubName;
-import com.karate.management.karatemanagementsystem.model.data.RoleName;
-import com.karate.management.karatemanagementsystem.model.dto.RegisterUserDto;
-import com.karate.management.karatemanagementsystem.model.dto.TokenRequestDto;
+import com.karate.management.karatemanagementsystem.model.staticdata.KarateClubName;
+import com.karate.management.karatemanagementsystem.model.staticdata.RoleName;
+import com.karate.management.karatemanagementsystem.model.dto.registration.RegisterUserDto;
+import com.karate.management.karatemanagementsystem.model.dto.login.TokenRequestDto;
 import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
 import com.karate.management.karatemanagementsystem.model.entity.RoleEntity;
 import com.karate.management.karatemanagementsystem.model.repository.KarateClubRepository;

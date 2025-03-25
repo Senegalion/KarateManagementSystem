@@ -1,6 +1,6 @@
 package com.karate.management.karatemanagementsystem.model.entity;
 
-import com.karate.management.karatemanagementsystem.model.data.KarateRank;
+import com.karate.management.karatemanagementsystem.model.staticdata.KarateRank;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;

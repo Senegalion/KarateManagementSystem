@@ -1,4 +1,4 @@
-package com.karate.management.karatemanagementsystem.controller.rest.user;
+package com.karate.management.karatemanagementsystem.model.dto.trainingsession;
 
 import lombok.Builder;
 
