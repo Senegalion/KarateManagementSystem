@@ -8,10 +8,7 @@ import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
 import com.karate.management.karatemanagementsystem.model.repository.FeedbackRepository;
 import com.karate.management.karatemanagementsystem.model.repository.TrainingSessionRepository;
 import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class FeedbackRESTControllerIT {
+class AdminRESTControllerIT {
     @Autowired
     private MockMvc mockMvc;
 
@@ -67,6 +64,11 @@ class FeedbackRESTControllerIT {
     @AfterAll
     void tearDown() {
         postgres.stop();
+    }
+
+    @BeforeEach
+    void clear() {
+        userRepository.deleteAll();
     }
 
     private TrainingSessionEntity createTrainingSession() {

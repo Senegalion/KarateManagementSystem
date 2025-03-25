@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
-public class FeedbackService {
+public class AdminFeedbackService {
     private final UserRepository userRepository;
     private final TrainingSessionRepository trainingSessionRepository;
     private final FeedbackRepository feedbackRepository;

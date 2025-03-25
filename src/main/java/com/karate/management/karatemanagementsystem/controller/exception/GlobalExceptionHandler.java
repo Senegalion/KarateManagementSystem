@@ -1,9 +1,6 @@
 package com.karate.management.karatemanagementsystem.controller.exception;
 
-import com.karate.management.karatemanagementsystem.service.exception.TrainingSessionNotFoundException;
-import com.karate.management.karatemanagementsystem.service.exception.UserAlreadySignedUpException;
-import com.karate.management.karatemanagementsystem.service.exception.UserNotSignedUpException;
-import com.karate.management.karatemanagementsystem.service.exception.UsernameWhileTryingToLogInNotFoundException;
+import com.karate.management.karatemanagementsystem.service.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,5 +39,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleUserHasNotBeenSignedUpException(UserNotSignedUpException ex) {
         log.error("Username has not been signed up for this training session: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body("User has not been signed up for this session");
+    }
+
+    @ExceptionHandler(FeedbackNotFoundException.class)
+    public ResponseEntity<String> handleFeedbackNotFoundException(FeedbackNotFoundException ex) {
+        log.error("Feedback not found for this session: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Feedback not found for this session");
     }
 }
