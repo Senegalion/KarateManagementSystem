@@ -12,6 +12,7 @@ import com.karate.management.karatemanagementsystem.model.repository.PaymentRepo
 import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
 import com.karate.management.karatemanagementsystem.model.staticdata.PaymentStatus;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -79,13 +80,24 @@ public class PayPalService {
 
             requestBody.set("purchase_units", JsonNodeFactory.instance.arrayNode().add(purchaseUnit));
 
+            ObjectNode applicationContext = JsonNodeFactory.instance.objectNode();
+            applicationContext.put("return_url", paymentRequest.returnUrl());
+            applicationContext.put("cancel_url", paymentRequest.cancelUrl());
+            applicationContext.put("brand_name", "Karate Management");
+            applicationContext.put("landing_page", "LOGIN");
+            applicationContext.put("user_action", "PAY_NOW");
+
+            requestBody.set("application_context", applicationContext);
+
             String jsonPayload = objectMapper.writeValueAsString(requestBody);
             System.out.println("Generated JSON: " + jsonPayload);
 
-            String orderId = payPalClient.createPayment(jsonPayload);
+            String token = payPalClient.createPayment(jsonPayload);
+
+            String approvalUrl = "https://www.sandbox.paypal.com/checkoutnow?token=" + token;
 
             PaymentEntity payment = new PaymentEntity();
-            payment.setPaypalOrderId(orderId);
+            payment.setPaypalOrderId(token);
             payment.setUserEntity(userEntity);
             payment.setAmount(paymentRequest.value());
             payment.setPaymentDate(LocalDate.now());
@@ -95,7 +107,7 @@ public class PayPalService {
             userRepository.save(userEntity);
             paymentRepository.save(payment);
 
-            return buildPaymentResponse(orderId, userEntity.getUserId(), payment);
+            return buildPaymentResponse(token, userEntity.getUserId(), payment, approvalUrl);
 
         } catch (IOException e) {
             throw new RuntimeException("Error creating payment with PayPal: " + e.getMessage(), e);
@@ -103,18 +115,23 @@ public class PayPalService {
     }
 
 
-    private PaymentResponseDto buildPaymentResponse(String paymentId, Long userId, PaymentEntity payment) {
+    private PaymentResponseDto buildPaymentResponse(String paymentId, Long userId, PaymentEntity payment, String approvalUrl) {
         return PaymentResponseDto.builder()
                 .paymentId(paymentId)
                 .userId(userId)
                 .amount(payment.getAmount())
                 .status(payment.getPaymentStatus())
                 .paymentDate(payment.getPaymentDate())
+                .approvalUrl(approvalUrl)
                 .build();
     }
 
+    private PaymentResponseDto buildPaymentResponse(String paymentId, Long userId, PaymentEntity payment) {
+        return buildPaymentResponse(paymentId, userId, payment, null);
+    }
+
     @Transactional
-    public PaymentResponseDto confirmPayment(String paypalOrderId) {
+    public PaymentResponseDto capturePayment(String paypalOrderId) throws JSONException {
         try {
             PaymentEntity payment = paymentRepository.findByPaypalOrderId(paypalOrderId)
                     .orElseThrow(() -> new RuntimeException("Payment not found"));
@@ -123,9 +140,9 @@ public class PayPalService {
                 throw new RuntimeException("Payment already confirmed.");
             }
 
-            boolean paymentConfirmed = payPalClient.confirmPayment(paypalOrderId);
-            if (!paymentConfirmed) {
-                throw new RuntimeException("Payment confirmation failed.");
+            boolean paymentCaptured = payPalClient.capturePayment(paypalOrderId);
+            if (!paymentCaptured) {
+                throw new RuntimeException("Payment capture failed.");
             }
 
             payment.setPaymentStatus(PaymentStatus.PAID);
@@ -133,9 +150,10 @@ public class PayPalService {
 
             return buildPaymentResponse(paypalOrderId, payment.getUserEntity().getUserId(), payment);
 
-        } catch (IOException e) {
-            throw new RuntimeException("Error confirming payment: " + e.getMessage(), e);
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Error capturing payment: " + e.getMessage(), e);
         }
     }
+
 
 }

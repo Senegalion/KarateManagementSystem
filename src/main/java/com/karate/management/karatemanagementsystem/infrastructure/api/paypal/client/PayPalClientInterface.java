@@ -1,9 +1,11 @@
 package com.karate.management.karatemanagementsystem.infrastructure.api.paypal.client;
 
+import org.springframework.boot.configurationprocessor.json.JSONException;
+
 import java.io.IOException;
 
 public interface PayPalClientInterface {
     String createPayment(String jsonPayload) throws IOException;
 
-    boolean confirmPayment(String paymentId) throws IOException;
+    boolean capturePayment(String orderId) throws IOException, JSONException, InterruptedException;
 }

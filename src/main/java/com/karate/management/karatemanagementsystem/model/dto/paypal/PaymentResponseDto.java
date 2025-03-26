@@ -14,6 +14,7 @@ public record PaymentResponseDto(
         BigDecimal amount,
         PaymentStatus status,
         @JsonFormat(pattern = "yyyy-MM-dd")
-        LocalDate paymentDate
+        LocalDate paymentDate,
+        String approvalUrl
 ) {
 }
