@@ -46,7 +46,7 @@ public class JwtAuthenticatorService {
                 .toList();
         return JWT.create()
                 .withSubject(user.getUsername())
-                .withClaim("role", roles)
+                .withClaim("roles", roles)
                 .withIssuedAt(now)
                 .withExpiresAt(expiresAt)
                 .withIssuer(issuer)

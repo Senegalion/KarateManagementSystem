@@ -24,6 +24,9 @@ public class UserEntity implements UserDetails {
     @Column(name = "user_id")
     private Long userId;
 
+    @Version
+    private Integer version;
+
     @Column(name = "username", unique = true, nullable = false)
     private String username;
 
@@ -63,7 +66,8 @@ public class UserEntity implements UserDetails {
     private Set<TrainingSessionEntity> trainingSessionEntities = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "userEntity")
-    private Set<PaymentEntity> paymentEntities;
+    @Builder.Default
+    private Set<PaymentEntity> paymentEntities = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

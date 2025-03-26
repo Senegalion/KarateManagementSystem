@@ -20,11 +20,15 @@ public class PaymentEntity {
     @Column(name = "payment_id")
     private Long paymentId;
 
+    @Column(name = "paypal_order_id")
+    private String paypalOrderId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity userEntity;
 
     @Column(name = "amount", nullable = false)
+    @Builder.Default
     private BigDecimal amount = new BigDecimal("150.00");
 
     @Column(name = "payment_date", nullable = false)

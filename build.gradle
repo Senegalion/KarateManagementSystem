@@ -5,6 +5,10 @@ plugins {
     id 'org.flywaydb.flyway' version '9.5.1'
 }
 
+ext {
+    springCloudVersion = "2024.0.1"
+}
+
 group = 'com.karate.management'
 version = '0.0.1-SNAPSHOT'
 
@@ -36,15 +40,16 @@ flyway {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-stub-runner'
     runtimeOnly group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.3.4'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
@@ -55,7 +60,7 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:postgresql'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.4.0'
+    implementation group: 'com.auth0', name: 'java-jwt', version: '4.0.0'
     implementation 'com.paypal.sdk:checkout-sdk:1.0.4'
 }
 
@@ -63,5 +68,11 @@ test {
     useJUnitPlatform()
     testLogging {
         events "passed", "skipped", "failed"
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
     }
 }

@@ -7,3 +7,10 @@ spring:
   jpa:
     hibernate.ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+paypal:
+  mode: sandbox
+  client-id: mock-client-id
+  client-secret: mock-client-secret
+  amount: 150
+  currency: PLN
