@@ -23,3 +23,9 @@ auth:
     secretKey: ${JWT_SECRET}
     expirationDays: 30
     issuer: karate-management-system-backend
+
+paypal:
+  mode: sandbox
+  client-id: ${PAYPAL_CLIENT_ID}
+  client-secret: ${PAYPAL_CLIENT_SECRET}
+  currency: PLN

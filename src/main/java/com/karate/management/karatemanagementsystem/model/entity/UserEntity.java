@@ -62,6 +62,9 @@ public class UserEntity implements UserDetails {
     @Builder.Default
     private Set<TrainingSessionEntity> trainingSessionEntities = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userEntity")
+    private Set<PaymentEntity> paymentEntities;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roleEntities.stream()
