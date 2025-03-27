@@ -1,16 +1,22 @@
 package com.karate.management.karatemanagementsystem.infrastructure.api.paypal.controller;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import com.karate.management.karatemanagementsystem.infrastructure.api.paypal.client.PayPalClientInterface;
 import com.karate.management.karatemanagementsystem.infrastructure.api.paypal.service.PayPalService;
+import com.karate.management.karatemanagementsystem.model.dto.paypal.PaymentRequestDto;
 import com.karate.management.karatemanagementsystem.model.dto.paypal.PaymentResponseDto;
+import com.karate.management.karatemanagementsystem.model.entity.PaymentEntity;
 import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
 import com.karate.management.karatemanagementsystem.model.repository.PaymentRepository;
 import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
+import com.karate.management.karatemanagementsystem.model.staticdata.PaymentStatus;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -18,11 +24,17 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -30,7 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PayPalRESTControllerIT {
-    public static final String PAYMENT_REQUEST_PAYLOAD = """
+    private static final String PAYMENT_REQUEST_PAYLOAD = """
                 {
                   "intent": "CAPTURE",
                   "purchase_units": [
@@ -44,7 +56,8 @@ class PayPalRESTControllerIT {
                   ]
                 }
             """.trim();
-    public static final Long PAYMENT_ID = 123L;
+
+    private static final String PAYMENT_ID = "6N579553BD4383536";
 
     @RegisterExtension
     public static WireMockExtension wireMockServer = WireMockExtension.newInstance()
@@ -66,6 +79,9 @@ class PayPalRESTControllerIT {
     @Autowired
     private PaymentRepository paymentRepository;
 
+    @MockBean
+    private PayPalClientInterface payPalClient;
+
     private UserEntity userEntity;
 
     @BeforeAll
@@ -80,111 +96,93 @@ class PayPalRESTControllerIT {
 
     @BeforeEach
     void setUp() {
+        paymentRepository.deleteAll();
+        userRepository.deleteAll();
+
         userEntity = new UserEntity();
         userEntity.setUsername("testUser");
         userEntity.setPassword("password");
         userRepository.save(userEntity);
     }
 
-//    @Test
-//    @WithMockUser(username = "testUser", roles = "USER")
-//    void should_create_payment_and_return_payment_response() {
-//        // given
-//        wireMockServer.stubFor(post(urlEqualTo("/v2/checkout/orders"))
-//                .withRequestBody(equalToJson(PAYMENT_REQUEST_PAYLOAD))
-//                .willReturn(aResponse()
-//                        .withStatus(201)
-//                        .withBody("{\"id\":\"PAYMENT123\"}"))); // Tu zwracamy id płatności jako odpowiedź
-//
-//        // when
-//        PaymentResponseDto paymentResponseDto = payPalService.createPayment(userEntity.getUserId()); // Odkomentowaliśmy tę linię
-//
-//        // then
-//        assertThat(paymentResponseDto).isNotNull();
-//        assertThat(paymentResponseDto.paymentId()).isEqualTo("PAYMENT123");  // Wartość, którą zwróci WireMock
-//        assertThat(paymentResponseDto.amount()).isEqualTo(BigDecimal.valueOf(150.00)); // Sprawdzenie kwoty
-//    }
+    @Test
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_create_payment_and_return_payment_response() throws IOException {
+        // given
+        when(payPalClient.createPayment(anyString())).thenReturn(PAYMENT_ID);
+        wireMockServer.stubFor(post(urlEqualTo("/v2/checkout/orders"))
+                .withRequestBody(equalToJson(PAYMENT_REQUEST_PAYLOAD))
+                .willReturn(aResponse()
+                        .withStatus(201)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("""
+                                    {
+                                        "id": "6N579553BD4383536",
+                                        "userId": 1,
+                                        "amount": 150.00,
+                                        "status": "PENDING",
+                                        "paymentDate": "2025-03-27",
+                                        "approvalUrl": "https://www.sandbox.paypal.com/checkoutnow?token=6N579553BD4383536"
+                                    }
+                                """)));
 
-//    @Test
-//    void should_throw_exception_when_payment_creation_fails() throws IOException {
-//        // given
-//        wireMockServer.stubFor(post(urlEqualTo("/v2/checkout/orders"))
-//                .willReturn(aResponse()
-//                        .withStatus(500)
-//                        .withBody("{\"error\":\"Internal Server Error\"}")));
-//
-//        // when
-//        Throwable throwable = catchThrowable(() -> payPalService.createPayment(userEntity.getUserId()));
-//
-//        // then
-//        assertThat(throwable).isInstanceOf(RuntimeException.class);
-//        assertThat(throwable.getMessage()).contains("Error creating payment");
-//    }
-//
-//    @Test
-//    void should_confirm_payment_and_return_payment_response() throws IOException {
-//        // given
-//        wireMockServer.stubFor(post(urlEqualTo("/v2/checkout/orders/" + PAYMENT_ID + "/capture"))
-//                .willReturn(aResponse()
-//                        .withStatus(200)
-//                        .withBody("{\"status\":\"COMPLETED\"}")));
-//
-//        // and given payment exists in the database
-//        PaymentEntity paymentEntity = new PaymentEntity();
-//        paymentEntity.setPaymentId(PAYMENT_ID);
-//        paymentEntity.setUserEntity(userEntity);
-//        paymentEntity.setAmount(BigDecimal.valueOf(150));
-//        paymentEntity.setPaymentStatus(PaymentStatus.PENDING);
-//        paymentRepository.save(paymentEntity);
-//
-//        // when
-//        PaymentResponseDto paymentResponseDto = payPalService.confirmPayment(PAYMENT_ID);
-//
-//        // then
-//        assertThat(paymentResponseDto).isNotNull();
-//        assertThat(paymentResponseDto.paymentId()).isEqualTo(PAYMENT_ID);
-//        assertThat(paymentResponseDto.status()).isEqualTo(PaymentStatus.PAID);
-//    }
-//
-//    @Test
-//    void should_throw_exception_when_payment_confirmation_fails() throws IOException {
-//        // given
-//        wireMockServer.stubFor(post(urlEqualTo("/v2/checkout/orders/" + PAYMENT_ID + "/capture"))
-//                .willReturn(aResponse()
-//                        .withStatus(500)
-//                        .withBody("{\"error\":\"Internal Server Error\"}")));
-//
-//        // and given payment exists in the database
-//        PaymentEntity paymentEntity = new PaymentEntity();
-//        paymentEntity.setPaymentId(PAYMENT_ID);
-//        paymentEntity.setUserEntity(userEntity);
-//        paymentEntity.setAmount(BigDecimal.valueOf(150));
-//        paymentEntity.setPaymentStatus(PaymentStatus.PENDING);
-//        paymentRepository.save(paymentEntity);
-//
-//        // when
-//        Throwable throwable = catchThrowable(() -> payPalService.confirmPayment(PAYMENT_ID));
-//
-//        // then
-//        assertThat(throwable).isInstanceOf(RuntimeException.class);
-//        assertThat(throwable.getMessage()).contains("Payment confirmation failed");
-//    }
-//
-//    @Test
-//    void should_throw_exception_when_payment_already_confirmed() throws IOException {
-//        // given
-//        PaymentEntity paymentEntity = new PaymentEntity();
-//        paymentEntity.setPaymentId(PAYMENT_ID);
-//        paymentEntity.setUserEntity(userEntity);
-//        paymentEntity.setAmount(BigDecimal.valueOf(150));
-//        paymentEntity.setPaymentStatus(PaymentStatus.PAID);
-//        paymentRepository.save(paymentEntity);
-//
-//        // when
-//        Throwable throwable = catchThrowable(() -> payPalService.confirmPayment(PAYMENT_ID));
-//
-//        // then
-//        assertThat(throwable).isInstanceOf(RuntimeException.class);
-//        assertThat(throwable.getMessage()).contains("Payment already confirmed");
-//    }
+        // when
+        PaymentRequestDto paymentRequestDto = new PaymentRequestDto(
+                userEntity.getUserId(),
+                "USD",
+                BigDecimal.valueOf(150.00),
+                "http://localhost:8082/success",
+                "http://localhost:8082/cancel"
+        );
+        PaymentResponseDto paymentResponseDto = payPalService.createPayment(paymentRequestDto);
+
+        // then
+        assertThat(paymentResponseDto).isNotNull();
+        assertThat(paymentResponseDto.paymentId()).isEqualTo("6N579553BD4383536");
+        assertThat(paymentResponseDto.userId()).isNotNull();
+        assertThat(paymentResponseDto.amount()).isEqualTo(BigDecimal.valueOf(150.00));
+        assertThat(paymentResponseDto.status()).isEqualTo(PaymentStatus.PENDING);
+        assertThat(paymentResponseDto.paymentDate()).isEqualTo("2025-03-27");
+        assertThat(paymentResponseDto.approvalUrl()).isEqualTo("https://www.sandbox.paypal.com/checkoutnow?token=6N579553BD4383536");
+    }
+
+    @Test
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_throw_exception_when_payment_creation_fails() throws IOException {
+        // given
+        PaymentRequestDto paymentRequestDto = new PaymentRequestDto(
+                userEntity.getUserId(),
+                "USD",
+                BigDecimal.valueOf(150.00),
+                "https://return.url",
+                "https://cancel.url"
+        );
+
+        when(payPalClient.createPayment(anyString())).thenThrow(new IOException("Internal Server Error"));
+
+        // when
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> payPalService.createPayment(paymentRequestDto));
+
+        // then
+        assertThat(exception.getMessage()).contains("Error creating payment with PayPal");
+    }
+
+    @Test
+    @WithMockUser(username = "testUser", roles = "USER")
+    void should_throw_exception_when_payment_already_confirmed() {
+        // given
+        PaymentEntity paymentEntity = new PaymentEntity();
+        paymentEntity.setPaypalOrderId(PAYMENT_ID);
+        paymentEntity.setUserEntity(userEntity);
+        paymentEntity.setAmount(BigDecimal.valueOf(150));
+        paymentEntity.setPaymentStatus(PaymentStatus.PAID);
+        paymentEntity.setPaymentDate(LocalDate.now());
+        paymentRepository.save(paymentEntity);
+
+        // when
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> payPalService.capturePayment(String.valueOf(PAYMENT_ID)));
+
+        // then
+        assertThat(exception.getMessage()).contains("Payment already confirmed");
+    }
 }

@@ -9,8 +9,8 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
 paypal:
-  mode: sandbox
-  client-id: mock-client-id
-  client-secret: mock-client-secret
+  mode: "sandbox"
+  client-id: ${PAYPAL_CLIENT_ID}
+  client-secret: ${PAYPAL_CLIENT_SECRET}
   amount: 150
   currency: PLN
