@@ -46,4 +46,22 @@ public class GlobalExceptionHandler {
         log.error("Feedback not found for this session: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Feedback not found for this session");
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
+        log.error("User not found: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(PaymentNotFoundException.class)
+    public ResponseEntity<String> handlePaymentNotFoundException(PaymentNotFoundException ex) {
+        log.error("Payment not found: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(PaymentAlreadyConfirmed.class)
+    public ResponseEntity<String> handlePaymentAlreadyConfirmedException(PaymentAlreadyConfirmed ex) {
+        log.error("Payment already confirmed: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
 }
