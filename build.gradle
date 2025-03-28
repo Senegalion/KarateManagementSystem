@@ -63,6 +63,7 @@ dependencies {
     implementation group: 'com.auth0', name: 'java-jwt', version: '4.0.0'
     implementation 'com.paypal.sdk:checkout-sdk:1.0.4'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    testImplementation 'com.icegreen:greenmail:1.6.10'
 }
 
 test {

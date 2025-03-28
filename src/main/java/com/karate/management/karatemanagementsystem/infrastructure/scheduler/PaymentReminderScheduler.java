@@ -19,7 +19,7 @@ public class PaymentReminderScheduler {
     private final PaymentService paymentService;
     private final EmailService emailService;
 
-    @Scheduled(cron = "0 0 8 10 * ?")
+    @Scheduled(cron = "${scheduler.cron}")
     public void sendPaymentReminders() {
         List<UserEntity> usersWithDebt = paymentService.getUsersWithOutstandingPayments();
 

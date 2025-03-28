@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: ${SERVER_PORT:8080}
 
 spring:
   application:
@@ -19,29 +19,32 @@ spring:
       ddl-auto: update
     show-sql: true
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: lupelikan@gmail.com
-    password: f t i j g e b q o q q i a r v z
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:3025}
+    username: ${MAIL_USERNAME:defaultUsername}
+    password: ${MAIL_PASSWORD:defaultPassword}
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
-      timeout: 5000
-      connectiontimeout: 5000
-      writetimeout: 5000
+      timeout: ${MAIL_PROPERTIES_TIMEOUT:5000}
+      connectiontimeout: ${MAIL_PROPERTIES_CONNECTION_TIMEOUT:5000}
+      writetimeout: ${MAIL_PROPERTIES_WRITE_TIMEOUT:5000}
 
 auth:
   jwt:
-    secretKey: gv2guyutf3yghudgytfdgy32ugytd32ygiugydtucuyieuhfgyiuviuhosjifibijimikmjnifujiuheg2fg8f6tyg3yvdbusayuvdbnoufyvu2yeuhdvy2fbu3h898gtf74g837h928rf78grveudybiuncojf8egrh978fyeiuhdj824f937g8fybeiund2hf987g38rye2h93g7r8ybfeunwdh9furgbyiuifu
-    expirationDays: 30
+    secretKey: ${JWT_SECRET:defaultSecretKey}
+    expirationDays: ${JWT_EXPIRATION_DAYS:30}
     issuer: karate-management-system-backend
 
 paypal:
   mode: "sandbox"
-  client-id: Abh466y0r3o8IyehVoTB1eYSc0T5DfliBZP7t4qz6l3CPCzQCXDrZt8Brm2zEd-b7LAU4wiSN0KHfLC1
-  client-secret: ENFF8rkuqGTU27tOAE9S3NwZQyDYcSWOSv5zZEF-ZYuqHSQLvKf1ugtt4ZMnvmc6BZKZPL5zMkevO2yL
-  amount: 150.00
-  currency: PLN
+  client-id: ${PAYPAL_CLIENT_ID:ATsjDqjpPBHA5ZNFAm4YGLPioWd6e2deYB12kbksjVD5xDROAq0QFIPf32lR5n-3_m4GcenSPsJ1dS_A}
+  client-secret: ${PAYPAL_CLIENT_SECRET:EHsOc_t4LQ4tndkT6iuufi6mWI44buCHZVvhwjZPalykt4XZajmUZhg5JthcFP260iLsrLQQMho9N84g}
+  amount: ${PAYPAL_AMOUNT:150.00}
+  currency: ${PAYPAL_CURRENCY:PLN}
+
+scheduler:
+  cron: "0 0 8 10 * ?"

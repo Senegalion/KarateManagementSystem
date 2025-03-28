@@ -7,8 +7,20 @@ spring:
   jpa:
     hibernate.ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: localhost
+    port: 3025
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
 
 paypal:
   mode: "sandbox"
   amount: 150
   currency: PLN
+
+scheduler:
+  cron: "*/5 * * * * *"
