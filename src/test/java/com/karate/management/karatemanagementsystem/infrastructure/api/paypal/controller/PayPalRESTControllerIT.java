@@ -26,7 +26,10 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -82,6 +85,9 @@ class PayPalRESTControllerIT {
     @MockBean
     private PayPalClientInterface payPalClient;
 
+    @MockBean
+    private Clock clock;
+
     private UserEntity userEntity;
 
     @BeforeAll
@@ -101,14 +107,20 @@ class PayPalRESTControllerIT {
 
         userEntity = new UserEntity();
         userEntity.setUsername("testUser");
+        userEntity.setEmail("testEmail@gmail.com");
         userEntity.setPassword("password");
         userRepository.save(userEntity);
+
+        Instant fixedInstant = Instant.parse("2025-03-27T00:00:00Z");
+        when(clock.instant()).thenReturn(fixedInstant);
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
     }
 
     @Test
     @WithMockUser(username = "testUser", roles = "USER")
     void should_create_payment_and_return_payment_response() throws IOException {
         // given
+        LocalDate now = LocalDate.now(clock);
         when(payPalClient.createPayment(anyString())).thenReturn(PAYMENT_ID);
         wireMockServer.stubFor(post(urlEqualTo("/v2/checkout/orders"))
                 .withRequestBody(equalToJson(PAYMENT_REQUEST_PAYLOAD))
@@ -121,10 +133,10 @@ class PayPalRESTControllerIT {
                                         "userId": 1,
                                         "amount": 150.00,
                                         "status": "PENDING",
-                                        "paymentDate": "2025-03-27",
+                                        "paymentDate": "%s",
                                         "approvalUrl": "https://www.sandbox.paypal.com/checkoutnow?token=6N579553BD4383536"
                                     }
-                                """)));
+                                """.trim().formatted(now))));
 
         // when
         PaymentRequestDto paymentRequestDto = new PaymentRequestDto(
@@ -142,7 +154,7 @@ class PayPalRESTControllerIT {
         assertThat(paymentResponseDto.userId()).isNotNull();
         assertThat(paymentResponseDto.amount()).isEqualTo(BigDecimal.valueOf(150.00));
         assertThat(paymentResponseDto.status()).isEqualTo(PaymentStatus.PENDING);
-        assertThat(paymentResponseDto.paymentDate()).isEqualTo("2025-03-27");
+        assertThat(paymentResponseDto.paymentDate()).isEqualTo(now.toString());
         assertThat(paymentResponseDto.approvalUrl()).isEqualTo("https://www.sandbox.paypal.com/checkoutnow?token=6N579553BD4383536");
     }
 

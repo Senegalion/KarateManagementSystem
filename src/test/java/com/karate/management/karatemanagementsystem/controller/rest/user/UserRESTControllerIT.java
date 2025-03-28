@@ -125,6 +125,7 @@ class UserRESTControllerIT {
         // given & when
         UserEntity user = new UserEntity();
         user.setUsername("testUser");
+        user.setEmail("someEmail@gmail.com");
         user.setPassword("password");
         userRepository.save(user);
 
@@ -155,6 +156,7 @@ class UserRESTControllerIT {
         // given
         UserEntity testUser = new UserEntity();
         testUser.setUsername("testUser");
+        testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
         UserEntity savedUser = userRepository.save(testUser);
 
@@ -195,6 +197,7 @@ class UserRESTControllerIT {
 
         UserEntity testUser = new UserEntity();
         testUser.setUsername("testUser");
+        testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
         userRepository.save(testUser);
 
@@ -211,6 +214,7 @@ class UserRESTControllerIT {
         // given
         UserEntity testUser = new UserEntity();
         testUser.setUsername("testUser");
+        testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
         testUser = userRepository.save(testUser);
 
@@ -238,6 +242,7 @@ class UserRESTControllerIT {
         // given
         UserEntity testUser = new UserEntity();
         testUser.setUsername("testUser");
+        testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
         UserEntity savedUser = userRepository.save(testUser);
 
@@ -281,6 +286,7 @@ class UserRESTControllerIT {
 
         UserEntity testUser = new UserEntity();
         testUser.setUsername("testUser");
+        testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
         userRepository.save(testUser);
 
@@ -297,6 +303,7 @@ class UserRESTControllerIT {
         // given
         UserEntity testUser = new UserEntity();
         testUser.setUsername("testUser");
+        testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
         testUser = userRepository.save(testUser);
 
@@ -318,6 +325,7 @@ class UserRESTControllerIT {
         // given
         UserEntity testUser = new UserEntity();
         testUser.setUsername("testUser");
+        testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
         userRepository.save(testUser);
 
@@ -353,6 +361,7 @@ class UserRESTControllerIT {
         // given
         UserEntity testUser = new UserEntity();
         testUser.setUsername("testUser");
+        testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
         userRepository.save(testUser);
 
@@ -369,6 +378,7 @@ class UserRESTControllerIT {
         // given
         UserEntity testUser = new UserEntity();
         testUser.setUsername("testUser");
+        testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
         userRepository.save(testUser);
 
@@ -408,6 +418,7 @@ class UserRESTControllerIT {
         // given
         UserEntity testUser = new UserEntity();
         testUser.setUsername("testUser");
+        testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
         userRepository.save(testUser);
 
@@ -428,6 +439,7 @@ class UserRESTControllerIT {
         // given
         UserEntity testUser = new UserEntity();
         testUser.setUsername("testUser");
+        testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
         userRepository.save(testUser);
 
@@ -453,6 +465,7 @@ class UserRESTControllerIT {
         // given
         UserEntity testUser = new UserEntity();
         testUser.setUsername("testUser");
+        testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
         userRepository.save(testUser);
 
@@ -468,6 +481,7 @@ class UserRESTControllerIT {
         // given
         UserEntity testUser = new UserEntity();
         testUser.setUsername("testUser");
+        testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
         userRepository.save(testUser);
 

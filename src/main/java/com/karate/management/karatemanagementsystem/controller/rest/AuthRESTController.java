@@ -1,6 +1,5 @@
 package com.karate.management.karatemanagementsystem.controller.rest;
 
-import com.karate.management.karatemanagementsystem.service.exception.UsernameWhileTryingToLogInNotFoundException;
 import com.karate.management.karatemanagementsystem.infrastructure.security.jwt.JwtAuthenticatorService;
 import com.karate.management.karatemanagementsystem.model.dto.login.LoginResponseDto;
 import com.karate.management.karatemanagementsystem.model.dto.login.TokenRequestDto;
@@ -8,6 +7,7 @@ import com.karate.management.karatemanagementsystem.model.dto.registration.Regis
 import com.karate.management.karatemanagementsystem.model.dto.registration.RegistrationResultDto;
 import com.karate.management.karatemanagementsystem.model.dto.user.UserDto;
 import com.karate.management.karatemanagementsystem.service.AuthService;
+import com.karate.management.karatemanagementsystem.service.exception.UsernameWhileTryingToLogInNotFoundException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,10 +33,11 @@ public class AuthRESTController {
         RegistrationResultDto registrationResultDto =
                 authService.register(
                         new RegisterUserDto(
-                                registerUserDto.username(), registerUserDto.city(),
-                                registerUserDto.street(), registerUserDto.number(),
-                                registerUserDto.postalCode(), registerUserDto.karateClubName(),
-                                registerUserDto.karateRank(), registerUserDto.role(), encodedPassword
+                                registerUserDto.username(), registerUserDto.email(),
+                                registerUserDto.city(), registerUserDto.street(),
+                                registerUserDto.number(), registerUserDto.postalCode(),
+                                registerUserDto.karateClubName(), registerUserDto.karateRank(),
+                                registerUserDto.role(), encodedPassword
                         )
                 );
         return ResponseEntity.status(HttpStatus.CREATED).body(registrationResultDto);

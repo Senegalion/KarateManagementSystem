@@ -1,5 +1,6 @@
 package com.karate.management.karatemanagementsystem.service.mapper;
 
+import com.karate.management.karatemanagementsystem.model.dto.user.scheduler.UserWithDebtDto;
 import com.karate.management.karatemanagementsystem.model.staticdata.KarateClubName;
 import com.karate.management.karatemanagementsystem.model.staticdata.KarateRank;
 import com.karate.management.karatemanagementsystem.model.staticdata.RoleName;
@@ -25,6 +26,7 @@ public class UserMapper {
     public static UserDetailsDto mapToUserDetailsDto(UserEntity userEntity) {
         return UserDetailsDto.builder()
                 .username(userEntity.getUsername())
+                .email(userEntity.getEmail())
                 .karateClub(userEntity.getKarateClub())
                 .karateRank(userEntity.getKarateRank())
                 .addressEntity(userEntity.getAddressEntity())
@@ -42,6 +44,7 @@ public class UserMapper {
 
         return UserEntity.builder()
                 .username(registerUserDto.username())
+                .email(registerUserDto.email())
                 .karateClub(karateClubEntity)
                 .karateRank(KarateRank.valueOf(registerUserDto.karateRank()))
                 .roleEntities(roleEntities)
@@ -54,6 +57,15 @@ public class UserMapper {
                         .build())
                 .feedbackEntities(new HashSet<>())
                 .trainingSessionEntities(new HashSet<>())
+                .build();
+    }
+
+    public static UserWithDebtDto convertToUserWithDebtDto(UserEntity userEntity) {
+        return UserWithDebtDto.builder()
+                .userId(userEntity.getUserId())
+                .username(userEntity.getUsername())
+                .email(userEntity.getEmail())
+                .karateRank(userEntity.getKarateRank())
                 .build();
     }
 }

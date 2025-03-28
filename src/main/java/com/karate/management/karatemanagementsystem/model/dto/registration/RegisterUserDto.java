@@ -1,5 +1,6 @@
 package com.karate.management.karatemanagementsystem.model.dto.registration;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -9,6 +10,10 @@ public record RegisterUserDto(
         @NotNull(message = "{username.not.null}")
         @NotEmpty(message = "{username.not.empty}")
         String username,
+        @NotNull(message = "{email.not.null}")
+        @NotEmpty(message = "{email.not.empty}")
+        @Email
+        String email,
         @NotNull(message = "{city.not.null}")
         @NotEmpty(message = "{city.not.empty}")
         String city,

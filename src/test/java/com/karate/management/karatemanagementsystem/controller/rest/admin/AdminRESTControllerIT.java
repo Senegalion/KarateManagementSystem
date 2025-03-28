@@ -81,6 +81,7 @@ class AdminRESTControllerIT {
     private UserEntity createUser(String username) {
         UserEntity user = new UserEntity();
         user.setUsername(username);
+        user.setEmail("someEmail@gmail.com");
         user.setPassword("password");
         return userRepository.save(user);
     }

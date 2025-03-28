@@ -8,6 +8,7 @@ import lombok.Builder;
 @Builder
 public record UserDetailsDto(
         String username,
+        String email,
         KarateClubEntity karateClub,
         KarateRank karateRank,
         AddressEntity addressEntity

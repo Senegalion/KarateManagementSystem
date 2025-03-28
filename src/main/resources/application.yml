@@ -1,5 +1,6 @@
 server:
   port: 8082
+
 spring:
   application:
     name: KarateManagementSystem
@@ -17,16 +18,30 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: lupelikan@gmail.com
+    password: f t i j g e b q o q q i a r v z
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+      timeout: 5000
+      connectiontimeout: 5000
+      writetimeout: 5000
 
 auth:
   jwt:
-    secretKey: ${JWT_SECRET}
+    secretKey: gv2guyutf3yghudgytfdgy32ugytd32ygiugydtucuyieuhfgyiuviuhosjifibijimikmjnifujiuheg2fg8f6tyg3yvdbusayuvdbnoufyvu2yeuhdvy2fbu3h898gtf74g837h928rf78grveudybiuncojf8egrh978fyeiuhdj824f937g8fybeiund2hf987g38rye2h93g7r8ybfeunwdh9furgbyiuifu
     expirationDays: 30
     issuer: karate-management-system-backend
 
 paypal:
   mode: "sandbox"
-  client-id: ${PAYPAL_CLIENT_ID}
-  client-secret: ${PAYPAL_CLIENT_SECRET}
+  client-id: Abh466y0r3o8IyehVoTB1eYSc0T5DfliBZP7t4qz6l3CPCzQCXDrZt8Brm2zEd-b7LAU4wiSN0KHfLC1
+  client-secret: ENFF8rkuqGTU27tOAE9S3NwZQyDYcSWOSv5zZEF-ZYuqHSQLvKf1ugtt4ZMnvmc6BZKZPL5zMkevO2yL
   amount: 150.00
   currency: PLN

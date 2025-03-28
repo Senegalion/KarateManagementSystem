@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 
 @Service
@@ -29,6 +30,7 @@ public class PayPalService {
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
+    private final Clock clock;
 
     @Value("${paypal.currency}")
     private String currency;
@@ -37,11 +39,12 @@ public class PayPalService {
     private BigDecimal amount;
 
     public PayPalService(PayPalClientInterface payPalClient, PaymentRepository paymentRepository,
-                         UserRepository userRepository, ObjectMapper objectMapper) {
+                         UserRepository userRepository, ObjectMapper objectMapper, Clock clock) {
         this.payPalClient = payPalClient;
         this.paymentRepository = paymentRepository;
         this.userRepository = userRepository;
         this.objectMapper = objectMapper;
+        this.clock = clock;
     }
 
     private UserEntity getAuthenticatedUser() {
@@ -100,7 +103,7 @@ public class PayPalService {
             payment.setPaypalOrderId(token);
             payment.setUserEntity(userEntity);
             payment.setAmount(paymentRequest.value());
-            payment.setPaymentDate(LocalDate.now());
+            payment.setPaymentDate(LocalDate.now(clock));
             payment.setPaymentStatus(PaymentStatus.PENDING);
             userEntity.getPaymentEntities().add(payment);
 

@@ -1,8 +1,5 @@
 package com.karate.management.karatemanagementsystem.service;
 
-import com.karate.management.karatemanagementsystem.model.staticdata.KarateClubName;
-import com.karate.management.karatemanagementsystem.model.staticdata.KarateRank;
-import com.karate.management.karatemanagementsystem.model.staticdata.RoleName;
 import com.karate.management.karatemanagementsystem.model.dto.registration.RegisterUserDto;
 import com.karate.management.karatemanagementsystem.model.dto.registration.RegistrationResultDto;
 import com.karate.management.karatemanagementsystem.model.dto.user.UserDto;
@@ -12,6 +9,9 @@ import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
 import com.karate.management.karatemanagementsystem.model.repository.KarateClubRepository;
 import com.karate.management.karatemanagementsystem.model.repository.RoleRepository;
 import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
+import com.karate.management.karatemanagementsystem.model.staticdata.KarateClubName;
+import com.karate.management.karatemanagementsystem.model.staticdata.KarateRank;
+import com.karate.management.karatemanagementsystem.model.staticdata.RoleName;
 import com.karate.management.karatemanagementsystem.service.exception.InvalidUserCredentialsException;
 import com.karate.management.karatemanagementsystem.service.mapper.UserMapper;
 import lombok.AllArgsConstructor;
@@ -50,13 +50,14 @@ public class AuthService {
         return RegistrationResultDto.builder()
                 .userId(savedUser.getUserId())
                 .username(registerUserDto.username())
+                .email(registerUserDto.email())
                 .build();
     }
 
     private static void validateWhetherRegistrationDataAreNull(RegisterUserDto registerUserDto) {
-        if (registerUserDto.username() == null || registerUserDto.password() == null
-                || registerUserDto.karateClubName() == null || registerUserDto.karateRank() == null
-                || registerUserDto.role() == null) {
+        if (registerUserDto.username() == null || registerUserDto.email() == null
+                || registerUserDto.password() == null || registerUserDto.karateClubName() == null
+                || registerUserDto.karateRank() == null || registerUserDto.role() == null) {
             throw new InvalidUserCredentialsException("User data cannot be null");
         }
     }

@@ -2,6 +2,7 @@ CREATE TABLE users
 (
     user_id        SERIAL PRIMARY KEY,
     username       VARCHAR(100) UNIQUE NOT NULL,
+    email          VARCHAR(100) UNIQUE NOT NULL,
     karate_club_id BIGINT,
     karate_rank    VARCHAR(10),
     password       VARCHAR(100)        NOT NULL,

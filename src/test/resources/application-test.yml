@@ -10,7 +10,5 @@ spring:
 
 paypal:
   mode: "sandbox"
-  client-id: ${PAYPAL_CLIENT_ID}
-  client-secret: ${PAYPAL_CLIENT_SECRET}
   amount: 150
   currency: PLN
