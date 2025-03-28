@@ -1,5 +1,6 @@
 package com.karate.management.karatemanagementsystem.infrastructure.scheduler;
 
+import com.karate.management.karatemanagementsystem.service.exception.EmailSendingException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
@@ -20,8 +21,8 @@ public class EmailService {
             helper.setSubject(subject);
             helper.setText(text);
             mailSender.send(message);
-        } catch (MessagingException e) {
-            e.printStackTrace();
+        } catch (MessagingException exception) {
+            throw new EmailSendingException("Error while sending email to " + to, exception);
         }
     }
 }

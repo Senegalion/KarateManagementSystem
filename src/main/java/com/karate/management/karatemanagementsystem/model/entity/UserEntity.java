@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -73,6 +74,9 @@ public class UserEntity implements UserDetails {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "userEntity")
     @Builder.Default
     private Set<PaymentEntity> paymentEntities = new HashSet<>();
+
+    @Column(name = "registration_date", nullable = false)
+    private LocalDate registrationDate;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

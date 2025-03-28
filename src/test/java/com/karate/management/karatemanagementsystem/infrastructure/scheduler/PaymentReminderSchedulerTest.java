@@ -1,6 +1,7 @@
 package com.karate.management.karatemanagementsystem.infrastructure.scheduler;
 
 import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
+import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +49,7 @@ class PaymentReminderSchedulerTest {
     }
 
     @Test
-    void should_send_payment_reminders_to_users_with_debts() {
+    void should_send_payment_reminders_to_users_with_debts() throws MessagingException {
         // given
         when(paymentService.getUsersWithOutstandingPayments()).thenReturn(List.of(user1, user2));
         when(paymentService.getUnpaidMonthsForUser(any())).thenReturn(List.of(YearMonth.now().minusMonths(1)));
@@ -62,7 +63,7 @@ class PaymentReminderSchedulerTest {
     }
 
     @Test
-    void should_not_send_emails_when_no_users_have_debts() {
+    void should_not_send_emails_when_no_users_have_debts() throws MessagingException {
         // given
         when(paymentService.getUsersWithOutstandingPayments()).thenReturn(Collections.emptyList());
 
@@ -74,7 +75,7 @@ class PaymentReminderSchedulerTest {
     }
 
     @Test
-    void should_not_send_email_if_user_has_no_unpaid_months() {
+    void should_not_send_email_if_user_has_no_unpaid_months() throws MessagingException {
         // given
         when(paymentService.getUsersWithOutstandingPayments()).thenReturn(List.of(user1));
         when(paymentService.getUnpaidMonthsForUser(user1)).thenReturn(Collections.emptyList());
@@ -87,7 +88,7 @@ class PaymentReminderSchedulerTest {
     }
 
     @Test
-    void should_handle_users_with_different_debt_amounts() {
+    void should_handle_users_with_different_debt_amounts() throws MessagingException {
         // given
         when(paymentService.getUsersWithOutstandingPayments()).thenReturn(List.of(user1, user2));
         when(paymentService.getUnpaidMonthsForUser(user1)).thenReturn(List.of(YearMonth.now().minusMonths(1)));
@@ -103,7 +104,7 @@ class PaymentReminderSchedulerTest {
     }
 
     @Test
-    void should_log_when_no_users_have_debts(CapturedOutput capturedOutput) {
+    void should_log_when_no_users_have_debts(CapturedOutput capturedOutput) throws MessagingException {
         // given
         when(paymentService.getUsersWithOutstandingPayments()).thenReturn(Collections.emptyList());
 
