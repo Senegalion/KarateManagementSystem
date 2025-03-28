@@ -24,6 +24,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -127,6 +128,7 @@ class UserRESTControllerIT {
         user.setUsername("testUser");
         user.setEmail("someEmail@gmail.com");
         user.setPassword("password");
+        user.setRegistrationDate(LocalDate.now());
         userRepository.save(user);
 
         // when & then
@@ -158,6 +160,7 @@ class UserRESTControllerIT {
         testUser.setUsername("testUser");
         testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
+        testUser.setRegistrationDate(LocalDate.now());
         UserEntity savedUser = userRepository.save(testUser);
 
         TrainingSessionEntity testSession = new TrainingSessionEntity();
@@ -199,6 +202,7 @@ class UserRESTControllerIT {
         testUser.setUsername("testUser");
         testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
+        testUser.setRegistrationDate(LocalDate.now());
         userRepository.save(testUser);
 
         // when & then
@@ -216,6 +220,7 @@ class UserRESTControllerIT {
         testUser.setUsername("testUser");
         testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
+        testUser.setRegistrationDate(LocalDate.now());
         testUser = userRepository.save(testUser);
 
         TrainingSessionEntity testSession = new TrainingSessionEntity();
@@ -244,6 +249,7 @@ class UserRESTControllerIT {
         testUser.setUsername("testUser");
         testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
+        testUser.setRegistrationDate(LocalDate.now());
         UserEntity savedUser = userRepository.save(testUser);
 
         TrainingSessionEntity testSession = new TrainingSessionEntity();
@@ -288,6 +294,7 @@ class UserRESTControllerIT {
         testUser.setUsername("testUser");
         testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
+        testUser.setRegistrationDate(LocalDate.now());
         userRepository.save(testUser);
 
         // when & then
@@ -305,6 +312,7 @@ class UserRESTControllerIT {
         testUser.setUsername("testUser");
         testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
+        testUser.setRegistrationDate(LocalDate.now());
         testUser = userRepository.save(testUser);
 
         TrainingSessionEntity testSession = new TrainingSessionEntity();
@@ -327,6 +335,7 @@ class UserRESTControllerIT {
         testUser.setUsername("testUser");
         testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
+        testUser.setRegistrationDate(LocalDate.now());
         userRepository.save(testUser);
 
         TrainingSessionEntity session1 = new TrainingSessionEntity();
@@ -363,6 +372,7 @@ class UserRESTControllerIT {
         testUser.setUsername("testUser");
         testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
+        testUser.setRegistrationDate(LocalDate.now());
         userRepository.save(testUser);
 
         // when & then
@@ -380,6 +390,7 @@ class UserRESTControllerIT {
         testUser.setUsername("testUser");
         testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
+        testUser.setRegistrationDate(LocalDate.now());
         userRepository.save(testUser);
 
         TrainingSessionEntity trainingSession = new TrainingSessionEntity();
@@ -420,6 +431,7 @@ class UserRESTControllerIT {
         testUser.setUsername("testUser");
         testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
+        testUser.setRegistrationDate(LocalDate.now());
         userRepository.save(testUser);
 
         TrainingSessionEntity otherSession = new TrainingSessionEntity();
@@ -441,6 +453,7 @@ class UserRESTControllerIT {
         testUser.setUsername("testUser");
         testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
+        testUser.setRegistrationDate(LocalDate.now());
         userRepository.save(testUser);
 
         TrainingSessionEntity trainingSession = new TrainingSessionEntity();
@@ -467,6 +480,7 @@ class UserRESTControllerIT {
         testUser.setUsername("testUser");
         testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
+        testUser.setRegistrationDate(LocalDate.now());
         userRepository.save(testUser);
 
         // when & then
@@ -483,6 +497,7 @@ class UserRESTControllerIT {
         testUser.setUsername("testUser");
         testUser.setEmail("someEmail@gmail.com");
         testUser.setPassword("password");
+        testUser.setRegistrationDate(LocalDate.now());
         userRepository.save(testUser);
 
         TrainingSessionEntity trainingSession = new TrainingSessionEntity();

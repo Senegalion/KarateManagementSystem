@@ -21,6 +21,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -83,6 +84,7 @@ class AdminRESTControllerIT {
         user.setUsername(username);
         user.setEmail("someEmail@gmail.com");
         user.setPassword("password");
+        user.setRegistrationDate(LocalDate.now());
         return userRepository.save(user);
     }
 

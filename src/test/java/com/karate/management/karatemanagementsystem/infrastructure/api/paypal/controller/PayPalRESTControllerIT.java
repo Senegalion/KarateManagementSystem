@@ -109,6 +109,7 @@ class PayPalRESTControllerIT {
         userEntity.setUsername("testUser");
         userEntity.setEmail("testEmail@gmail.com");
         userEntity.setPassword("password");
+        userEntity.setRegistrationDate(LocalDate.now());
         userRepository.save(userEntity);
 
         Instant fixedInstant = Instant.parse("2025-03-27T00:00:00Z");
