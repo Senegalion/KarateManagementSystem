@@ -87,6 +87,7 @@ class AuthRESTControllerIT {
         // given
         RegisterUserDto registerUserDto = new RegisterUserDto(
                 "testUser1",
+                "someEmail@gmail.com",
                 "someCity",
                 "someStreet",
                 "1",
@@ -102,13 +103,14 @@ class AuthRESTControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerUserDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value("testUser1"));
+                .andExpect(jsonPath("$.username").value("testUser1"))
+                .andExpect(jsonPath("$.email").value("someEmail@gmail.com"));
     }
 
     @Test
     void should_return_400_bad_request_when_user_registered_with_invalid_data() throws Exception {
         // given
-        RegisterUserDto invalidUserDto = new RegisterUserDto(null, "someCity",
+        RegisterUserDto invalidUserDto = new RegisterUserDto(null, "someEmail@gmail.com", "someCity",
                 "someStreet", "1", "12-345", "INVALID_CLUB",
                 "KYU_10", "USER", "password123");
 
@@ -124,6 +126,7 @@ class AuthRESTControllerIT {
         // given
         RegisterUserDto registerUserDto = new RegisterUserDto(
                 "testUser2",
+                "someEmail@gmail.com",
                 "someCity",
                 "someStreet",
                 "1",

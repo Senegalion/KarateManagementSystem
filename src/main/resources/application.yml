@@ -1,5 +1,6 @@
 server:
-  port: 8082
+  port: ${SERVER_PORT:8080}
+
 spring:
   application:
     name: KarateManagementSystem
@@ -17,16 +18,33 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:3025}
+    username: ${MAIL_USERNAME:defaultUsername}
+    password: ${MAIL_PASSWORD:defaultPassword}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+      timeout: ${MAIL_PROPERTIES_TIMEOUT:5000}
+      connectiontimeout: ${MAIL_PROPERTIES_CONNECTION_TIMEOUT:5000}
+      writetimeout: ${MAIL_PROPERTIES_WRITE_TIMEOUT:5000}
 
 auth:
   jwt:
-    secretKey: ${JWT_SECRET}
-    expirationDays: 30
+    secretKey: ${JWT_SECRET:defaultSecretKey}
+    expirationDays: ${JWT_EXPIRATION_DAYS:30}
     issuer: karate-management-system-backend
 
 paypal:
   mode: "sandbox"
-  client-id: ${PAYPAL_CLIENT_ID}
-  client-secret: ${PAYPAL_CLIENT_SECRET}
-  amount: 150.00
-  currency: PLN
+  client-id: ${PAYPAL_CLIENT_ID:ATsjDqjpPBHA5ZNFAm4YGLPioWd6e2deYB12kbksjVD5xDROAq0QFIPf32lR5n-3_m4GcenSPsJ1dS_A}
+  client-secret: ${PAYPAL_CLIENT_SECRET:EHsOc_t4LQ4tndkT6iuufi6mWI44buCHZVvhwjZPalykt4XZajmUZhg5JthcFP260iLsrLQQMho9N84g}
+  amount: ${PAYPAL_AMOUNT:150.00}
+  currency: ${PAYPAL_CURRENCY:PLN}
+
+scheduler:
+  cron: "0 0 8 10 * ?"

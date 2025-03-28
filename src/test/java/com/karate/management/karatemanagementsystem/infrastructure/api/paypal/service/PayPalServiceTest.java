@@ -18,7 +18,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,6 +39,9 @@ class PayPalServiceTest {
 
     @Mock
     private ObjectMapper objectMapper;
+
+    @Mock
+    private Clock clock;
 
     @InjectMocks
     private PayPalService payPalService;
@@ -61,6 +67,10 @@ class PayPalServiceTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(userEntity));
+
+        Instant fixedInstant = Instant.parse("2025-03-27T12:00:00Z");
+        when(clock.instant()).thenReturn(fixedInstant);
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
     }
 
     @Test

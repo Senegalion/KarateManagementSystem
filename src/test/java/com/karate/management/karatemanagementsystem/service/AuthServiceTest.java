@@ -46,6 +46,7 @@ class AuthServiceTest {
         // given
         RegisterUserDto validDto = RegisterUserDto.builder()
                 .username("testUser")
+                .email("someEmail")
                 .karateClubName("LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO")
                 .karateRank("KYU_10")
                 .role("USER")
@@ -59,6 +60,7 @@ class AuthServiceTest {
         UserEntity savedUser = new UserEntity();
         savedUser.setUserId(1L);
         savedUser.setUsername("testUser");
+        savedUser.setEmail("someEmail");
         savedUser.setRoleEntities(Set.of());
         when(userRepository.save(any(UserEntity.class))).thenReturn(savedUser);
 
@@ -69,6 +71,7 @@ class AuthServiceTest {
         assertNotNull(result);
         assertEquals(1L, result.userId());
         assertEquals("testUser", result.username());
+        assertEquals("someEmail", result.email());
         verify(userRepository, times(1)).save(any(UserEntity.class));
     }
 
@@ -77,6 +80,26 @@ class AuthServiceTest {
         // given
         RegisterUserDto invalidDto = RegisterUserDto.builder()
                 .username(null)
+                .email("someEmail")
+                .karateClubName("LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO")
+                .karateRank("KYU_10")
+                .role("USER")
+                .password("password123")
+                .build();
+
+        // when && then
+        InvalidUserCredentialsException exception = assertThrows(InvalidUserCredentialsException.class, () -> {
+            authService.register(invalidDto);
+        });
+        assertEquals("User data cannot be null", exception.getMessage());
+    }
+
+    @Test
+    void testRegisterUser_withNullEmail() {
+        // given
+        RegisterUserDto invalidDto = RegisterUserDto.builder()
+                .username("testUser")
+                .email(null)
                 .karateClubName("LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO")
                 .karateRank("KYU_10")
                 .role("USER")
@@ -95,6 +118,7 @@ class AuthServiceTest {
         // given
         RegisterUserDto invalidDto = RegisterUserDto.builder()
                 .username("testUser")
+                .email("someEmail")
                 .karateClubName("INVALID_CLUB")
                 .karateRank("KYU_10")
                 .role("USER")
@@ -113,6 +137,7 @@ class AuthServiceTest {
         // given
         RegisterUserDto invalidDto = RegisterUserDto.builder()
                 .username("testUser")
+                .email("someEmail")
                 .karateClubName("LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO")
                 .karateRank("INVALID_RANK")
                 .role("USER")
@@ -131,6 +156,7 @@ class AuthServiceTest {
         // given
         RegisterUserDto invalidDto = RegisterUserDto.builder()
                 .username("testUser")
+                .email("someEmail")
                 .karateClubName("LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO")
                 .karateRank("KYU_10")
                 .role("INVALID_ROLE")
@@ -149,6 +175,7 @@ class AuthServiceTest {
         // given
         RegisterUserDto invalidDto = RegisterUserDto.builder()
                 .username("testUser")
+                .email("someEmail")
                 .karateClubName("LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO")
                 .karateRank("KYU_10")
                 .role(null)
@@ -167,6 +194,7 @@ class AuthServiceTest {
         // given
         RegisterUserDto invalidDto = RegisterUserDto.builder()
                 .username("testUser")
+                .email("someEmail")
                 .karateClubName("LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO")
                 .karateRank("KYU_10")
                 .role("USER")
@@ -186,6 +214,7 @@ class AuthServiceTest {
         UserEntity userEntity = new UserEntity();
         userEntity.setUserId(1L);
         userEntity.setUsername("testUser");
+        userEntity.setEmail("someEmail");
         userEntity.setPassword("password123");
         userEntity.setRoleEntities(Set.of());
         when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(userEntity));

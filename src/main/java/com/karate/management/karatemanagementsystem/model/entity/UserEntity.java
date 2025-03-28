@@ -2,11 +2,13 @@ package com.karate.management.karatemanagementsystem.model.entity;
 
 import com.karate.management.karatemanagementsystem.model.staticdata.KarateRank;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,6 +31,10 @@ public class UserEntity implements UserDetails {
 
     @Column(name = "username", unique = true, nullable = false)
     private String username;
+
+    @Column(name = "email", unique = true, nullable = false)
+    @Email
+    private String email;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "karate_club_id")
@@ -68,6 +74,9 @@ public class UserEntity implements UserDetails {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "userEntity")
     @Builder.Default
     private Set<PaymentEntity> paymentEntities = new HashSet<>();
+
+    @Column(name = "registration_date", nullable = false)
+    private LocalDate registrationDate;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
