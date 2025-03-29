@@ -57,7 +57,7 @@ If you don't have a PayPal sandbox account yet, please follow the Testing PayPal
 To run the application, follow these steps:
 
 ```sh
-git clone https://github.com/twoj-repo/karate-management-system.git
+git clone https://github.com/Senegalion/KarateManagementSystem.git
 cd karate-management-system
 mvn clean install
 mvn spring-boot:run
