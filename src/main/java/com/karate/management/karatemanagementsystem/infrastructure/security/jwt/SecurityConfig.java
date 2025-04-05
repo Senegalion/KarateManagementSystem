@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -44,10 +45,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/v3/api-docs").permitAll()
+                        .requestMatchers("/swagger-ui.html/**").permitAll()
+                        .requestMatchers("/v3/api-docs*/**").permitAll()
+                        .requestMatchers("/v2/api-docs*/**").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
                         .requestMatchers("/swagger-resources/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/register").permitAll()
+                        .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/users/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/success/**").hasAnyRole("USER", "ADMIN")
