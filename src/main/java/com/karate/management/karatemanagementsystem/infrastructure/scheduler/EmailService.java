@@ -1,6 +1,6 @@
 package com.karate.management.karatemanagementsystem.infrastructure.scheduler;
 
-import com.karate.management.karatemanagementsystem.service.exception.EmailSendingException;
+import com.karate.management.karatemanagementsystem.domain.notification.EmailSendingException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;

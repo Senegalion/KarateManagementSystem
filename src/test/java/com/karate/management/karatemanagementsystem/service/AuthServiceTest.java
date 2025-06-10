@@ -1,15 +1,9 @@
 package com.karate.management.karatemanagementsystem.service;
 
-import com.karate.management.karatemanagementsystem.model.dto.registration.RegisterUserDto;
-import com.karate.management.karatemanagementsystem.model.dto.registration.RegistrationResultDto;
-import com.karate.management.karatemanagementsystem.model.dto.user.UserDto;
-import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
-import com.karate.management.karatemanagementsystem.model.entity.RoleEntity;
-import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
-import com.karate.management.karatemanagementsystem.model.repository.KarateClubRepository;
-import com.karate.management.karatemanagementsystem.model.repository.RoleRepository;
-import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
-import com.karate.management.karatemanagementsystem.service.exception.InvalidUserCredentialsException;
+import com.karate.management.karatemanagementsystem.domain.user.*;
+import com.karate.management.karatemanagementsystem.domain.user.dto.RegisterUserDto;
+import com.karate.management.karatemanagementsystem.domain.user.dto.RegistrationResultDto;
+import com.karate.management.karatemanagementsystem.domain.user.dto.UserDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

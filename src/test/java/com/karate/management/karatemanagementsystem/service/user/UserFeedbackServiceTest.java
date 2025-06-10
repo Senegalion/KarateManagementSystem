@@ -1,15 +1,16 @@
 package com.karate.management.karatemanagementsystem.service.user;
 
-import com.karate.management.karatemanagementsystem.model.dto.feedback.FeedbackResponseDto;
-import com.karate.management.karatemanagementsystem.model.entity.FeedbackEntity;
-import com.karate.management.karatemanagementsystem.model.entity.TrainingSessionEntity;
-import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
-import com.karate.management.karatemanagementsystem.model.repository.FeedbackRepository;
-import com.karate.management.karatemanagementsystem.model.repository.TrainingSessionRepository;
-import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
-import com.karate.management.karatemanagementsystem.service.exception.FeedbackNotFoundException;
-import com.karate.management.karatemanagementsystem.service.exception.TrainingSessionNotFoundException;
-import com.karate.management.karatemanagementsystem.service.exception.UserNotSignedUpException;
+import com.karate.management.karatemanagementsystem.domain.feedback.UserFeedbackService;
+import com.karate.management.karatemanagementsystem.domain.feedback.dto.FeedbackResponseDto;
+import com.karate.management.karatemanagementsystem.domain.feedback.FeedbackEntity;
+import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionEntity;
+import com.karate.management.karatemanagementsystem.domain.user.UserEntity;
+import com.karate.management.karatemanagementsystem.domain.feedback.FeedbackRepository;
+import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionRepository;
+import com.karate.management.karatemanagementsystem.domain.user.UserRepository;
+import com.karate.management.karatemanagementsystem.domain.feedback.FeedbackNotFoundException;
+import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionNotFoundException;
+import com.karate.management.karatemanagementsystem.domain.user.UserNotSignedUpException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

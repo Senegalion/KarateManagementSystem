@@ -1,14 +1,15 @@
 package com.karate.management.karatemanagementsystem.service.admin;
 
-import com.karate.management.karatemanagementsystem.model.dto.feedback.FeedbackRequestDto;
-import com.karate.management.karatemanagementsystem.model.dto.feedback.FeedbackResponseDto;
-import com.karate.management.karatemanagementsystem.model.entity.FeedbackEntity;
-import com.karate.management.karatemanagementsystem.model.entity.TrainingSessionEntity;
-import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
-import com.karate.management.karatemanagementsystem.model.repository.FeedbackRepository;
-import com.karate.management.karatemanagementsystem.model.repository.TrainingSessionRepository;
-import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
-import com.karate.management.karatemanagementsystem.service.exception.TrainingSessionNotFoundException;
+import com.karate.management.karatemanagementsystem.domain.feedback.AdminFeedbackService;
+import com.karate.management.karatemanagementsystem.domain.feedback.dto.FeedbackRequestDto;
+import com.karate.management.karatemanagementsystem.domain.feedback.dto.FeedbackResponseDto;
+import com.karate.management.karatemanagementsystem.domain.feedback.FeedbackEntity;
+import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionEntity;
+import com.karate.management.karatemanagementsystem.domain.user.UserEntity;
+import com.karate.management.karatemanagementsystem.domain.feedback.FeedbackRepository;
+import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionRepository;
+import com.karate.management.karatemanagementsystem.domain.user.UserRepository;
+import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

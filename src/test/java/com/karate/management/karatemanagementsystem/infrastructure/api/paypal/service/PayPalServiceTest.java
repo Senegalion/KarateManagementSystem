@@ -2,13 +2,13 @@ package com.karate.management.karatemanagementsystem.infrastructure.api.paypal.s
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karate.management.karatemanagementsystem.infrastructure.api.paypal.client.PayPalClientInterface;
-import com.karate.management.karatemanagementsystem.model.dto.paypal.PaymentRequestDto;
-import com.karate.management.karatemanagementsystem.model.dto.paypal.PaymentResponseDto;
-import com.karate.management.karatemanagementsystem.model.entity.PaymentEntity;
-import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
-import com.karate.management.karatemanagementsystem.model.repository.PaymentRepository;
-import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
-import com.karate.management.karatemanagementsystem.model.staticdata.PaymentStatus;
+import com.karate.management.karatemanagementsystem.domain.payment.dto.PaymentRequestDto;
+import com.karate.management.karatemanagementsystem.domain.payment.dto.PaymentResponseDto;
+import com.karate.management.karatemanagementsystem.domain.payment.PaymentEntity;
+import com.karate.management.karatemanagementsystem.domain.user.UserEntity;
+import com.karate.management.karatemanagementsystem.domain.payment.PaymentRepository;
+import com.karate.management.karatemanagementsystem.domain.user.UserRepository;
+import com.karate.management.karatemanagementsystem.domain.payment.PaymentStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
