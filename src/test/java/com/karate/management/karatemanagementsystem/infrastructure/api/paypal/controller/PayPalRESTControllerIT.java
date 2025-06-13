@@ -1,19 +1,18 @@
 package com.karate.management.karatemanagementsystem.infrastructure.api.paypal.controller;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
-import com.karate.management.karatemanagementsystem.infrastructure.api.paypal.client.PayPalClientInterface;
-import com.karate.management.karatemanagementsystem.infrastructure.api.paypal.service.PayPalService;
-import com.karate.management.karatemanagementsystem.model.dto.paypal.PaymentRequestDto;
-import com.karate.management.karatemanagementsystem.model.dto.paypal.PaymentResponseDto;
-import com.karate.management.karatemanagementsystem.model.entity.PaymentEntity;
-import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
-import com.karate.management.karatemanagementsystem.model.repository.PaymentRepository;
-import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
-import com.karate.management.karatemanagementsystem.model.staticdata.PaymentStatus;
+import com.karate.management.karatemanagementsystem.payment.infrastructure.api.paypal.client.PayPalClientInterface;
+import com.karate.management.karatemanagementsystem.payment.domain.service.PayPalService;
+import com.karate.management.karatemanagementsystem.payment.api.dto.PaymentRequestDto;
+import com.karate.management.karatemanagementsystem.payment.api.dto.PaymentResponseDto;
+import com.karate.management.karatemanagementsystem.payment.domain.model.PaymentEntity;
+import com.karate.management.karatemanagementsystem.user.domain.model.UserEntity;
+import com.karate.management.karatemanagementsystem.payment.domain.repository.PaymentRepository;
+import com.karate.management.karatemanagementsystem.user.domain.repository.UserRepository;
+import com.karate.management.karatemanagementsystem.payment.domain.model.PaymentStatus;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,7 +29,6 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;

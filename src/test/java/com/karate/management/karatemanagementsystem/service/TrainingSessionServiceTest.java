@@ -1,15 +1,15 @@
 package com.karate.management.karatemanagementsystem.service;
 
-import com.karate.management.karatemanagementsystem.model.dto.trainingsession.TrainingSessionRegistrationResponseDto;
-import com.karate.management.karatemanagementsystem.model.dto.trainingsession.TrainingSessionDto;
-import com.karate.management.karatemanagementsystem.model.entity.TrainingSessionEntity;
-import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
-import com.karate.management.karatemanagementsystem.model.repository.TrainingSessionRepository;
-import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
-import com.karate.management.karatemanagementsystem.service.exception.TrainingSessionNotFoundException;
-import com.karate.management.karatemanagementsystem.service.exception.UserAlreadySignedUpException;
-import com.karate.management.karatemanagementsystem.service.exception.UserNotSignedUpException;
-import com.karate.management.karatemanagementsystem.service.user.TrainingSessionService;
+import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionRegistrationResponseDto;
+import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionDto;
+import com.karate.management.karatemanagementsystem.training.domain.model.TrainingSessionEntity;
+import com.karate.management.karatemanagementsystem.user.domain.model.UserEntity;
+import com.karate.management.karatemanagementsystem.training.domain.repository.TrainingSessionRepository;
+import com.karate.management.karatemanagementsystem.user.domain.repository.UserRepository;
+import com.karate.management.karatemanagementsystem.training.domain.exception.TrainingSessionNotFoundException;
+import com.karate.management.karatemanagementsystem.user.domain.exception.UserAlreadySignedUpException;
+import com.karate.management.karatemanagementsystem.user.domain.exception.UserNotSignedUpException;
+import com.karate.management.karatemanagementsystem.training.domain.service.TrainingSessionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

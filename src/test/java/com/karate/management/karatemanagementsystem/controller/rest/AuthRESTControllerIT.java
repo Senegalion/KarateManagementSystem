@@ -1,14 +1,14 @@
 package com.karate.management.karatemanagementsystem.controller.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.karate.management.karatemanagementsystem.model.staticdata.KarateClubName;
-import com.karate.management.karatemanagementsystem.model.staticdata.RoleName;
-import com.karate.management.karatemanagementsystem.model.dto.registration.RegisterUserDto;
-import com.karate.management.karatemanagementsystem.model.dto.login.TokenRequestDto;
-import com.karate.management.karatemanagementsystem.model.entity.KarateClubEntity;
-import com.karate.management.karatemanagementsystem.model.entity.RoleEntity;
-import com.karate.management.karatemanagementsystem.model.repository.KarateClubRepository;
-import com.karate.management.karatemanagementsystem.model.repository.RoleRepository;
+import com.karate.management.karatemanagementsystem.user.domain.model.KarateClubName;
+import com.karate.management.karatemanagementsystem.user.domain.model.RoleName;
+import com.karate.management.karatemanagementsystem.user.api.dto.RegisterUserDto;
+import com.karate.management.karatemanagementsystem.user.api.dto.TokenRequestDto;
+import com.karate.management.karatemanagementsystem.user.domain.model.KarateClubEntity;
+import com.karate.management.karatemanagementsystem.user.domain.model.RoleEntity;
+import com.karate.management.karatemanagementsystem.user.domain.repository.KarateClubRepository;
+import com.karate.management.karatemanagementsystem.user.domain.repository.RoleRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

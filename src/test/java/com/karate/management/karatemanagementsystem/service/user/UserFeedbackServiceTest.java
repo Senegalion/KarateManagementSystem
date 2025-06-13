@@ -1,15 +1,16 @@
 package com.karate.management.karatemanagementsystem.service.user;
 
-import com.karate.management.karatemanagementsystem.model.dto.feedback.FeedbackResponseDto;
-import com.karate.management.karatemanagementsystem.model.entity.FeedbackEntity;
-import com.karate.management.karatemanagementsystem.model.entity.TrainingSessionEntity;
-import com.karate.management.karatemanagementsystem.model.entity.UserEntity;
-import com.karate.management.karatemanagementsystem.model.repository.FeedbackRepository;
-import com.karate.management.karatemanagementsystem.model.repository.TrainingSessionRepository;
-import com.karate.management.karatemanagementsystem.model.repository.UserRepository;
-import com.karate.management.karatemanagementsystem.service.exception.FeedbackNotFoundException;
-import com.karate.management.karatemanagementsystem.service.exception.TrainingSessionNotFoundException;
-import com.karate.management.karatemanagementsystem.service.exception.UserNotSignedUpException;
+import com.karate.management.karatemanagementsystem.feedback.domain.service.UserFeedbackService;
+import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackResponseDto;
+import com.karate.management.karatemanagementsystem.feedback.domain.model.FeedbackEntity;
+import com.karate.management.karatemanagementsystem.training.domain.model.TrainingSessionEntity;
+import com.karate.management.karatemanagementsystem.user.domain.model.UserEntity;
+import com.karate.management.karatemanagementsystem.feedback.domain.repository.FeedbackRepository;
+import com.karate.management.karatemanagementsystem.training.domain.repository.TrainingSessionRepository;
+import com.karate.management.karatemanagementsystem.user.domain.repository.UserRepository;
+import com.karate.management.karatemanagementsystem.feedback.domain.exception.FeedbackNotFoundException;
+import com.karate.management.karatemanagementsystem.training.domain.exception.TrainingSessionNotFoundException;
+import com.karate.management.karatemanagementsystem.user.domain.exception.UserNotSignedUpException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
