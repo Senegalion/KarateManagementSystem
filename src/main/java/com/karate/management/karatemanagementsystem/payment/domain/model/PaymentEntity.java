@@ -1,4 +1,4 @@
-package com.karate.management.karatemanagementsystem.domain.payment;
+package com.karate.management.karatemanagementsystem.payment.domain.model;
 
 import com.karate.management.karatemanagementsystem.user.domain.model.UserEntity;
 import jakarta.persistence.*;

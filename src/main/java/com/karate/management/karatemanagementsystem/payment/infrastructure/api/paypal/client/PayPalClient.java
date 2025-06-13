@@ -1,4 +1,4 @@
-package com.karate.management.karatemanagementsystem.infrastructure.api.paypal.client;
+package com.karate.management.karatemanagementsystem.payment.infrastructure.api.paypal.client;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;

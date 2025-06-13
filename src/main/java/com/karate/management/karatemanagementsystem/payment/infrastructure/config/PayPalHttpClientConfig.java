@@ -1,4 +1,4 @@
-package com.karate.management.karatemanagementsystem.infrastructure.api.paypal.config;
+package com.karate.management.karatemanagementsystem.payment.infrastructure.config;
 
 
 import com.paypal.core.PayPalEnvironment;

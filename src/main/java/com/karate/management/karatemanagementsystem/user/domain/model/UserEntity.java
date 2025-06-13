@@ -2,7 +2,7 @@ package com.karate.management.karatemanagementsystem.user.domain.model;
 
 import com.karate.management.karatemanagementsystem.feedback.domain.model.FeedbackEntity;
 import com.karate.management.karatemanagementsystem.training.domain.model.TrainingSessionEntity;
-import com.karate.management.karatemanagementsystem.domain.payment.PaymentEntity;
+import com.karate.management.karatemanagementsystem.payment.domain.model.PaymentEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;

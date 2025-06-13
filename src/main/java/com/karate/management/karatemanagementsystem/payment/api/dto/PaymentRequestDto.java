@@ -1,4 +1,4 @@
-package com.karate.management.karatemanagementsystem.domain.payment.dto;
+package com.karate.management.karatemanagementsystem.payment.api.dto;
 
 import lombok.Builder;
 

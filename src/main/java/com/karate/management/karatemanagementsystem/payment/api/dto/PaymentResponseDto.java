@@ -1,7 +1,7 @@
-package com.karate.management.karatemanagementsystem.domain.payment.dto;
+package com.karate.management.karatemanagementsystem.payment.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.karate.management.karatemanagementsystem.domain.payment.PaymentStatus;
+import com.karate.management.karatemanagementsystem.payment.domain.model.PaymentStatus;
 import lombok.Builder;
 
 import java.math.BigDecimal;

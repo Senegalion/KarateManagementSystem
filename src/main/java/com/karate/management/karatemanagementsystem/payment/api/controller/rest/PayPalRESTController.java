@@ -1,8 +1,8 @@
-package com.karate.management.karatemanagementsystem.infrastructure.api.paypal.controller;
+package com.karate.management.karatemanagementsystem.payment.api.controller.rest;
 
-import com.karate.management.karatemanagementsystem.infrastructure.api.paypal.service.PayPalService;
-import com.karate.management.karatemanagementsystem.domain.payment.dto.PaymentRequestDto;
-import com.karate.management.karatemanagementsystem.domain.payment.dto.PaymentResponseDto;
+import com.karate.management.karatemanagementsystem.payment.domain.service.PayPalService;
+import com.karate.management.karatemanagementsystem.payment.api.dto.PaymentRequestDto;
+import com.karate.management.karatemanagementsystem.payment.api.dto.PaymentResponseDto;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpStatus;

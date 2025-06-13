@@ -1,15 +1,15 @@
 package com.karate.management.karatemanagementsystem.infrastructure.api.paypal.controller;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
-import com.karate.management.karatemanagementsystem.infrastructure.api.paypal.client.PayPalClientInterface;
-import com.karate.management.karatemanagementsystem.infrastructure.api.paypal.service.PayPalService;
-import com.karate.management.karatemanagementsystem.domain.payment.dto.PaymentRequestDto;
-import com.karate.management.karatemanagementsystem.domain.payment.dto.PaymentResponseDto;
-import com.karate.management.karatemanagementsystem.domain.payment.PaymentEntity;
+import com.karate.management.karatemanagementsystem.payment.infrastructure.api.paypal.client.PayPalClientInterface;
+import com.karate.management.karatemanagementsystem.payment.domain.service.PayPalService;
+import com.karate.management.karatemanagementsystem.payment.api.dto.PaymentRequestDto;
+import com.karate.management.karatemanagementsystem.payment.api.dto.PaymentResponseDto;
+import com.karate.management.karatemanagementsystem.payment.domain.model.PaymentEntity;
 import com.karate.management.karatemanagementsystem.user.domain.model.UserEntity;
-import com.karate.management.karatemanagementsystem.domain.payment.PaymentRepository;
+import com.karate.management.karatemanagementsystem.payment.domain.repository.PaymentRepository;
 import com.karate.management.karatemanagementsystem.user.domain.repository.UserRepository;
-import com.karate.management.karatemanagementsystem.domain.payment.PaymentStatus;
+import com.karate.management.karatemanagementsystem.payment.domain.model.PaymentStatus;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;

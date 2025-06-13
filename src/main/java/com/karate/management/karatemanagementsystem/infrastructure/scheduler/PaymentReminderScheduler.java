@@ -1,6 +1,7 @@
 package com.karate.management.karatemanagementsystem.infrastructure.scheduler;
 
 import com.karate.management.karatemanagementsystem.domain.notification.dto.UserWithDebtDto;
+import com.karate.management.karatemanagementsystem.payment.domain.service.PaymentService;
 import com.karate.management.karatemanagementsystem.user.domain.model.UserEntity;
 import com.karate.management.karatemanagementsystem.user.infrastructure.persistence.mapper.UserMapper;
 import lombok.AllArgsConstructor;

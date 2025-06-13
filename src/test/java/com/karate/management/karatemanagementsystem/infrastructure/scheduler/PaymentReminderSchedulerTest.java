@@ -1,5 +1,6 @@
 package com.karate.management.karatemanagementsystem.infrastructure.scheduler;
 
+import com.karate.management.karatemanagementsystem.payment.domain.service.PaymentService;
 import com.karate.management.karatemanagementsystem.user.domain.model.UserEntity;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;

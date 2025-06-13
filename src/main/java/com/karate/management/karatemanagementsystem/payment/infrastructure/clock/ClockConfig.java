@@ -1,4 +1,4 @@
-package com.karate.management.karatemanagementsystem.infrastructure.clock;
+package com.karate.management.karatemanagementsystem.payment.infrastructure.clock;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

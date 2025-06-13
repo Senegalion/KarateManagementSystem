@@ -1,4 +1,4 @@
-package com.karate.management.karatemanagementsystem.domain.payment.api;
+package com.karate.management.karatemanagementsystem.payment.api.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
