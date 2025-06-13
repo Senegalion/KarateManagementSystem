@@ -12,7 +12,7 @@ import com.karate.management.karatemanagementsystem.user.domain.repository.Karat
 import com.karate.management.karatemanagementsystem.user.domain.repository.RoleRepository;
 import com.karate.management.karatemanagementsystem.user.api.dto.RegisterUserDto;
 import com.karate.management.karatemanagementsystem.user.domain.model.dto.UserDetailsDto;
-import com.karate.management.karatemanagementsystem.domain.notification.dto.UserWithDebtDto;
+import com.karate.management.karatemanagementsystem.notification.domain.model.dto.UserWithDebtDto;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
