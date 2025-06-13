@@ -5,10 +5,10 @@ import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackRes
 import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionRegistrationResponseDto;
 import com.karate.management.karatemanagementsystem.feedback.domain.model.FeedbackEntity;
 import com.karate.management.karatemanagementsystem.training.domain.model.TrainingSessionEntity;
-import com.karate.management.karatemanagementsystem.domain.user.UserEntity;
+import com.karate.management.karatemanagementsystem.user.domain.model.UserEntity;
 import com.karate.management.karatemanagementsystem.feedback.domain.repository.FeedbackRepository;
 import com.karate.management.karatemanagementsystem.training.domain.repository.TrainingSessionRepository;
-import com.karate.management.karatemanagementsystem.domain.user.UserRepository;
+import com.karate.management.karatemanagementsystem.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

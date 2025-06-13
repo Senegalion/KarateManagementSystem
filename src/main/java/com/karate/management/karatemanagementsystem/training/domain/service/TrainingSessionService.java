@@ -6,10 +6,10 @@ import com.karate.management.karatemanagementsystem.training.domain.model.Traini
 import com.karate.management.karatemanagementsystem.training.domain.repository.TrainingSessionRepository;
 import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionRegistrationResponseDto;
 import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionDto;
-import com.karate.management.karatemanagementsystem.domain.user.UserEntity;
-import com.karate.management.karatemanagementsystem.domain.user.UserRepository;
-import com.karate.management.karatemanagementsystem.domain.user.UserAlreadySignedUpException;
-import com.karate.management.karatemanagementsystem.domain.user.UserNotSignedUpException;
+import com.karate.management.karatemanagementsystem.user.domain.model.UserEntity;
+import com.karate.management.karatemanagementsystem.user.domain.repository.UserRepository;
+import com.karate.management.karatemanagementsystem.user.domain.exception.UserAlreadySignedUpException;
+import com.karate.management.karatemanagementsystem.user.domain.exception.UserNotSignedUpException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

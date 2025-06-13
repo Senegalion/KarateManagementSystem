@@ -1,9 +1,9 @@
 package com.karate.management.karatemanagementsystem.infrastructure.scheduler;
 
 import com.karate.management.karatemanagementsystem.domain.payment.PaymentEntity;
-import com.karate.management.karatemanagementsystem.domain.user.UserEntity;
+import com.karate.management.karatemanagementsystem.user.domain.model.UserEntity;
 import com.karate.management.karatemanagementsystem.domain.payment.PaymentRepository;
-import com.karate.management.karatemanagementsystem.domain.user.UserRepository;
+import com.karate.management.karatemanagementsystem.user.domain.repository.UserRepository;
 import com.karate.management.karatemanagementsystem.domain.payment.PaymentStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

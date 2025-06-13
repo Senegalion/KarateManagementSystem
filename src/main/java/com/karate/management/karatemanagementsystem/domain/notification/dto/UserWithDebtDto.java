@@ -1,6 +1,6 @@
 package com.karate.management.karatemanagementsystem.domain.notification.dto;
 
-import com.karate.management.karatemanagementsystem.domain.user.KarateRank;
+import com.karate.management.karatemanagementsystem.user.domain.model.KarateRank;
 import lombok.Builder;
 
 @Builder

@@ -4,10 +4,10 @@ import com.karate.management.karatemanagementsystem.feedback.domain.exception.Fe
 import com.karate.management.karatemanagementsystem.domain.payment.PaymentAlreadyConfirmed;
 import com.karate.management.karatemanagementsystem.domain.payment.PaymentNotFoundException;
 import com.karate.management.karatemanagementsystem.training.domain.exception.TrainingSessionNotFoundException;
-import com.karate.management.karatemanagementsystem.domain.user.UserAlreadySignedUpException;
-import com.karate.management.karatemanagementsystem.domain.user.UserNotFoundException;
-import com.karate.management.karatemanagementsystem.domain.user.UserNotSignedUpException;
-import com.karate.management.karatemanagementsystem.domain.user.UsernameWhileTryingToLogInNotFoundException;
+import com.karate.management.karatemanagementsystem.user.domain.exception.UserAlreadySignedUpException;
+import com.karate.management.karatemanagementsystem.user.domain.exception.UserNotFoundException;
+import com.karate.management.karatemanagementsystem.user.domain.exception.UserNotSignedUpException;
+import com.karate.management.karatemanagementsystem.user.domain.exception.UsernameWhileTryingToLogInNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

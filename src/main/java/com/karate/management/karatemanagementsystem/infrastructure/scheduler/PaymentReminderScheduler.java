@@ -1,8 +1,8 @@
 package com.karate.management.karatemanagementsystem.infrastructure.scheduler;
 
 import com.karate.management.karatemanagementsystem.domain.notification.dto.UserWithDebtDto;
-import com.karate.management.karatemanagementsystem.domain.user.UserEntity;
-import com.karate.management.karatemanagementsystem.domain.user.UserMapper;
+import com.karate.management.karatemanagementsystem.user.domain.model.UserEntity;
+import com.karate.management.karatemanagementsystem.user.infrastructure.persistence.mapper.UserMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
