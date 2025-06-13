@@ -1,15 +1,15 @@
 package com.karate.management.karatemanagementsystem.service;
 
-import com.karate.management.karatemanagementsystem.domain.training.dto.TrainingSessionRegistrationResponseDto;
-import com.karate.management.karatemanagementsystem.domain.training.dto.TrainingSessionDto;
-import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionEntity;
+import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionRegistrationResponseDto;
+import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionDto;
+import com.karate.management.karatemanagementsystem.training.domain.model.TrainingSessionEntity;
 import com.karate.management.karatemanagementsystem.domain.user.UserEntity;
-import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionRepository;
+import com.karate.management.karatemanagementsystem.training.domain.repository.TrainingSessionRepository;
 import com.karate.management.karatemanagementsystem.domain.user.UserRepository;
-import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionNotFoundException;
+import com.karate.management.karatemanagementsystem.training.domain.exception.TrainingSessionNotFoundException;
 import com.karate.management.karatemanagementsystem.domain.user.UserAlreadySignedUpException;
 import com.karate.management.karatemanagementsystem.domain.user.UserNotSignedUpException;
-import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionService;
+import com.karate.management.karatemanagementsystem.training.domain.service.TrainingSessionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

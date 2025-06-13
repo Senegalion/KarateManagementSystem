@@ -4,11 +4,11 @@ import com.karate.management.karatemanagementsystem.feedback.domain.exception.Fe
 import com.karate.management.karatemanagementsystem.feedback.domain.model.FeedbackEntity;
 import com.karate.management.karatemanagementsystem.feedback.domain.repository.FeedbackRepository;
 import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackResponseDto;
-import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionEntity;
+import com.karate.management.karatemanagementsystem.training.domain.model.TrainingSessionEntity;
 import com.karate.management.karatemanagementsystem.domain.user.UserEntity;
-import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionRepository;
+import com.karate.management.karatemanagementsystem.training.domain.repository.TrainingSessionRepository;
 import com.karate.management.karatemanagementsystem.domain.user.UserRepository;
-import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionNotFoundException;
+import com.karate.management.karatemanagementsystem.training.domain.exception.TrainingSessionNotFoundException;
 import com.karate.management.karatemanagementsystem.domain.user.UserNotSignedUpException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;

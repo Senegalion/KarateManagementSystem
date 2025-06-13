@@ -1,10 +1,10 @@
-package com.karate.management.karatemanagementsystem.domain.training.api;
+package com.karate.management.karatemanagementsystem.training.api.controller.rest;
 
 import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackResponseDto;
-import com.karate.management.karatemanagementsystem.domain.training.dto.TrainingSessionDto;
-import com.karate.management.karatemanagementsystem.domain.training.dto.TrainingSessionRegistrationResponseDto;
+import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionDto;
+import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionRegistrationResponseDto;
 import com.karate.management.karatemanagementsystem.domain.user.dto.UserDetailsDto;
-import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionService;
+import com.karate.management.karatemanagementsystem.training.domain.service.TrainingSessionService;
 import com.karate.management.karatemanagementsystem.feedback.domain.service.UserFeedbackService;
 import com.karate.management.karatemanagementsystem.domain.user.UserService;
 import lombok.AllArgsConstructor;

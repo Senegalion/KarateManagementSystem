@@ -1,7 +1,11 @@
-package com.karate.management.karatemanagementsystem.domain.training;
+package com.karate.management.karatemanagementsystem.training.domain.service;
 
-import com.karate.management.karatemanagementsystem.domain.training.dto.TrainingSessionRegistrationResponseDto;
-import com.karate.management.karatemanagementsystem.domain.training.dto.TrainingSessionDto;
+import com.karate.management.karatemanagementsystem.training.infrastructure.persistence.mapper.TrainingSessionMapper;
+import com.karate.management.karatemanagementsystem.training.domain.exception.TrainingSessionNotFoundException;
+import com.karate.management.karatemanagementsystem.training.domain.model.TrainingSessionEntity;
+import com.karate.management.karatemanagementsystem.training.domain.repository.TrainingSessionRepository;
+import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionRegistrationResponseDto;
+import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionDto;
 import com.karate.management.karatemanagementsystem.domain.user.UserEntity;
 import com.karate.management.karatemanagementsystem.domain.user.UserRepository;
 import com.karate.management.karatemanagementsystem.domain.user.UserAlreadySignedUpException;

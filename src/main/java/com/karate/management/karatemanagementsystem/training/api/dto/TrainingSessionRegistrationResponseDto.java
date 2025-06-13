@@ -1,4 +1,4 @@
-package com.karate.management.karatemanagementsystem.domain.training.dto;
+package com.karate.management.karatemanagementsystem.training.api.dto;
 
 import lombok.Builder;
 

@@ -3,7 +3,7 @@ package com.karate.management.karatemanagementsystem.shared.exception;
 import com.karate.management.karatemanagementsystem.feedback.domain.exception.FeedbackNotFoundException;
 import com.karate.management.karatemanagementsystem.domain.payment.PaymentAlreadyConfirmed;
 import com.karate.management.karatemanagementsystem.domain.payment.PaymentNotFoundException;
-import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionNotFoundException;
+import com.karate.management.karatemanagementsystem.training.domain.exception.TrainingSessionNotFoundException;
 import com.karate.management.karatemanagementsystem.domain.user.UserAlreadySignedUpException;
 import com.karate.management.karatemanagementsystem.domain.user.UserNotFoundException;
 import com.karate.management.karatemanagementsystem.domain.user.UserNotSignedUpException;

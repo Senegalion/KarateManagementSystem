@@ -1,5 +1,6 @@
-package com.karate.management.karatemanagementsystem.domain.training;
+package com.karate.management.karatemanagementsystem.training.domain.repository;
 
+import com.karate.management.karatemanagementsystem.training.domain.model.TrainingSessionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

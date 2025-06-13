@@ -1,6 +1,6 @@
 package com.karate.management.karatemanagementsystem.feedback.domain.model;
 
-import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionEntity;
+import com.karate.management.karatemanagementsystem.training.domain.model.TrainingSessionEntity;
 import com.karate.management.karatemanagementsystem.domain.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

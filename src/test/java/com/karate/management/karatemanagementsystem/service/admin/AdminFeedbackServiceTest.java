@@ -4,12 +4,12 @@ import com.karate.management.karatemanagementsystem.feedback.domain.service.Admi
 import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackRequestDto;
 import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackResponseDto;
 import com.karate.management.karatemanagementsystem.feedback.domain.model.FeedbackEntity;
-import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionEntity;
+import com.karate.management.karatemanagementsystem.training.domain.model.TrainingSessionEntity;
 import com.karate.management.karatemanagementsystem.domain.user.UserEntity;
 import com.karate.management.karatemanagementsystem.feedback.domain.repository.FeedbackRepository;
-import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionRepository;
+import com.karate.management.karatemanagementsystem.training.domain.repository.TrainingSessionRepository;
 import com.karate.management.karatemanagementsystem.domain.user.UserRepository;
-import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionNotFoundException;
+import com.karate.management.karatemanagementsystem.training.domain.exception.TrainingSessionNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

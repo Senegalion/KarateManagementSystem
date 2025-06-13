@@ -1,6 +1,7 @@
-package com.karate.management.karatemanagementsystem.domain.training;
+package com.karate.management.karatemanagementsystem.training.infrastructure.persistence.mapper;
 
-import com.karate.management.karatemanagementsystem.domain.training.dto.TrainingSessionDto;
+import com.karate.management.karatemanagementsystem.training.domain.model.TrainingSessionEntity;
+import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionDto;
 
 public class TrainingSessionMapper {
     public static TrainingSessionDto mapToTrainingSessionDto(TrainingSessionEntity trainingSessionEntity) {
