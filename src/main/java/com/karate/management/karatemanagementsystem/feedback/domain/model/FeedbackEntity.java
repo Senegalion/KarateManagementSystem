@@ -1,4 +1,4 @@
-package com.karate.management.karatemanagementsystem.domain.feedback;
+package com.karate.management.karatemanagementsystem.feedback.domain.model;
 
 import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionEntity;
 import com.karate.management.karatemanagementsystem.domain.user.UserEntity;

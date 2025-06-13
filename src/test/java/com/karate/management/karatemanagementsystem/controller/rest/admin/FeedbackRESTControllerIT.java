@@ -1,11 +1,11 @@
 package com.karate.management.karatemanagementsystem.controller.rest.admin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.karate.management.karatemanagementsystem.domain.feedback.dto.FeedbackRequestDto;
-import com.karate.management.karatemanagementsystem.domain.feedback.dto.FeedbackResponseDto;
+import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackRequestDto;
+import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackResponseDto;
 import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionEntity;
 import com.karate.management.karatemanagementsystem.domain.user.UserEntity;
-import com.karate.management.karatemanagementsystem.domain.feedback.FeedbackRepository;
+import com.karate.management.karatemanagementsystem.feedback.domain.repository.FeedbackRepository;
 import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionRepository;
 import com.karate.management.karatemanagementsystem.domain.user.UserRepository;
 import org.junit.jupiter.api.*;

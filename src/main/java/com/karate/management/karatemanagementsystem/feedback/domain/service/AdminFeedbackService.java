@@ -1,7 +1,9 @@
-package com.karate.management.karatemanagementsystem.domain.feedback;
+package com.karate.management.karatemanagementsystem.feedback.domain.service;
 
-import com.karate.management.karatemanagementsystem.domain.feedback.dto.FeedbackRequestDto;
-import com.karate.management.karatemanagementsystem.domain.feedback.dto.FeedbackResponseDto;
+import com.karate.management.karatemanagementsystem.feedback.domain.model.FeedbackEntity;
+import com.karate.management.karatemanagementsystem.feedback.domain.repository.FeedbackRepository;
+import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackRequestDto;
+import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackResponseDto;
 import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionEntity;
 import com.karate.management.karatemanagementsystem.domain.user.UserEntity;
 import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionRepository;

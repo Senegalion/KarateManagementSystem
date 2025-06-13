@@ -1,11 +1,11 @@
 package com.karate.management.karatemanagementsystem.domain.training.api;
 
-import com.karate.management.karatemanagementsystem.domain.feedback.dto.FeedbackResponseDto;
+import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackResponseDto;
 import com.karate.management.karatemanagementsystem.domain.training.dto.TrainingSessionDto;
 import com.karate.management.karatemanagementsystem.domain.training.dto.TrainingSessionRegistrationResponseDto;
 import com.karate.management.karatemanagementsystem.domain.user.dto.UserDetailsDto;
 import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionService;
-import com.karate.management.karatemanagementsystem.domain.feedback.UserFeedbackService;
+import com.karate.management.karatemanagementsystem.feedback.domain.service.UserFeedbackService;
 import com.karate.management.karatemanagementsystem.domain.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

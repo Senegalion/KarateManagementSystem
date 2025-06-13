@@ -1,8 +1,8 @@
-package com.karate.management.karatemanagementsystem.domain.feedback.api;
+package com.karate.management.karatemanagementsystem.feedback.api.controller.rest;
 
-import com.karate.management.karatemanagementsystem.domain.feedback.dto.FeedbackRequestDto;
-import com.karate.management.karatemanagementsystem.domain.feedback.dto.FeedbackResponseDto;
-import com.karate.management.karatemanagementsystem.domain.feedback.AdminFeedbackService;
+import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackRequestDto;
+import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackResponseDto;
+import com.karate.management.karatemanagementsystem.feedback.domain.service.AdminFeedbackService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

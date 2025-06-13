@@ -1,6 +1,6 @@
-package com.karate.management.karatemanagementsystem.exception;
+package com.karate.management.karatemanagementsystem.shared.exception;
 
-import com.karate.management.karatemanagementsystem.domain.feedback.FeedbackNotFoundException;
+import com.karate.management.karatemanagementsystem.feedback.domain.exception.FeedbackNotFoundException;
 import com.karate.management.karatemanagementsystem.domain.payment.PaymentAlreadyConfirmed;
 import com.karate.management.karatemanagementsystem.domain.payment.PaymentNotFoundException;
 import com.karate.management.karatemanagementsystem.domain.training.TrainingSessionNotFoundException;

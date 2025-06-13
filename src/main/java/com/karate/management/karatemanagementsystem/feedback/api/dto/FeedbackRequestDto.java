@@ -1,4 +1,4 @@
-package com.karate.management.karatemanagementsystem.domain.feedback.dto;
+package com.karate.management.karatemanagementsystem.feedback.api.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
