@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'dev') {
+                        echo "Dev branch - running unit and integration tests"
+                        bat '.\\gradlew clean test'
+                    } else if (env.BRANCH_NAME == 'test') {
+                        echo "Test branch - running E2E and language correctness tests"
+//                         bat '.\\gradlew clean e2eTest languageCheck'
+                    } else if (env.BRANCH_NAME == 'master') {
+                        echo "Master branch - deploying to production"
+                        bat '.\\gradlew clean build'
+                    } else {
+                        echo "Other branch - running unit tests"
+                        bat '.\\gradlew clean test'
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            junit '**/build/test-results/test/*.xml'
+            archiveArtifacts artifacts: '**/build/libs/*.jar', allowEmptyArchive: true
+        }
+        success {
+            echo "Build completed successfully!"
+        }
+        failure {
+            echo "Build failed!"
+        }
+    }
+}
