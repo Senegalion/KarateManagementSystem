@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+
+    tools {
+        sonarQube 'SonarQubeScanner'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Sonar Analysis') {
+            when { 
+                anyOf { 
+                    branch 'dev'; 
+                    branch 'test' 
+                }
+            }
+            steps {
+                withSonarQubeEnv('SonarQubeScanner') {
+                    sh './gradlew sonarqube'
+                }
+            }
+        }
+    }
+}
