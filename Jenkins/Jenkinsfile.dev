@@ -11,7 +11,7 @@ pipeline {
         stage('Unit Tests & Integration Tests & Code Quality') {
             steps {
                 dir('backend') {
-                    sh './gradlew test'
+                    sh 'gradlew test'
                 }
             }
         }
