@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Unit Tests & Integration Tests & Code Quality') {
+            steps {
+                sh './gradlew test'
+            }
+        }
+
+        stage('Auto PR to test') {
+            when {
+                branch 'dev'
+            }
+            steps {
+                withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                    sh '''
+                    echo "$GITHUB_TOKEN" | gh auth login --with-token
+                    gh pr create --base test --head dev --title "Auto: Promote dev to test" --body "Automated PR"
+                    gh pr merge --auto --squash
+                    '''
+                }
+            }
+        }
+    }
+}
