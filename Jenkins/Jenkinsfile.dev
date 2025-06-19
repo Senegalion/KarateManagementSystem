@@ -10,7 +10,7 @@ pipeline {
 
         stage('Run Backend Tests') {
             steps {
-                dir('../backend') {
+                dir('backend') {
                     sh 'chmod +x ./gradlew'
                     sh './gradlew test'
                 }
