@@ -23,7 +23,9 @@ services:
       - "5050:80"
 
   jenkins:
-    image: jenkins/jenkins:lts
+    build:
+      context: ./Jenkins
+      dockerfile: Dockerfile.jenkins
     ports:
       - "8090:8080"
       - "50000:50000"
