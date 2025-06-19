@@ -8,10 +8,11 @@ pipeline {
             }
         }
 
-        stage('Unit Tests & Integration Tests & Code Quality') {
+        stage('Run Backend Tests') {
             steps {
-                dir('backend') {
-                    sh 'gradlew test'
+                dir('../backend') {
+                    sh 'chmod +x ./gradlew'
+                    sh './gradlew test'
                 }
             }
         }
