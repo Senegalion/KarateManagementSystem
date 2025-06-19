@@ -79,3 +79,8 @@ dependencyManagement {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
     }
 }
+
+bootJar {
+    archiveBaseName.set("karate-management-system")
+    archiveVersion.set("")
+}
