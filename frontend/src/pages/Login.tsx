@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API } from "../api";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -11,12 +11,12 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8080/auth/login", {
+      const response = await API.post("/auth/login", {
         username,
         password,
       });
       localStorage.setItem("token", response.data.token);
-      navigate("/");
+      navigate("/app/dashboard");
     } catch (err) {
       setError("Niepoprawne dane logowania");
     }
