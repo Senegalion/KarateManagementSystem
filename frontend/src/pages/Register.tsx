@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API } from "../api";
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -25,7 +25,7 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8080/auth/register", form);
+      await API.post("/auth/register", form);
       navigate("/login");
     } catch (err) {
       setError("Błąd rejestracji. Upewnij się, że dane są poprawne.");
