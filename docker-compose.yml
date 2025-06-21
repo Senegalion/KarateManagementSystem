@@ -13,6 +13,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
     depends_on:
       - postgres
+    restart: always
 
   frontend:
     build:
@@ -22,6 +23,7 @@ services:
       - "3000:80"
     depends_on:
       - backend
+    restart: always
 
   postgres:
     image: postgres:15
@@ -54,6 +56,7 @@ services:
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
 
 volumes:
   postgres-data:

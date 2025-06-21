@@ -5,7 +5,8 @@ spring:
   application:
     name: KarateManagementSystem
   datasource:
-    url: jdbc:postgresql://postgres:5432/karate_management
+    url: jdbc:postgresql://localhost:5433/karate_management # url for app on local machine
+#    url: jdbc:postgresql://postgres:5432/karate_management # url for app in docker
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
