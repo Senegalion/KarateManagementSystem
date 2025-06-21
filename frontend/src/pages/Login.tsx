@@ -16,7 +16,7 @@ const Login = () => {
         password,
       });
       localStorage.setItem("token", response.data.token);
-      navigate("/app/dashboard");
+      navigate("/app");
     } catch (err) {
       setError("Niepoprawne dane logowania");
     }
