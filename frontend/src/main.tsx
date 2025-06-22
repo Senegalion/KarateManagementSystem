@@ -9,6 +9,8 @@ import Home from "./pages/Home";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./layouts/AppLayout";
 import Dashboard from "./pages/Dashboard";
+import SelectClub from "./pages/SelectClub";
+import RequireClub from "./components/RequireClub";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -16,7 +18,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <Routes>
         <Route path="/" element={<App />}>
           <Route index element={<Home />} />
-          <Route path="login" element={<Login />} />
+          <Route path="select-club" element={<SelectClub />} />
+          <Route
+            path="login"
+            element={
+              <RequireClub>
+                <Login />
+              </RequireClub>
+            }
+          />
           <Route path="register" element={<Register />} />
         </Route>
 
