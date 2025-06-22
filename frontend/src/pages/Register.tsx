@@ -44,7 +44,7 @@ const Register = () => {
     street: "",
     number: "",
     postalCode: "",
-    karateClubName: "",
+    karateClubName: localStorage.getItem("selectedClub") || "",
     karateRank: "",
     password: "",
   });

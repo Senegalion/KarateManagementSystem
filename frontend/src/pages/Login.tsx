@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API } from "../api";
+import ChangeClubButton from "../components/ChangeClubButton";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -44,9 +45,10 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
         />
-        <button className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+        <button className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition mb-4">
           Log in
         </button>
+        <ChangeClubButton />
       </form>
     </div>
   );
