@@ -5,9 +5,12 @@ import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackRes
 import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionRegistrationResponseDto;
 import com.karate.management.karatemanagementsystem.feedback.domain.model.FeedbackEntity;
 import com.karate.management.karatemanagementsystem.training.domain.model.TrainingSessionEntity;
+import com.karate.management.karatemanagementsystem.user.domain.model.KarateClubEntity;
+import com.karate.management.karatemanagementsystem.user.domain.model.KarateClubName;
 import com.karate.management.karatemanagementsystem.user.domain.model.UserEntity;
 import com.karate.management.karatemanagementsystem.feedback.domain.repository.FeedbackRepository;
 import com.karate.management.karatemanagementsystem.training.domain.repository.TrainingSessionRepository;
+import com.karate.management.karatemanagementsystem.user.domain.repository.KarateClubRepository;
 import com.karate.management.karatemanagementsystem.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +56,9 @@ class TrainingRESTControllerIT {
     private TrainingSessionRepository trainingSessionRepository;
 
     @Autowired
+    private KarateClubRepository karateClubRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -84,6 +90,9 @@ class TrainingRESTControllerIT {
     @WithMockUser(username = "testUser", roles = "USER")
     void should_return_200_ok_and_all_training_sessions_when_sessions_exist() throws Exception {
         // given
+        KarateClubEntity club = new KarateClubEntity();
+        club.setName(KarateClubName.LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO);
+        karateClubRepository.save(club);
         TrainingSessionEntity session1 = new TrainingSessionEntity();
         session1.setDescription("Session 1");
         session1.setDate(LocalDateTime.of(2025, 3, 18, 20, 0, 0));
