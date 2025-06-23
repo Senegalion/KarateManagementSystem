@@ -52,7 +52,7 @@ class UserServiceTest {
         UserEntity userEntity = new UserEntity();
 
         String expectedUsername = "testUser";
-        KarateClubEntity expectedKarateClub = new KarateClubEntity(1L, LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO, new HashSet<>());
+        KarateClubEntity expectedKarateClub = new KarateClubEntity(1L, LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO, new HashSet<>(), new HashSet<>());
         KarateRank expectedKarateRank = KarateRank.DAN_1;
         AddressEntity expectedAddressEntity = new AddressEntity(1L, "someCity", "someStreet", "1", "12-345", userEntity);
 
