@@ -1,6 +1,7 @@
 package com.karate.management.karatemanagementsystem.training.domain.model;
 
 import com.karate.management.karatemanagementsystem.feedback.domain.model.FeedbackEntity;
+import com.karate.management.karatemanagementsystem.user.domain.model.KarateClubEntity;
 import com.karate.management.karatemanagementsystem.user.domain.model.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -31,4 +32,8 @@ public class TrainingSessionEntity {
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "trainingSessionEntities")
     private Set<UserEntity> userEntities = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "karate_club_id")
+    private KarateClubEntity karateClub;
 }

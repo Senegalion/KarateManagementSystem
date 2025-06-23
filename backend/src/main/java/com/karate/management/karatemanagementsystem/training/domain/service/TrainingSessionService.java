@@ -1,5 +1,6 @@
 package com.karate.management.karatemanagementsystem.training.domain.service;
 
+import com.karate.management.karatemanagementsystem.training.domain.exception.TrainingSessionClubMismatchException;
 import com.karate.management.karatemanagementsystem.training.infrastructure.persistence.mapper.TrainingSessionMapper;
 import com.karate.management.karatemanagementsystem.training.domain.exception.TrainingSessionNotFoundException;
 import com.karate.management.karatemanagementsystem.training.domain.model.TrainingSessionEntity;
@@ -29,12 +30,10 @@ public class TrainingSessionService {
     private final TrainingSessionRepository trainingSessionRepository;
     private final UserRepository userRepository;
 
-    public List<TrainingSessionDto> getAllTrainingSessions() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        List<TrainingSessionEntity> trainingSessions = trainingSessionRepository.findAll();
+    public List<TrainingSessionDto> getAllTrainingSessionsForCurrentUserClub() {
+        UserEntity user = getCurrentUser();
+        Long clubId = user.getKarateClub().getKarateClubId();
+        List<TrainingSessionEntity> trainingSessions = trainingSessionRepository.findAllByKarateClubKarateClubId(clubId);
         if (trainingSessions.isEmpty()) {
             throw new TrainingSessionNotFoundException("No training sessions found");
         }
@@ -67,6 +66,10 @@ public class TrainingSessionService {
 
         TrainingSessionEntity session = trainingSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new TrainingSessionNotFoundException("Training session not found"));
+
+        if (!session.getKarateClub().getKarateClubId().equals(user.getKarateClub().getKarateClubId())) {
+            throw new TrainingSessionClubMismatchException("You can't sign up for a session outside your club.");
+        }
 
         if (user.getTrainingSessionEntities().contains(session)) {
             throw new UserAlreadySignedUpException("User is already signed up for this session");
@@ -110,5 +113,12 @@ public class TrainingSessionService {
                 .date(session.getDate().truncatedTo(ChronoUnit.MINUTES))
                 .description(session.getDescription())
                 .build();
+    }
+
+    private UserEntity getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }
