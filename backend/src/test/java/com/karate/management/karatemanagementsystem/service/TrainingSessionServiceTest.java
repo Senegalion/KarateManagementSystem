@@ -70,7 +70,7 @@ class TrainingSessionServiceTest {
         when(trainingSessionRepository.findAll()).thenReturn(sessions);
 
         // when
-        List<TrainingSessionDto> result = trainingSessionService.getAllTrainingSessions();
+        List<TrainingSessionDto> result = trainingSessionService.getAllTrainingSessionsForCurrentUserClub();
 
         // then
         assertNotNull(result);
@@ -86,7 +86,7 @@ class TrainingSessionServiceTest {
 
         // when & then
         TrainingSessionNotFoundException exception = assertThrows(TrainingSessionNotFoundException.class,
-                () -> trainingSessionService.getAllTrainingSessions());
+                () -> trainingSessionService.getAllTrainingSessionsForCurrentUserClub());
         assertEquals("No training sessions found", exception.getMessage());
     }
 
@@ -97,7 +97,7 @@ class TrainingSessionServiceTest {
 
         // when & then
         RuntimeException exception = assertThrows(RuntimeException.class,
-                () -> trainingSessionService.getAllTrainingSessions());
+                () -> trainingSessionService.getAllTrainingSessionsForCurrentUserClub());
         assertEquals("Database error", exception.getMessage());
     }
 

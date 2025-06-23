@@ -1,5 +1,6 @@
 package com.karate.management.karatemanagementsystem.user.domain.model;
 
+import com.karate.management.karatemanagementsystem.training.domain.model.TrainingSessionEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,4 +25,7 @@ public class KarateClubEntity {
 
     @OneToMany(mappedBy = "karateClub", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserEntity> userEntities;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "karateClub")
+    private Set<TrainingSessionEntity> trainingSessionEntities;
 }

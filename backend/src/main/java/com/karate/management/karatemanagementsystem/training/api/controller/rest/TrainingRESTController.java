@@ -29,8 +29,8 @@ public class TrainingRESTController {
     }
 
     @GetMapping("/trainings")
-    public ResponseEntity<List<TrainingSessionDto>> getAllTrainingSessions() {
-        List<TrainingSessionDto> trainingSessions = trainingSessionService.getAllTrainingSessions();
+    public ResponseEntity<List<TrainingSessionDto>> getAllTrainingSessionsForUserClub() {
+        List<TrainingSessionDto> trainingSessions = trainingSessionService.getAllTrainingSessionsForCurrentUserClub();
         return ResponseEntity.ok(trainingSessions);
     }
 
