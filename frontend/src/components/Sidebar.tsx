@@ -13,11 +13,8 @@ const Sidebar = () => {
         <NavLink to="/app/dashboard" className={navItemClass}>
           Dashboard
         </NavLink>
-        <NavLink to="/app/trainings" className={navItemClass}>
-          Trainings
-        </NavLink>
-        <NavLink to="/app/profile" className={navItemClass}>
-          Profile
+        <NavLink to="/app/calendar" className={navItemClass}>
+          Calendar
         </NavLink>
       </nav>
     </aside>

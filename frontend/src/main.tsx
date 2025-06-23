@@ -11,6 +11,7 @@ import AppLayout from "./layouts/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import SelectClub from "./pages/SelectClub";
 import RequireClub from "./components/RequireClub";
+import TrainingCalendar from "./pages/TrainingCalendar";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -39,6 +40,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           }
         >
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="calendar" element={<TrainingCalendar />} />
         </Route>
       </Routes>
     </BrowserRouter>
