@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { API } from "../api";
 import dayjs from "dayjs";
+import { SearchContext } from "../context/SearchContext";
 
 type Training = {
   id: number;
@@ -10,6 +11,8 @@ type Training = {
 
 const Dashboard = () => {
   const [trainings, setTrainings] = useState<Training[]>([]);
+  const searchContext = useContext(SearchContext);
+  const search = searchContext?.search ?? "";
 
   useEffect(() => {
     API.get("/users/trainings", {
@@ -21,13 +24,19 @@ const Dashboard = () => {
     });
   }, []);
 
+  // Filtruj treningi wg search
+  const filteredTrainings = trainings.filter((t) =>
+    t.description.toLowerCase().includes(search.toLowerCase())
+  );
+
   const now = dayjs();
-  const upcoming = trainings
+
+  const upcoming = filteredTrainings
     .filter((t) => dayjs(t.date).isAfter(now))
     .sort((a, b) => dayjs(a.date).diff(dayjs(b.date)))
     .slice(0, 5);
 
-  const past = trainings
+  const past = filteredTrainings
     .filter((t) => dayjs(t.date).isBefore(now))
     .sort((a, b) => dayjs(b.date).diff(dayjs(a.date)));
 
@@ -43,7 +52,7 @@ const Dashboard = () => {
         <div className="bg-white border shadow-sm rounded-xl p-5">
           <h2 className="text-xl font-semibold mb-3">Quick Overview</h2>
           <ul className="text-sm text-gray-700 space-y-1">
-            <li>📊 Total trainings: {trainings.length}</li>
+            <li>📊 Total trainings: {filteredTrainings.length}</li>
             <li>⏭️ Upcoming: {upcoming.length}</li>
             <li>
               ⏪ Last session:{" "}
