@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import dayjs from "dayjs";
 import { API } from "../api";
+import { SearchContext } from "../context/SearchContext";
 
 type Training = {
   id: number;
@@ -17,6 +18,9 @@ const TrainingCalendar = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMounted, setModalMounted] = useState(false);
   const today = dayjs().format("YYYY-MM-DD");
+
+  const searchContext = useContext(SearchContext);
+  const search = searchContext?.search ?? "";
 
   useEffect(() => {
     setLoading(true);
@@ -56,6 +60,11 @@ const TrainingCalendar = () => {
         setLoading(false);
       });
   }, []);
+
+  // Filtrujemy wg search
+  const filteredTrainings = trainings.filter((t) =>
+    t.description.toLowerCase().includes(search.toLowerCase())
+  );
 
   const handleMonthChange = (direction: "prev" | "next") => {
     setSelectedDate(null);
@@ -105,7 +114,7 @@ const TrainingCalendar = () => {
     const date = startOfMonth.add(i - 1, "day").format("YYYY-MM-DD");
     const isToday = date === today;
 
-    const dayTrainings = trainings.filter(
+    const dayTrainings = filteredTrainings.filter(
       (t) => typeof t.date === "string" && t.date.startsWith(date)
     );
 
@@ -144,7 +153,8 @@ const TrainingCalendar = () => {
   }
 
   const selectedTrainings =
-    selectedDate && trainings.filter((t) => t.date.startsWith(selectedDate));
+    selectedDate &&
+    filteredTrainings.filter((t) => t.date.startsWith(selectedDate));
 
   return (
     <div className="p-4 relative">
