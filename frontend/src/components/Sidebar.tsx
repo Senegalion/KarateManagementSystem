@@ -16,6 +16,9 @@ const Sidebar = () => {
         <NavLink to="/app/calendar" className={navItemClass}>
           Calendar
         </NavLink>
+        <NavLink to="/app/trainings/new" className={navItemClass}>
+          Create Training
+        </NavLink>
       </nav>
     </aside>
   );

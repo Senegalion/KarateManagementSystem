@@ -3,6 +3,7 @@ package com.karate.management.karatemanagementsystem.training.api.controller.res
 import com.karate.management.karatemanagementsystem.feedback.api.dto.FeedbackResponseDto;
 import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionDto;
 import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionRegistrationResponseDto;
+import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionRequestDto;
 import com.karate.management.karatemanagementsystem.user.domain.model.dto.UserDetailsDto;
 import com.karate.management.karatemanagementsystem.training.domain.service.TrainingSessionService;
 import com.karate.management.karatemanagementsystem.feedback.domain.service.UserFeedbackService;
@@ -38,6 +39,12 @@ public class TrainingRESTController {
     public ResponseEntity<List<TrainingSessionDto>> getUserTrainingSessions() {
         List<TrainingSessionDto> trainingSessions = trainingSessionService.getUserTrainingSessions();
         return ResponseEntity.ok(trainingSessions);
+    }
+
+    @PostMapping("/trainings")
+    public ResponseEntity<TrainingSessionDto> createTrainingSession(@RequestBody TrainingSessionRequestDto dto) {
+        TrainingSessionDto created = trainingSessionService.createTrainingSession(dto);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @PostMapping("/trainings/signup/{sessionId}")

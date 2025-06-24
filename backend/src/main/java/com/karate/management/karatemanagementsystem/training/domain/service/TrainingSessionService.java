@@ -1,5 +1,6 @@
 package com.karate.management.karatemanagementsystem.training.domain.service;
 
+import com.karate.management.karatemanagementsystem.training.api.dto.TrainingSessionRequestDto;
 import com.karate.management.karatemanagementsystem.training.domain.exception.TrainingSessionClubMismatchException;
 import com.karate.management.karatemanagementsystem.training.infrastructure.persistence.mapper.TrainingSessionMapper;
 import com.karate.management.karatemanagementsystem.training.domain.exception.TrainingSessionNotFoundException;
@@ -55,6 +56,25 @@ public class TrainingSessionService {
         return user.getTrainingSessionEntities().stream()
                 .map(TrainingSessionMapper::mapToTrainingSessionDto)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public TrainingSessionDto createTrainingSession(TrainingSessionRequestDto dto) {
+        UserEntity user = getCurrentUser();
+
+        TrainingSessionEntity trainingSession = new TrainingSessionEntity();
+        trainingSession.setDate(dto.date());
+        trainingSession.setDescription(dto.description());
+
+        trainingSession.setKarateClub(user.getKarateClub());
+
+        TrainingSessionEntity saved = trainingSessionRepository.save(trainingSession);
+
+        return TrainingSessionDto.builder()
+                .trainingSessionId(saved.getTrainingSessionId())
+                .date(saved.getDate())
+                .description(saved.getDescription())
+                .build();
     }
 
     @Transactional

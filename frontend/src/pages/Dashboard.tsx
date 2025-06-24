@@ -82,7 +82,7 @@ const Dashboard = () => {
       </div>
 
       {/* Upcoming sessions */}
-      <div className="bg-white border shadow-sm rounded-xl p-5">
+      <div className="bg-white border shadow-sm rounded-xl p-5 mb-6">
         <h2 className="text-xl font-semibold mb-4">Upcoming Trainings</h2>
         {upcoming.length === 0 ? (
           <p className="text-gray-500 text-sm">
@@ -94,6 +94,28 @@ const Dashboard = () => {
               <li
                 key={t.id}
                 className="p-2 bg-blue-50 border border-blue-200 rounded"
+              >
+                <span className="font-medium">
+                  {dayjs(t.date).format("MMM DD, YYYY HH:mm")}
+                </span>{" "}
+                – {t.description}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* Past sessions */}
+      <div className="bg-white border shadow-sm rounded-xl p-5">
+        <h2 className="text-xl font-semibold mb-4">Past Trainings</h2>
+        {past.length === 0 ? (
+          <p className="text-gray-500 text-sm">No past trainings.</p>
+        ) : (
+          <ul className="space-y-2 text-sm">
+            {past.map((t) => (
+              <li
+                key={t.id}
+                className="p-2 bg-gray-50 border border-gray-300 rounded"
               >
                 <span className="font-medium">
                   {dayjs(t.date).format("MMM DD, YYYY HH:mm")}
