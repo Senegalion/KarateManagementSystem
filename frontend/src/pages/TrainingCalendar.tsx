@@ -13,6 +13,9 @@ const TrainingCalendar = () => {
   const [currentDate, setCurrentDate] = useState(dayjs());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMounted, setModalMounted] = useState(false);
   const today = dayjs().format("YYYY-MM-DD");
 
   useEffect(() => {
@@ -27,9 +30,7 @@ const TrainingCalendar = () => {
       .then((res) => {
         const data = res.data;
 
-        if (!Array.isArray(data)) {
-          throw new Error("Invalid response format");
-        }
+        if (!Array.isArray(data)) throw new Error("Invalid response format");
 
         const validTrainings = data
           .filter(
@@ -56,6 +57,39 @@ const TrainingCalendar = () => {
       });
   }, []);
 
+  const handleMonthChange = (direction: "prev" | "next") => {
+    setSelectedDate(null);
+    setModalVisible(false);
+    setModalMounted(false);
+    setCurrentDate((prev) =>
+      direction === "prev" ? prev.subtract(1, "month") : prev.add(1, "month")
+    );
+  };
+
+  const handleDayClick = (date: string) => {
+    if (selectedDate && selectedDate !== date) {
+      setModalVisible(false);
+      setModalMounted(false);
+      setTimeout(() => {
+        setSelectedDate(date);
+        setModalMounted(true);
+        setModalVisible(true);
+      }, 200);
+    } else {
+      setSelectedDate(date);
+      setModalMounted(true);
+      setModalVisible(true);
+    }
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setTimeout(() => {
+      setModalMounted(false);
+      setSelectedDate(null);
+    }, 200);
+  };
+
   const startOfMonth = currentDate.startOf("month");
   const endOfMonth = currentDate.endOf("month");
   const daysInMonth = endOfMonth.date();
@@ -78,7 +112,8 @@ const TrainingCalendar = () => {
     days.push(
       <div
         key={i}
-        className={`border p-2 rounded-xl shadow-sm h-32 overflow-y-auto bg-white relative transition-transform hover:scale-[1.01] ${
+        onClick={() => handleDayClick(date)}
+        className={`border p-2 rounded-xl shadow-sm h-32 bg-white relative cursor-pointer transition-transform duration-200 hover:scale-[1.01] ${
           isToday ? "bg-yellow-50 border-yellow-300 ring-2 ring-yellow-400" : ""
         }`}
       >
@@ -90,7 +125,7 @@ const TrainingCalendar = () => {
             </span>
           )}
         </div>
-        {dayTrainings.map((t) => (
+        {dayTrainings.slice(0, 2).map((t) => (
           <div
             key={t.id}
             className="text-xs bg-blue-100 text-blue-800 rounded px-1 py-0.5 mb-1 truncate"
@@ -99,12 +134,20 @@ const TrainingCalendar = () => {
             {t.description}
           </div>
         ))}
+        {dayTrainings.length > 2 && (
+          <div className="text-xs text-blue-500">
+            +{dayTrainings.length - 2} more
+          </div>
+        )}
       </div>
     );
   }
 
+  const selectedTrainings =
+    selectedDate && trainings.filter((t) => t.date.startsWith(selectedDate));
+
   return (
-    <div className="p-4 animate-fade-in">
+    <div className="p-4 relative">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">
         Training Calendar
       </h1>
@@ -117,7 +160,7 @@ const TrainingCalendar = () => {
         <>
           <div className="flex items-center justify-between mb-6">
             <button
-              onClick={() => setCurrentDate(currentDate.subtract(1, "month"))}
+              onClick={() => handleMonthChange("prev")}
               className="px-4 py-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition font-medium shadow-sm"
             >
               ← Prev
@@ -126,7 +169,7 @@ const TrainingCalendar = () => {
               {currentDate.format("MMMM YYYY")}
             </h2>
             <button
-              onClick={() => setCurrentDate(currentDate.add(1, "month"))}
+              onClick={() => handleMonthChange("next")}
               className="px-4 py-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition font-medium shadow-sm"
             >
               Next →
@@ -141,8 +184,53 @@ const TrainingCalendar = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-3">{days}</div>
+          <div
+            key={currentDate.format("YYYY-MM")}
+            className="grid grid-cols-7 gap-3 animate-fade-in"
+          >
+            {days}
+          </div>
         </>
+      )}
+
+      {modalMounted && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div
+            className={`bg-white border border-gray-300 rounded-2xl shadow-2xl p-6 w-full max-w-md pointer-events-auto transform transition-all duration-300 ${
+              modalVisible
+                ? "opacity-100 translate-y-0 animate-fade-in"
+                : "opacity-0 translate-y-2"
+            }`}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">
+                {dayjs(selectedDate!).format("DD MMMM YYYY")}
+              </h3>
+              <button
+                onClick={closeModal}
+                className="text-sm text-gray-500 hover:text-red-500"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-2 max-h-80 overflow-y-auto">
+              {selectedTrainings && selectedTrainings.length > 0 ? (
+                selectedTrainings.map((t) => (
+                  <div
+                    key={t.id}
+                    className="bg-blue-100 text-blue-900 rounded px-3 py-2 text-sm shadow-sm"
+                  >
+                    {t.description}
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">
+                  No trainings on this day.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
