@@ -13,6 +13,7 @@ import SelectClub from "./pages/SelectClub";
 import RequireClub from "./components/RequireClub";
 import TrainingCalendar from "./pages/TrainingCalendar";
 import { SearchProvider } from "./context/SearchContext";
+import CreateTraining from "./pages/CreateTraining";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -44,6 +45,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="calendar" element={<TrainingCalendar />} />
+            <Route path="trainings/new" element={<CreateTraining />} />
           </Route>
         </Routes>
       </BrowserRouter>

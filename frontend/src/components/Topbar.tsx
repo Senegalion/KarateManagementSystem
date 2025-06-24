@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const pages = [
   { name: "Dashboard", path: "/app/dashboard" },
   { name: "Calendar", path: "/app/calendar" },
+  { name: "Create Training", path: "/app/trainings/new" },
 ];
 
 const Topbar = () => {
