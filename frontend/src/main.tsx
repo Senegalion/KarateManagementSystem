@@ -12,38 +12,41 @@ import Dashboard from "./pages/Dashboard";
 import SelectClub from "./pages/SelectClub";
 import RequireClub from "./components/RequireClub";
 import TrainingCalendar from "./pages/TrainingCalendar";
+import { SearchProvider } from "./context/SearchContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />}>
-          <Route index element={<Home />} />
-          <Route path="select-club" element={<SelectClub />} />
-          <Route
-            path="login"
-            element={
-              <RequireClub>
-                <Login />
-              </RequireClub>
-            }
-          />
-          <Route path="register" element={<Register />} />
-        </Route>
+    <SearchProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<App />}>
+            <Route index element={<Home />} />
+            <Route path="select-club" element={<SelectClub />} />
+            <Route
+              path="login"
+              element={
+                <RequireClub>
+                  <Login />
+                </RequireClub>
+              }
+            />
+            <Route path="register" element={<Register />} />
+          </Route>
 
-        <Route
-          path="/app"
-          element={
-            <ProtectedRoute>
-              <AppLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="calendar" element={<TrainingCalendar />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+          <Route
+            path="/app"
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="calendar" element={<TrainingCalendar />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </SearchProvider>
   </React.StrictMode>
 );
