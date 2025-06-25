@@ -72,7 +72,7 @@ const Dashboard = () => {
               📅 Open Calendar
             </a>
             <a
-              href="/trainings/new"
+              href="/app/trainings/new"
               className="px-4 py-2 bg-green-600 text-white rounded-lg text-center hover:bg-green-700 transition"
             >
               ➕ Add New Training
