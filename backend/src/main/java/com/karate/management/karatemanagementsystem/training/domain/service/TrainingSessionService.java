@@ -35,9 +35,7 @@ public class TrainingSessionService {
         UserEntity user = getCurrentUser();
         Long clubId = user.getKarateClub().getKarateClubId();
         List<TrainingSessionEntity> trainingSessions = trainingSessionRepository.findAllByKarateClubKarateClubId(clubId);
-        if (trainingSessions.isEmpty()) {
-            throw new TrainingSessionNotFoundException("No training sessions found");
-        }
+
         return trainingSessions.stream()
                 .map(TrainingSessionMapper::mapToTrainingSessionDto)
                 .toList();
