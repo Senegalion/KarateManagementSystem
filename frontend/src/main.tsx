@@ -14,6 +14,8 @@ import RequireClub from "./components/RequireClub";
 import TrainingCalendar from "./pages/TrainingCalendar";
 import { SearchProvider } from "./context/SearchContext";
 import CreateTraining from "./pages/CreateTraining";
+import SettingsLayout from "./layouts/SettingsLayout";
+import LanguageSettings from "./pages/settings/LanguageSettings";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -46,6 +48,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="calendar" element={<TrainingCalendar />} />
             <Route path="trainings/new" element={<CreateTraining />} />
+          </Route>
+
+          <Route path="/settings" element={<SettingsLayout />}>
+            <Route index element={<Navigate to="language" replace />} />
+            <Route path="language" element={<LanguageSettings />} />
           </Route>
         </Routes>
       </BrowserRouter>
