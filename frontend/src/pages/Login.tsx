@@ -3,20 +3,40 @@ import { useNavigate } from "react-router-dom";
 import { API } from "../api";
 import ChangeClubButton from "../components/ChangeClubButton";
 
+const formatClubName = (club: string | null) => {
+  if (!club) return "";
+  return club
+    .toLowerCase()
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const karateClubName = localStorage.getItem("selectedClub");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!karateClubName) {
+      setError("No club selected.");
+      return;
+    }
+
     try {
-      const response = await API.post("/auth/login", { username, password });
+      const response = await API.post("/auth/login", {
+        username,
+        password,
+        karateClubName,
+      });
       localStorage.setItem("token", response.data.token);
       navigate("/app/dashboard");
     } catch {
-      setError("Invalid login credentials.");
+      setError("Invalid login credentials or club mismatch.");
     }
   };
 
@@ -27,10 +47,22 @@ const Login = () => {
         className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md animate-fade-in"
         autoComplete="off"
       >
-        <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+        <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">
           Login
         </h2>
+
+        {karateClubName && (
+          <p className="text-sm text-center text-gray-500 mb-4">
+            Logging in as member of:
+            <br />
+            <span className="font-semibold text-blue-600">
+              {formatClubName(karateClubName)}
+            </span>
+          </p>
+        )}
+
         {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
+
         <input
           type="text"
           placeholder="Username"

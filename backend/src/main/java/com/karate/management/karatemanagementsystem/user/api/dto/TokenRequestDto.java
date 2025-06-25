@@ -11,6 +11,9 @@ public record TokenRequestDto(
         String username,
         @NotEmpty(message = "{password.not.empty}")
         @NotNull(message = "{password.not.null}")
-        String password
+        String password,
+        @NotNull(message = "{karateClubName.not.null}")
+        @NotEmpty(message = "{karateClubName.not.empty}")
+        String karateClubName
 ) {
 }
