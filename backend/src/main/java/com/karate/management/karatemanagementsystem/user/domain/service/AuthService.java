@@ -102,7 +102,8 @@ public class AuthService {
                 userEntity.getUserId(),
                 userEntity.getUsername(),
                 userEntity.getPassword(),
-                roles
+                roles,
+                userEntity.getKarateClub().getName()
         );
     }
 }

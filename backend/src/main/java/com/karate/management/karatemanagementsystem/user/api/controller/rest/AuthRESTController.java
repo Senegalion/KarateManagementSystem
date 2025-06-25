@@ -5,6 +5,7 @@ import com.karate.management.karatemanagementsystem.user.api.dto.LoginResponseDt
 import com.karate.management.karatemanagementsystem.user.api.dto.TokenRequestDto;
 import com.karate.management.karatemanagementsystem.user.api.dto.RegisterUserDto;
 import com.karate.management.karatemanagementsystem.user.api.dto.RegistrationResultDto;
+import com.karate.management.karatemanagementsystem.user.domain.model.KarateClubName;
 import com.karate.management.karatemanagementsystem.user.domain.model.dto.UserDto;
 import com.karate.management.karatemanagementsystem.user.domain.service.AuthService;
 import com.karate.management.karatemanagementsystem.user.domain.exception.UsernameWhileTryingToLogInNotFoundException;
@@ -46,7 +47,18 @@ public class AuthRESTController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> authenticateAndGenerateToken(@Valid @RequestBody TokenRequestDto tokenRequestDto) throws UsernameWhileTryingToLogInNotFoundException {
         try {
-            UserDto byUsername = authService.findByUsername(tokenRequestDto.username());
+            UserDto user = authService.findByUsername(tokenRequestDto.username());
+            KarateClubName requestedClub;
+            try {
+                requestedClub = KarateClubName.valueOf(tokenRequestDto.karateClubName());
+            } catch (IllegalArgumentException e) {
+                throw new UsernameWhileTryingToLogInNotFoundException("Invalid club name format");
+            }
+
+            if (!user.karateClubName().equals(requestedClub)) {
+                throw new UsernameWhileTryingToLogInNotFoundException("Invalid club for this user");
+            }
+
             final LoginResponseDto loginResponseDto = jwtAuthenticatorService.authenticateAndGenerateToken(tokenRequestDto);
             return ResponseEntity.ok(loginResponseDto);
         } catch (UsernameNotFoundException exception) {
