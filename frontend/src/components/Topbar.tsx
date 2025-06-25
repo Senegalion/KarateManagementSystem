@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearch } from "../context/SearchContext";
-import { useNavigate } from "react-router-dom";
 
 const pages = [
   { name: "Dashboard", path: "/app/dashboard" },
@@ -10,39 +9,51 @@ const pages = [
 
 const Topbar = () => {
   const { search, setSearch } = useSearch();
+  const [inputValue, setInputValue] = useState(search); // lokalny stan inputa
   const [filtered, setFiltered] = useState<typeof pages>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const navigate = useNavigate();
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const [inputWidth, setInputWidth] = useState<number>(0);
 
   useEffect(() => {
-    if (search.trim() === "") {
+    if (inputValue.trim() === "") {
       setFiltered([]);
       setShowSuggestions(false);
       return;
     }
 
     const filt = pages.filter((p) =>
-      p.name.toLowerCase().includes(search.toLowerCase())
+      p.name.toLowerCase().includes(inputValue.toLowerCase())
     );
 
     setFiltered(filt);
     setShowSuggestions(filt.length > 0);
-  }, [search]);
+  }, [inputValue]);
 
   useEffect(() => {
     if (inputRef.current) {
       setInputWidth(inputRef.current.offsetWidth);
     }
+  }, [inputValue]);
+
+  useEffect(() => {
+    setInputValue(search);
   }, [search]);
 
   const handleSelect = (path: string) => {
-    navigate(path);
-    setSearch("");
+    setSearch(inputValue);
+    window.location.href = path; // pełne przeładowanie strony
     setShowSuggestions(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && filtered.length > 0) {
+      setSearch(inputValue);
+      window.location.href = filtered[0].path; // pełne przeładowanie strony
+      setShowSuggestions(false);
+    }
   };
 
   useEffect(() => {
@@ -69,10 +80,10 @@ const Topbar = () => {
           type="text"
           placeholder="Search features..."
           className="w-1/2 px-4 py-2 border rounded shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
           onFocus={() => {
-            if (search.trim() === "") {
+            if (inputValue.trim() === "") {
               setFiltered(pages);
               setShowSuggestions(true);
             }
@@ -80,6 +91,7 @@ const Topbar = () => {
               setInputWidth(inputRef.current.offsetWidth);
             }
           }}
+          onKeyDown={handleKeyDown}
         />
         {showSuggestions && (
           <ul
