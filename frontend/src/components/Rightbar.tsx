@@ -19,6 +19,7 @@ const Rightbar = () => {
       <button
         title="Settings"
         className="text-gray-600 hover:text-blue-600 text-xl"
+        onClick={() => navigate("/settings")}
       >
         <FaCog />
       </button>
