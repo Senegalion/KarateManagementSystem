@@ -17,6 +17,28 @@ The app provides robust tools for instructors, such as:
 
 This project aims to modernize the management of karate schools and improve communication between instructors and students, with a strong focus on automation, ease of use, and scalability.
 
+## 📷 Application Preview
+
+### 🖥️ Dashboard View
+
+Below is a screenshot of the main admin dashboard of the application:
+![Dashboard View](https://github.com/user-attachments/assets/32298e6e-a42c-468c-8f66-8ebcd27c7d6c)
+
+---
+
+### 🛠️ Jenkins CI/CD
+
+This screenshot shows the Jenkins pipeline and build status:
+![Jenkins Screenshot](https://github.com/user-attachments/assets/a2b2e2a8-c8c6-4743-a84f-8009a4dc8181)
+
+---
+
+### 🐳 Docker
+
+Currently running Docker containers related to the project:
+
+![Docker Containers](https://github.com/user-attachments/assets/69fe19a1-3774-4530-9163-f5a7748fc7b7)
+
 ## ✨ Features
 
 - ✅ User registration and authentication (JWT authentication)
