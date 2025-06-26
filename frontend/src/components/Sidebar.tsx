@@ -14,6 +14,11 @@ const Sidebar = () => {
         <NavLink to="/app/dashboard" className={navItemClass}>
           Dashboard
         </NavLink>
+        {isAdmin() && (
+          <NavLink to="/app/users" className={navItemClass}>
+            Users
+          </NavLink>
+        )}
         <NavLink to="/app/calendar" className={navItemClass}>
           Calendar
         </NavLink>

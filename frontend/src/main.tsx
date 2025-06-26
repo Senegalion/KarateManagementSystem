@@ -17,6 +17,7 @@ import CreateTraining from "./pages/CreateTraining";
 import SettingsLayout from "./layouts/SettingsLayout";
 import LanguageSettings from "./pages/settings/LanguageSettings";
 import RequireAdmin from "./components/RequireAdmin";
+import UsersList from "./pages/UsersList";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -47,6 +48,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           >
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
+            <Route
+              path="users"
+              element={
+                <RequireAdmin>
+                  <UsersList />
+                </RequireAdmin>
+              }
+            />
             <Route path="calendar" element={<TrainingCalendar />} />
             <Route
               path="trainings/new"
