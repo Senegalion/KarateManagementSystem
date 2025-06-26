@@ -1,9 +1,11 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import SettingsSidebar from "../components/SettingsSidebar";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const SettingsLayout = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [isSaving, setIsSaving] = useState(false);
@@ -32,14 +34,16 @@ const SettingsLayout = () => {
 
         <div className="fixed bottom-6 right-6 space-y-2">
           {isSaving && (
-            <div className="text-sm text-blue-600 animate-pulse">Saving...</div>
+            <div className="text-sm text-blue-600 animate-pulse">
+              {t("saving")}
+            </div>
           )}
-          {saved && <div className="text-sm text-green-600">Saved ✅</div>}
+          {saved && <div className="text-sm text-green-600">{t("saved")}</div>}
           <button
             onClick={handleSave}
             className="bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition"
           >
-            💾 Save and return to dashboard
+            💾 {t("saveAndReturn")}
           </button>
         </div>
       </main>
