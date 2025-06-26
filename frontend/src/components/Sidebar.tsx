@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { isAdmin } from "../utils/auth";
 
 const Sidebar = () => {
   const navItemClass = ({ isActive }: { isActive: boolean }) =>
@@ -16,9 +17,11 @@ const Sidebar = () => {
         <NavLink to="/app/calendar" className={navItemClass}>
           Calendar
         </NavLink>
-        <NavLink to="/app/trainings/new" className={navItemClass}>
-          Create Training
-        </NavLink>
+        {isAdmin() && (
+          <NavLink to="/app/trainings/new" className={navItemClass}>
+            Create Training
+          </NavLink>
+        )}
       </nav>
     </aside>
   );
