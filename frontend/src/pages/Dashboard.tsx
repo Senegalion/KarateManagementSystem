@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { API } from "../api";
 import dayjs from "dayjs";
 import { SearchContext } from "../context/SearchContext";
+import { isAdmin } from "../utils/auth";
 
 type Training = {
   id: number;
@@ -24,7 +25,6 @@ const Dashboard = () => {
     });
   }, []);
 
-  // Filtruj treningi wg search
   const filteredTrainings = trainings.filter((t) =>
     t.description.toLowerCase().includes(search.toLowerCase())
   );
@@ -46,9 +46,7 @@ const Dashboard = () => {
     <div className="p-6 animate-fade-in">
       <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
-      {/* Top section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Quick Stats */}
         <div className="bg-white border shadow-sm rounded-xl p-5">
           <h2 className="text-xl font-semibold mb-3">Quick Overview</h2>
           <ul className="text-sm text-gray-700 space-y-1">
@@ -61,7 +59,6 @@ const Dashboard = () => {
           </ul>
         </div>
 
-        {/* Shortcuts */}
         <div className="bg-white border shadow-sm rounded-xl p-5">
           <h2 className="text-xl font-semibold mb-3">Shortcuts</h2>
           <div className="flex flex-col gap-2">
@@ -71,17 +68,18 @@ const Dashboard = () => {
             >
               📅 Open Calendar
             </a>
-            <a
-              href="/app/trainings/new"
-              className="px-4 py-2 bg-green-600 text-white rounded-lg text-center hover:bg-green-700 transition"
-            >
-              ➕ Add New Training
-            </a>
+            {isAdmin() && (
+              <a
+                href="/app/trainings/new"
+                className="px-4 py-2 bg-green-600 text-white rounded-lg text-center hover:bg-green-700 transition"
+              >
+                ➕ Add New Training
+              </a>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Upcoming sessions */}
       <div className="bg-white border shadow-sm rounded-xl p-5 mb-6">
         <h2 className="text-xl font-semibold mb-4">Upcoming Trainings</h2>
         {upcoming.length === 0 ? (
@@ -105,7 +103,6 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* Past sessions */}
       <div className="bg-white border shadow-sm rounded-xl p-5">
         <h2 className="text-xl font-semibold mb-4">Past Trainings</h2>
         {past.length === 0 ? (
