@@ -1,21 +1,29 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useSearch } from "../context/SearchContext";
-
-const pages = [
-  { name: "Dashboard", path: "/app/dashboard" },
-  { name: "Calendar", path: "/app/calendar" },
-  { name: "Create Training", path: "/app/trainings/new" },
-];
+import { isAdmin } from "../utils/auth";
 
 const Topbar = () => {
   const { search, setSearch } = useSearch();
-  const [inputValue, setInputValue] = useState(search); // lokalny stan inputa
-  const [filtered, setFiltered] = useState<typeof pages>([]);
+  const [inputValue, setInputValue] = useState(search);
+  const [filtered, setFiltered] = useState<{ name: string; path: string }[]>(
+    []
+  );
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const [inputWidth, setInputWidth] = useState<number>(0);
+
+  const pages = useMemo(() => {
+    const basePages = [
+      { name: "Dashboard", path: "/app/dashboard" },
+      { name: "Calendar", path: "/app/calendar" },
+    ];
+    if (isAdmin()) {
+      basePages.push({ name: "Create Training", path: "/app/trainings/new" });
+    }
+    return basePages;
+  }, []);
 
   useEffect(() => {
     if (inputValue.trim() === "") {
@@ -30,7 +38,7 @@ const Topbar = () => {
 
     setFiltered(filt);
     setShowSuggestions(filt.length > 0);
-  }, [inputValue]);
+  }, [inputValue, pages]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -44,14 +52,14 @@ const Topbar = () => {
 
   const handleSelect = (path: string) => {
     setSearch(inputValue);
-    window.location.href = path; // pełne przeładowanie strony
+    window.location.href = path;
     setShowSuggestions(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && filtered.length > 0) {
       setSearch(inputValue);
-      window.location.href = filtered[0].path; // pełne przeładowanie strony
+      window.location.href = filtered[0].path;
       setShowSuggestions(false);
     }
   };
