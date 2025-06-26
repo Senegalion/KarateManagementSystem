@@ -7,6 +7,7 @@ import lublinLogo from "../assets/logos/clubs/lublin.png";
 import gdanskLogo from "../assets/logos/clubs/gdansk.png";
 import tarnowLogo from "../assets/logos/clubs/tarnow.png";
 import warszawaLogo from "../assets/logos/clubs/warszawa.png";
+import { useTranslation } from "react-i18next";
 
 const clubLogos = [
   {
@@ -44,6 +45,7 @@ const clubLogos = [
 ];
 
 const SelectClub = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleSelectClub = (clubName: string) => {
@@ -56,7 +58,7 @@ const SelectClub = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-8">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">
-        Wybierz klub karate
+        {t("selectKarateClub")}
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {clubLogos.map((club) => (
@@ -71,7 +73,7 @@ const SelectClub = () => {
               className="w-24 h-24 object-contain mb-2"
             />
             <span className="text-sm text-center font-medium text-gray-700">
-              {club.name.replace(/_/g, " ")}
+              {t(club.name)}
             </span>
           </div>
         ))}

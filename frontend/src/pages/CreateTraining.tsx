@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { API } from "../api";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 type Training = {
   id: number;
@@ -10,6 +11,7 @@ type Training = {
 };
 
 const CreateTraining = () => {
+  const { t } = useTranslation();
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -46,9 +48,7 @@ const CreateTraining = () => {
       navigate("/app/dashboard");
     } catch (err: any) {
       setLoading(false);
-      setError(
-        err.response?.data?.message || "Failed to create training session"
-      );
+      setError(err.response?.data?.message || t("failedToCreateTraining"));
     }
   };
 
@@ -56,7 +56,7 @@ const CreateTraining = () => {
     <div className="p-6 animate-fade-in max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
       <div className="md:col-span-2 bg-white rounded shadow p-6">
         <h1 className="text-3xl font-bold mb-6 text-center">
-          Create New Training
+          {t("createNewTraining")}
         </h1>
 
         {error && (
@@ -68,7 +68,7 @@ const CreateTraining = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block mb-1 font-semibold" htmlFor="description">
-              Description
+              {t("description")}
             </label>
             <input
               id="description"
@@ -76,14 +76,14 @@ const CreateTraining = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
-              placeholder="Enter training description"
+              placeholder={t("enterTrainingDescription")}
               className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
             />
           </div>
 
           <div>
             <label className="block mb-1 font-semibold" htmlFor="date">
-              Date and Time
+              {t("dateAndTime")}
             </label>
             <input
               id="date"
@@ -100,15 +100,17 @@ const CreateTraining = () => {
             disabled={loading}
             className="w-full px-4 py-3 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-300 transition font-semibold"
           >
-            {loading ? "Creating..." : "Create Training"}
+            {loading ? t("creating") : t("createTraining")}
           </button>
         </form>
       </div>
 
       <div className="md:col-span-3 bg-white rounded shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">Recent Created Trainings</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          {t("recentCreatedTrainings")}
+        </h2>
         {trainings.length === 0 ? (
-          <p className="text-gray-500 text-sm">No trainings yet.</p>
+          <p className="text-gray-500 text-sm">{t("noTrainingsYet")}</p>
         ) : (
           <ul className="space-y-2 text-sm max-h-[400px] overflow-y-auto">
             {trainings
