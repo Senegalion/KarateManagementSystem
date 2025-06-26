@@ -1,7 +1,9 @@
 import { NavLink } from "react-router-dom";
 import { isAdmin } from "../utils/auth";
+import { useTranslation } from "react-i18next";
 
 const Sidebar = () => {
+  const { t } = useTranslation();
   const navItemClass = ({ isActive }: { isActive: boolean }) =>
     `block px-4 py-2 rounded transition ${
       isActive ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-blue-100"
@@ -9,22 +11,22 @@ const Sidebar = () => {
 
   return (
     <aside className="w-64 bg-white p-4 shadow-md h-screen sticky top-0">
-      <h2 className="text-xl font-bold mb-4">Karate App</h2>
+      <h2 className="text-xl font-bold mb-4">{t("appName")}</h2>
       <nav className="space-y-2">
         <NavLink to="/app/dashboard" className={navItemClass}>
-          Dashboard
+          {t("dashboard")}
         </NavLink>
         {isAdmin() && (
           <NavLink to="/app/users" className={navItemClass}>
-            Users
+            {t("users")}
           </NavLink>
         )}
         <NavLink to="/app/calendar" className={navItemClass}>
-          Calendar
+          {t("calendar")}
         </NavLink>
         {isAdmin() && (
           <NavLink to="/app/trainings/new" className={navItemClass}>
-            Create Training
+            {t("createTraining")}
           </NavLink>
         )}
       </nav>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { API } from "../api";
+import { useTranslation } from "react-i18next";
 
 type User = {
   userId: number;
@@ -10,6 +11,7 @@ type User = {
 };
 
 const UsersList = () => {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -19,7 +21,7 @@ const UsersList = () => {
     const token = localStorage.getItem("token");
 
     if (!clubName) {
-      setError("No valid club selected.");
+      setError(t("noValidClubSelected"));
       setLoading(false);
       return;
     }
@@ -35,13 +37,13 @@ const UsersList = () => {
       })
       .catch((err) => {
         console.error(err);
-        setError("Failed to fetch users.");
+        setError(t("failedToFetchUsers"));
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   if (loading) {
-    return <div className="p-6">Loading users...</div>;
+    return <div className="p-6">{t("loadingUsers")}</div>;
   }
 
   if (error) {
@@ -55,15 +57,17 @@ const UsersList = () => {
     <div className="mb-10">
       <h2 className="text-2xl font-semibold mb-4">{title}</h2>
       {data.length === 0 ? (
-        <p className="text-gray-500">No {title.toLowerCase()} found.</p>
+        <p className="text-gray-500">
+          {t("no")} {title.toLowerCase()} {t("found")}.
+        </p>
       ) : (
         <table className="w-full table-auto text-sm border shadow-sm rounded-xl overflow-hidden">
           <thead>
             <tr className="bg-gray-100 text-left">
-              <th className="p-2">Username</th>
-              <th className="p-2">Email</th>
-              <th className="p-2">Roles</th>
-              <th className="p-2">Karate Rank</th>
+              <th className="p-2">{t("username")}</th>
+              <th className="p-2">{t("email")}</th>
+              <th className="p-2">{t("roles")}</th>
+              <th className="p-2">{t("karateRank")}</th>
             </tr>
           </thead>
           <tbody>
@@ -97,10 +101,10 @@ const UsersList = () => {
 
   return (
     <div className="p-6 animate-fade-in">
-      <h1 className="text-3xl font-bold mb-6">Club Members Overview</h1>
+      <h1 className="text-3xl font-bold mb-6">{t("clubMembersOverview")}</h1>
       <div className="bg-white border shadow-sm rounded-xl p-5">
-        {renderTable("Admins", admins)}
-        {renderTable("Users", nonAdmins)}
+        {renderTable(t("admins"), admins)}
+        {renderTable(t("users"), nonAdmins)}
       </div>
     </div>
   );

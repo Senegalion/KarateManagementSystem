@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API } from "../api";
+import { useTranslation } from "react-i18next";
 
 const clubOptions = [
   "LODZKIE_CENTRUM_OKINAWA_SHORIN_RYU_KARATE_I_KOBUDO",
@@ -37,6 +38,7 @@ const rankOptions = [
 ];
 
 const Register = () => {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -78,7 +80,7 @@ const Register = () => {
         autoComplete="off"
       >
         <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-          Register
+          {t("register")}
         </h2>
         {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -95,42 +97,54 @@ const Register = () => {
               key={field}
               type={field === "password" ? "password" : "text"}
               name={field}
-              placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+              placeholder={t(field)}
               value={(form as any)[field]}
               onChange={handleChange}
-              autoComplete={field === "password" ? "new-password" : "off"}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              required
             />
           ))}
+
           <select
             name="karateClubName"
             value={form.karateClubName}
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+            required
           >
-            <option value="">Select karate club</option>
+            <option value="" disabled>
+              {t("selectKarateClub")}
+            </option>
             {clubOptions.map((club) => (
               <option key={club} value={club}>
-                {club.replace(/_/g, " ")}
+                {t(club)}
               </option>
             ))}
           </select>
+
           <select
             name="karateRank"
             value={form.karateRank}
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+            required
           >
-            <option value="">Select karate rank</option>
+            <option value="" disabled>
+              {t("selectKarateRank")}
+            </option>
             {rankOptions.map((rank) => (
               <option key={rank} value={rank}>
-                {rank.replace("_", " ")}
+                {t(rank)}
               </option>
             ))}
           </select>
         </div>
-        <button className="mt-6 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
-          Sign up
+
+        <button
+          type="submit"
+          className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+        >
+          {t("register")}
         </button>
       </form>
     </div>
