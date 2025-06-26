@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
+import i18n from "../../i18n";
 
 type SettingsContextType = {
   selectedLanguage: string;
@@ -18,8 +20,17 @@ const LanguageSettings = () => {
   ];
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedLanguage(e.target.value);
+    const lang = e.target.value;
+    setSelectedLanguage(lang);
+    localStorage.setItem("i18nextLng", lang);
+    i18n.changeLanguage(lang);
   };
+
+  useEffect(() => {
+    const saved = localStorage.getItem("i18nextLng") || "en";
+    setSelectedLanguage(saved);
+    i18n.changeLanguage(saved);
+  }, []);
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md max-w-md">

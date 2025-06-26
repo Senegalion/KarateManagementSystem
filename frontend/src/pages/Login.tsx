@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API } from "../api";
 import ChangeClubButton from "../components/ChangeClubButton";
+import { useTranslation } from "react-i18next";
 
 const formatClubName = (club: string | null) => {
   if (!club) return "";
@@ -13,6 +14,7 @@ const formatClubName = (club: string | null) => {
 };
 
 const Login = () => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -48,12 +50,12 @@ const Login = () => {
         autoComplete="off"
       >
         <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">
-          Login
+          {t("login")}
         </h2>
 
         {karateClubName && (
           <p className="text-sm text-center text-gray-500 mb-4">
-            Logging in as member of:
+            {t("loggingInAs")}:
             <br />
             <span className="font-semibold text-blue-600">
               {formatClubName(karateClubName)}
@@ -65,20 +67,20 @@ const Login = () => {
 
         <input
           type="text"
-          placeholder="Username"
+          placeholder={t("username")}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder={t("password")}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
         />
         <button className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition mb-4">
-          Log in
+          {t("login")}
         </button>
         <ChangeClubButton />
       </form>

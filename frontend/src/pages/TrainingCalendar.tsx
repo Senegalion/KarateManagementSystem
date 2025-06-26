@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import dayjs from "dayjs";
 import { API } from "../api";
 import { SearchContext } from "../context/SearchContext";
+import { useTranslation } from "react-i18next";
 
 type Training = {
   id: number;
@@ -10,6 +11,7 @@ type Training = {
 };
 
 const TrainingCalendar = () => {
+  const { t } = useTranslation();
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [currentDate, setCurrentDate] = useState(dayjs());
   const [loading, setLoading] = useState(true);
@@ -130,7 +132,7 @@ const TrainingCalendar = () => {
           {i}
           {isToday && (
             <span className="ml-1 text-xs text-yellow-600 font-medium">
-              (today)
+              ({t("today")})
             </span>
           )}
         </div>
@@ -159,11 +161,11 @@ const TrainingCalendar = () => {
   return (
     <div className="p-4 relative">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">
-        Training Calendar
+        {t("trainingCalendar")}
       </h1>
 
       {loading ? (
-        <p>Loading...</p>
+        <p>{t("loading")}...</p>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : (
@@ -173,7 +175,7 @@ const TrainingCalendar = () => {
               onClick={() => handleMonthChange("prev")}
               className="px-4 py-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition font-medium shadow-sm"
             >
-              ← Prev
+              {t("prev")}
             </button>
             <h2 className="text-xl font-semibold text-gray-700">
               {currentDate.format("MMMM YYYY")}
@@ -182,7 +184,7 @@ const TrainingCalendar = () => {
               onClick={() => handleMonthChange("next")}
               className="px-4 py-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition font-medium shadow-sm"
             >
-              Next →
+              {t("next")}
             </button>
           </div>
 
@@ -235,7 +237,7 @@ const TrainingCalendar = () => {
                 ))
               ) : (
                 <p className="text-sm text-gray-500">
-                  No trainings on this day.
+                  {t("noTrainingsOnThisDay")}
                 </p>
               )}
             </div>
