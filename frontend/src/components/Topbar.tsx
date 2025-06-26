@@ -17,11 +17,12 @@ const Topbar = () => {
   const pages = useMemo(() => {
     const basePages = [
       { name: "Dashboard", path: "/app/dashboard" },
+      ...(isAdmin() ? [{ name: "Users", path: "/app/users" }] : []),
       { name: "Calendar", path: "/app/calendar" },
+      ...(isAdmin()
+        ? [{ name: "Create Training", path: "/app/trainings/new" }]
+        : []),
     ];
-    if (isAdmin()) {
-      basePages.push({ name: "Create Training", path: "/app/trainings/new" });
-    }
     return basePages;
   }, []);
 

@@ -1,23 +1,19 @@
 package com.karate.management.karatemanagementsystem.user.infrastructure.persistence.mapper;
 
-import com.karate.management.karatemanagementsystem.user.domain.model.KarateClubName;
-import com.karate.management.karatemanagementsystem.user.domain.model.KarateRank;
-import com.karate.management.karatemanagementsystem.user.domain.model.RoleName;
+import com.karate.management.karatemanagementsystem.notification.domain.model.dto.UserWithDebtDto;
+import com.karate.management.karatemanagementsystem.user.api.dto.RegisterUserDto;
+import com.karate.management.karatemanagementsystem.user.api.dto.UserFromClubDto;
 import com.karate.management.karatemanagementsystem.user.domain.exception.InvalidUserCredentialsException;
-import com.karate.management.karatemanagementsystem.user.domain.model.AddressEntity;
-import com.karate.management.karatemanagementsystem.user.domain.model.KarateClubEntity;
-import com.karate.management.karatemanagementsystem.user.domain.model.RoleEntity;
-import com.karate.management.karatemanagementsystem.user.domain.model.UserEntity;
+import com.karate.management.karatemanagementsystem.user.domain.model.*;
+import com.karate.management.karatemanagementsystem.user.domain.model.dto.UserDetailsDto;
 import com.karate.management.karatemanagementsystem.user.domain.repository.KarateClubRepository;
 import com.karate.management.karatemanagementsystem.user.domain.repository.RoleRepository;
-import com.karate.management.karatemanagementsystem.user.api.dto.RegisterUserDto;
-import com.karate.management.karatemanagementsystem.user.domain.model.dto.UserDetailsDto;
-import com.karate.management.karatemanagementsystem.notification.domain.model.dto.UserWithDebtDto;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class UserMapper {
@@ -69,5 +65,15 @@ public class UserMapper {
                 .email(userEntity.getEmail())
                 .karateRank(userEntity.getKarateRank())
                 .build();
+    }
+
+    public UserFromClubDto mapToDto(UserEntity userEntity) {
+        return new UserFromClubDto(
+                userEntity.getUserId(),
+                userEntity.getUsername(),
+                userEntity.getEmail(),
+                userEntity.getRoleEntities().stream().map(RoleEntity::getName).collect(Collectors.toSet()),
+                userEntity.getKarateRank().toString()
+        );
     }
 }
