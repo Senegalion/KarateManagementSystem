@@ -102,6 +102,13 @@ const Register = () => {
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
               required
+              autoComplete={
+                field === "username"
+                  ? "new-username"
+                  : field === "password"
+                  ? "new-password"
+                  : "off"
+              }
             />
           ))}
 
