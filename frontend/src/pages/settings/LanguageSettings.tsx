@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import i18n from "../../i18n";
+import { useTranslation } from "react-i18next";
 
 type SettingsContextType = {
   selectedLanguage: string;
@@ -8,6 +9,8 @@ type SettingsContextType = {
 };
 
 const LanguageSettings = () => {
+  const { t } = useTranslation();
+
   const { selectedLanguage, setSelectedLanguage } =
     useOutletContext<SettingsContextType>();
 
@@ -34,9 +37,9 @@ const LanguageSettings = () => {
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md max-w-md">
-      <h1 className="text-2xl font-bold mb-4">🌐 Language Settings</h1>
+      <h1 className="text-2xl font-bold mb-4">🌐 {t("languageSettings")}</h1>
       <label className="block mb-2 text-sm font-medium text-gray-700">
-        Choose your preferred language:
+        {t("chooseLanguage")}
       </label>
       <select
         value={selectedLanguage}
