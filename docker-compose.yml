@@ -29,6 +29,20 @@ services:
       - postgres-user-db
     restart: always
 
+  auth-service:
+    build:
+      context: ./microservices/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth-db:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - postgres-auth-db
+    restart: always
+
   frontend:
     build:
       context: ./frontend
@@ -62,6 +76,18 @@ services:
       - "5434:5432"
     volumes:
       - postgres-user-data:/var/lib/postgresql/data
+
+  postgres-auth-db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-auth-data:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4
@@ -100,6 +126,7 @@ services:
 volumes:
   postgres-data:
   postgres-user-data:
+  postgres-auth-data:
   jenkins_home:
   sonarqube_data:
   sonarqube_logs:
