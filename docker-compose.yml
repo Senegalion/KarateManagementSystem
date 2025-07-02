@@ -15,6 +15,20 @@ services:
       - postgres
     restart: always
 
+  user-service:
+    build:
+      context: ./microservices/user-service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user-db:5432/user_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - postgres-user-db
+    restart: always
+
   frontend:
     build:
       context: ./frontend
@@ -36,6 +50,18 @@ services:
       - "5433:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+
+  postgres-user-db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: user_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-user-data:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4
@@ -73,6 +99,7 @@ services:
 
 volumes:
   postgres-data:
+  postgres-user-data:
   jenkins_home:
   sonarqube_data:
   sonarqube_logs:
