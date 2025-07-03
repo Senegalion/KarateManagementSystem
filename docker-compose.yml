@@ -27,6 +27,20 @@ services:
       - postgres-user-db
     restart: always
 
+  club-service:
+    build:
+      context: ./microservices/club-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-club-db:5432/club_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - postgres-club-db
+    restart: always
+
   frontend:
     build:
       context: ./frontend
@@ -59,7 +73,19 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      - postgres-user-data:/var/lib/postgresql/data
+      - postgres-user-data:/var/lib/postgresql/
+
+  postgres-club-db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: club_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-club-data:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4
@@ -98,6 +124,7 @@ services:
 volumes:
   postgres-data:
   postgres-user-data:
+  postgres-club-data:
   jenkins_home:
   sonarqube_data:
   sonarqube_logs:

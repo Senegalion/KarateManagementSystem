@@ -35,7 +35,7 @@ public class UserService {
     @Transactional
     public List<UserFromClubDto> getUsersFromClubByName(String clubName) {
         KarateClubDto clubDto = karateClubClient.getClubByName(clubName);
-        Long karateClubId = clubDto.id();
+        Long karateClubId = clubDto.karateClubId();
 
         return userRepository.findAllByKarateClubId(karateClubId)
                 .stream()
