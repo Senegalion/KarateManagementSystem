@@ -34,9 +34,8 @@ public class UserEntity implements UserDetails {
     @Email
     private String email;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "karate_club_id")
-    private KarateClubEntity karateClub;
+    @Column(name = "karate_club_id", nullable = false)
+    private Long karateClubId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "karate_rank", nullable = false)

@@ -1,13 +1,11 @@
 package com.karate.userservice.domain.service;
 
 import com.karate.userservice.api.dto.UserFromClubDto;
-import com.karate.userservice.domain.model.KarateClubEntity;
-import com.karate.userservice.domain.model.KarateClubName;
 import com.karate.userservice.domain.model.UserEntity;
 import com.karate.userservice.domain.model.dto.UserDetailsDto;
-import com.karate.userservice.domain.repository.KarateClubRepository;
-import com.karate.userservice.domain.repository.RoleRepository;
 import com.karate.userservice.domain.repository.UserRepository;
+import com.karate.userservice.infrastructure.client.KarateClubClient;
+import com.karate.userservice.infrastructure.client.dto.KarateClubDto;
 import com.karate.userservice.infrastructure.persistence.mapper.UserMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,33 +21,25 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final KarateClubRepository karateClubRepository;
-    private final RoleRepository roleRepository;
+    private final KarateClubClient karateClubClient;
 
     public UserDetailsDto getCurrentUserInfo() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity userEntity = userRepository.getUserByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return UserMapper.mapToUserDetailsDto(userEntity);
+
+        KarateClubDto karateClubDto = karateClubClient.getClubById(userEntity.getKarateClubId());
+        return UserMapper.mapToUserDetailsDto(userEntity, karateClubDto.name());
     }
 
     @Transactional
     public List<UserFromClubDto> getUsersFromClubByName(String clubName) {
-        KarateClubName clubNameEnum;
-        try {
-            clubNameEnum = KarateClubName.valueOf(clubName.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid club name: " + clubName, e);
-        }
+        KarateClubDto clubDto = karateClubClient.getClubByName(clubName);
+        Long karateClubId = clubDto.id();
 
-        KarateClubEntity club = karateClubRepository.findByName(clubNameEnum)
-                .orElseThrow(() -> new IllegalArgumentException("Club not found: " + clubName));
-
-        UserMapper userMapper = new UserMapper(karateClubRepository, roleRepository);
-
-        return userRepository.findAllByKarateClub(club)
+        return userRepository.findAllByKarateClubId(karateClubId)
                 .stream()
-                .map(userMapper::mapToDto)
+                .map(UserMapper::mapToDto)
                 .collect(Collectors.toList());
     }
 }

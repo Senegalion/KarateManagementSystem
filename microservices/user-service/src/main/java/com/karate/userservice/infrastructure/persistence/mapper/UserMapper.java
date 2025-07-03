@@ -2,46 +2,37 @@ package com.karate.userservice.infrastructure.persistence.mapper;
 
 import com.karate.userservice.api.dto.RegisterUserDto;
 import com.karate.userservice.api.dto.UserFromClubDto;
-import com.karate.userservice.domain.exception.InvalidUserCredentialsException;
-import com.karate.userservice.domain.model.*;
+import com.karate.userservice.domain.model.AddressEntity;
+import com.karate.userservice.domain.model.KarateRank;
+import com.karate.userservice.domain.model.RoleEntity;
+import com.karate.userservice.domain.model.UserEntity;
 import com.karate.userservice.domain.model.dto.UserDetailsDto;
-import com.karate.userservice.domain.repository.KarateClubRepository;
-import com.karate.userservice.domain.repository.RoleRepository;
-import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
 public class UserMapper {
-    private final KarateClubRepository karateClubRepository;
-    private final RoleRepository roleRepository;
 
-    public static UserDetailsDto mapToUserDetailsDto(UserEntity userEntity) {
+    public static UserDetailsDto mapToUserDetailsDto(UserEntity userEntity, String karateClubName) {
         return UserDetailsDto.builder()
                 .username(userEntity.getUsername())
                 .email(userEntity.getEmail())
-                .karateClub(userEntity.getKarateClub())
+                .karateClubName(karateClubName)
                 .karateRank(userEntity.getKarateRank())
                 .addressEntity(userEntity.getAddressEntity())
                 .build();
     }
 
-    public UserEntity mapFromUserDto(RegisterUserDto registerUserDto) {
-        KarateClubEntity karateClubEntity = karateClubRepository.findByName(KarateClubName.valueOf(registerUserDto.karateClubName()))
-                .orElseThrow(() -> new InvalidUserCredentialsException("Karate club not found"));
-        RoleEntity roleEntity = roleRepository.findByName(RoleName.valueOf("ROLE_" + registerUserDto.role().toUpperCase()))
-                .orElseThrow(() -> new InvalidUserCredentialsException("Role not found"));
-
+    public static UserEntity mapFromUserDto(RegisterUserDto registerUserDto, Long karateClubId, RoleEntity roleEntity) {
         Set<RoleEntity> roleEntities = new HashSet<>();
         roleEntities.add(roleEntity);
 
         return UserEntity.builder()
                 .username(registerUserDto.username())
                 .email(registerUserDto.email())
-                .karateClub(karateClubEntity)
+                .karateClubId(karateClubId)
                 .karateRank(KarateRank.valueOf(registerUserDto.karateRank()))
                 .roleEntities(roleEntities)
                 .password(registerUserDto.password())
@@ -55,7 +46,7 @@ public class UserMapper {
                 .build();
     }
 
-    public UserFromClubDto mapToDto(UserEntity userEntity) {
+    public static UserFromClubDto mapToDto(UserEntity userEntity) {
         return new UserFromClubDto(
                 userEntity.getUserId(),
                 userEntity.getUsername(),

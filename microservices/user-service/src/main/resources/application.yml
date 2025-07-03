@@ -1,6 +1,9 @@
 server:
   port: 8081
 
+club-service:
+  url: http://localhost:8082
+
 spring:
   application:
     name: user-service
@@ -16,3 +19,14 @@ spring:
       ddl-auto: update
     show-sql: true
     open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+auth:
+  jwt:
+    secretKey: ${JWT_SECRET:defaultSecretKey}
+    expirationDays: ${JWT_EXPIRATION_DAYS:30}
+    issuer: karate-management-system-backend
