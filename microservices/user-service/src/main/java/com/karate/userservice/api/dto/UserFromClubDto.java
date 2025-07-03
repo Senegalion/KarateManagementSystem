@@ -1,5 +1,6 @@
 package com.karate.userservice.api.dto;
 
+
 import com.karate.userservice.domain.model.RoleName;
 
 import java.util.Set;
