@@ -37,8 +37,8 @@ public class AuthService {
         RoleEntity roleEntity = roleRepository.findByName(RoleName.valueOf("ROLE_" + registerUserDto.role().toUpperCase()))
                 .orElseThrow(() -> new InvalidUserCredentialsException("Role not found"));
 
-        UserEntity user = UserMapper.mapFromUserDto(registerUserDto, karateClubDto.id(), roleEntity);
-        user.setKarateClubId(karateClubDto.id());
+        UserEntity user = UserMapper.mapFromUserDto(registerUserDto, karateClubDto.karateClubId(), roleEntity);
+        user.setKarateClubId(karateClubDto.karateClubId());
         user.getRoleEntities().add(roleEntity);
 
         UserEntity savedUser = userRepository.save(user);
