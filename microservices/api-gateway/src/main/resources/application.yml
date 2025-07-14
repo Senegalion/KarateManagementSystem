@@ -1,0 +1,13 @@
+server:
+  port: 9191
+
+spring:
+  application:
+    name: api-gateway
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
