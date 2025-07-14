@@ -26,6 +26,22 @@ Below is a screenshot of the main admin dashboard of the application:
 
 ---
 
+### 🧭 Eureka Service Registry (Service Discovery)
+
+The system uses **Spring Cloud Eureka** as a service registry. All microservices such as `user-service` and `club-service` register themselves with Eureka, allowing them to communicate using logical service names via Feign Clients.
+
+This setup enables:
+- Easy service discovery
+- Load balancing between multiple instances
+- Decoupled and scalable architecture
+
+Below is a screenshot of the **Eureka Dashboard** with multiple registered instances (e.g., two `user-service` instances):
+
+![Eureka Service Registry](https://github.com/user-attachments/assets/81cba5c8-977f-4a4f-8593-eb9c0ab515b6)
+
+
+---
+
 ### 🛠️ Jenkins CI/CD
 
 This screenshot shows the Jenkins pipeline and build status:
