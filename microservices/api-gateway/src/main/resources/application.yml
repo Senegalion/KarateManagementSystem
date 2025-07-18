@@ -6,19 +6,22 @@ spring:
     name: api-gateway
   cloud:
     gateway:
-      routes:
-        - id: user-service
-          uri: lb://user-service
-          predicates:
-            - Path=/users/**, /auth/**
-        - id: club-service
-          uri: lb://club-service
-          predicates:
-            - Path=/clubs/**
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
+      server:
+        webflux:
+          routes:
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/users/**
+                - Path=/auth/**
+            - id: club-service
+              uri: lb://club-service
+              predicates:
+                - Path=/clubs/**
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
 
 logging:
   level:
