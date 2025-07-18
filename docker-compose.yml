@@ -25,6 +25,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
     depends_on:
       - postgres-user-db
+      - rabbitmq
     restart: always
 
   club-service:
@@ -39,6 +40,18 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
     depends_on:
       - postgres-club-db
+      - rabbitmq
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
     restart: always
 
   frontend:
