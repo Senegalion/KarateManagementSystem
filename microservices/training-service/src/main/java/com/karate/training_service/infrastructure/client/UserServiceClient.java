@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 @FeignClient(name = "user-service")
 public interface UserServiceClient {
 
-    @GetMapping("/api/internal/me/club-id")
+    @GetMapping("/users/me/club-id")
     Long getCurrentUserClubId();
 }

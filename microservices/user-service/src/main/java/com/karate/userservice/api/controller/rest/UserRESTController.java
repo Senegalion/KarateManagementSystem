@@ -26,4 +26,10 @@ public class UserRESTController {
         List<UserFromClubDto> users = userService.getUsersFromClubByName(clubName);
         return ResponseEntity.ok(users);
     }
+
+    @GetMapping("/me/club-id")
+    public ResponseEntity<Long> getCurrentUserClubId() {
+        Long clubId = userService.getCurrentUserClubId();
+        return ResponseEntity.ok(clubId);
+    }
 }
