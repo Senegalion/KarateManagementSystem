@@ -9,10 +9,13 @@ spring:
       server:
         webflux:
           routes:
-            - id: user-service
+            - id: user-service-users
               uri: lb://user-service
               predicates:
                 - Path=/users/**
+            - id: user-service-auth
+              uri: lb://user-service
+              predicates:
                 - Path=/auth/**
             - id: club-service
               uri: lb://club-service
