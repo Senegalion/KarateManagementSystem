@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -40,6 +39,21 @@ public class UserService {
         return userRepository.findAllByKarateClubId(karateClubId)
                 .stream()
                 .map(UserMapper::mapToDto)
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    public Long getCurrentUserClubId() {
+        UserEntity user = getCurrentUser();
+        return user.getKarateClubId();
+    }
+
+    private UserEntity getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = principal instanceof UserDetails userDetails
+                ? userDetails.getUsername()
+                : principal.toString();
+
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }
