@@ -2,7 +2,7 @@ spring:
   application:
     name: training-service
   config:
-    import: optional:configserver:http://localhost:8888
+    import: optional:configserver:http://localhost:8780
   rabbitmq:
     host: rabbitmq
     port: 5672

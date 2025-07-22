@@ -1,46 +1,32 @@
+version: "3.8"
+
 services:
-  backend:
+  # --- Infrastructure ---
+
+  config-server:
     build:
-      context: ./backend
+      context: ./microservices/config-server
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/karate_management
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-    depends_on:
-      - postgres
+      - "8780:8888"
     restart: always
 
-  user-service:
+  service-registry:
     build:
-      context: ./microservices/user-service
+      context: ./microservices/service-registry
       dockerfile: Dockerfile
     ports:
-      - "8081:8081"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user-db:5432/user_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-    depends_on:
-      - postgres-user-db
-      - rabbitmq
+      - "8761:8761"
     restart: always
 
-  club-service:
+  api-gateway:
     build:
-      context: ./microservices/club-service
+      context: ./microservices/api-gateway
       dockerfile: Dockerfile
     ports:
-      - "8082:8082"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-club-db:5432/club_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
+      - "9191:9191"
     depends_on:
-      - postgres-club-db
-      - rabbitmq
+      - service-registry
     restart: always
 
   rabbitmq:
@@ -54,15 +40,7 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
     restart: always
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-    restart: always
+  # --- Databases ---
 
   postgres:
     image: postgres:15
@@ -86,7 +64,7 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      - postgres-user-data:/var/lib/postgresql/
+      - postgres-user-data:/var/lib/postgresql/data
 
   postgres-club-db:
     image: postgres:15
@@ -100,6 +78,18 @@ services:
     volumes:
       - postgres-club-data:/var/lib/postgresql/data
 
+  postgres-feedback-db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: feedback_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres-feedback-data:/var/lib/postgresql/data
+
   pgadmin:
     image: dpage/pgadmin4
     restart: always
@@ -108,6 +98,93 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5050:80"
+
+  # --- Microservices ---
+
+  modular-monolith:
+    build:
+      context: ./modular-monolith
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/karate_management
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - postgres
+    restart: always
+
+  user-service:
+    build:
+      context: ./microservices/user-service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user-db:5432/user_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+    depends_on:
+      - postgres-user-db
+      - rabbitmq
+      - service-registry
+      - config-server
+    restart: always
+
+  club-service:
+    build:
+      context: ./microservices/club-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-club-db:5432/club_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+    depends_on:
+      - postgres-club-db
+      - rabbitmq
+      - service-registry
+      - config-server
+    restart: always
+
+  feedback-service:
+    build:
+      context: ./microservices/feedback-service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-feedback-db:5432/feedback_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+    depends_on:
+      - postgres-feedback-db
+      - rabbitmq
+      - service-registry
+      - config-server
+    restart: always
+
+  # --- Frontend ---
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - modular-monolith
+    restart: always
+
+  # --- CI/CD Tools ---
 
   jenkins:
     build:
@@ -138,6 +215,7 @@ volumes:
   postgres-data:
   postgres-user-data:
   postgres-club-data:
+  postgres-feedback-data:
   jenkins_home:
   sonarqube_data:
   sonarqube_logs:
