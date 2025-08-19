@@ -1,13 +1,9 @@
 package com.karate.userservice.api.dto;
 
-
-import java.util.Set;
-
-public record UserFromClubDto(
+public record UserInfoDto(
         Long userId,
-        String username,
         String email,
-        Set<String> roles,
+        Long karateClubId,
         String karateRank
 ) {
 }

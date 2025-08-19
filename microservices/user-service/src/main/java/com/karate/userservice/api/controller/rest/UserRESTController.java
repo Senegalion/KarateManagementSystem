@@ -4,6 +4,7 @@ import com.karate.userservice.api.dto.UserFromClubDto;
 import com.karate.userservice.domain.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,8 +29,9 @@ public class UserRESTController {
     }
 
     @GetMapping("/me/club-id")
-    public ResponseEntity<Long> getCurrentUserClubId() {
-        Long clubId = userService.getCurrentUserClubId();
+    public ResponseEntity<Long> getCurrentUserClubId(Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+        Long clubId = userService.getCurrentUserClubId(userId);
         return ResponseEntity.ok(clubId);
     }
 }
