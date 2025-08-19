@@ -1,4 +1,4 @@
-package com.karate.userservice.domain.exception;
+package com.karate.authservice.domain.exception;
 
 public class InvalidUserCredentialsException extends RuntimeException {
     public InvalidUserCredentialsException(String message) {

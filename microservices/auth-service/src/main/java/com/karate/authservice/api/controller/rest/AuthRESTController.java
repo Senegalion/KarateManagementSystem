@@ -1,19 +1,20 @@
 package com.karate.authservice.api.controller.rest;
 
-import com.karate.authservice.api.dto.LoginResponseDto;
-import com.karate.authservice.api.dto.RegisterUserDto;
-import com.karate.authservice.api.dto.RegistrationResultDto;
-import com.karate.authservice.api.dto.TokenRequestDto;
+import com.karate.authservice.api.dto.*;
+import com.karate.authservice.domain.exception.UsernameWhileTryingToLogInNotFoundException;
+import com.karate.authservice.domain.model.AuthUserEntity;
+import com.karate.authservice.domain.model.dto.UserDto;
+import com.karate.authservice.domain.service.AuthService;
+import com.karate.authservice.infrastructure.jwt.JwtAuthenticatorService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
@@ -52,5 +53,17 @@ public class AuthRESTController {
         } catch (UsernameNotFoundException exception) {
             throw new UsernameWhileTryingToLogInNotFoundException("Invalid username or password");
         }
+    }
+
+    @GetMapping("/users/{userId}")
+    public AuthUserDto getAuthUserByUserId(@PathVariable Long userId) {
+        AuthUserEntity entity = authService.findByUserId(userId);
+        return new AuthUserDto(
+                entity.getUserId(),
+                entity.getUsername(),
+                entity.getRoleEntities().stream()
+                        .map(r -> r.getName().name())
+                        .collect(Collectors.toSet())
+        );
     }
 }

@@ -1,7 +1,7 @@
-package com.karate.userservice.infrastructure.security.jwt;
+package com.karate.authservice.infrastructure.jwt;
 
-import com.karate.userservice.domain.model.dto.UserDto;
-import com.karate.userservice.domain.service.AuthService;
+import com.karate.authservice.domain.model.dto.UserDto;
+import com.karate.authservice.domain.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;

@@ -1,18 +1,20 @@
-package com.karate.userservice.domain.service;
+package com.karate.authservice.domain.service;
 
-import com.karate.userservice.api.dto.RegisterUserDto;
-import com.karate.userservice.api.dto.RegistrationResultDto;
-import com.karate.userservice.domain.exception.InvalidUserCredentialsException;
-import com.karate.userservice.domain.model.KarateRank;
-import com.karate.userservice.domain.model.RoleEntity;
-import com.karate.userservice.domain.model.RoleName;
-import com.karate.userservice.domain.model.UserEntity;
-import com.karate.userservice.domain.model.dto.UserDto;
-import com.karate.userservice.domain.repository.RoleRepository;
-import com.karate.userservice.domain.repository.UserRepository;
-import com.karate.userservice.infrastructure.client.KarateClubClient;
-import com.karate.userservice.infrastructure.client.dto.KarateClubDto;
-import com.karate.userservice.infrastructure.persistence.mapper.UserMapper;
+import com.karate.authservice.api.dto.RegisterUserDto;
+import com.karate.authservice.api.dto.RegistrationResultDto;
+import com.karate.authservice.domain.exception.InvalidUserCredentialsException;
+import com.karate.authservice.domain.model.AuthUserEntity;
+import com.karate.authservice.domain.model.KarateRank;
+import com.karate.authservice.domain.model.RoleEntity;
+import com.karate.authservice.domain.model.RoleName;
+import com.karate.authservice.domain.model.dto.UserDto;
+import com.karate.authservice.domain.repository.AuthUserRepository;
+import com.karate.authservice.domain.repository.RoleRepository;
+import com.karate.authservice.infrastructure.client.KarateClubClient;
+import com.karate.authservice.infrastructure.client.UserClient;
+import com.karate.authservice.infrastructure.client.dto.KarateClubDto;
+import com.karate.authservice.infrastructure.client.dto.NewUserRequestDto;
+import com.karate.authservice.infrastructure.client.dto.UserInfoDto;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -24,9 +26,10 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class AuthService {
-    private final UserRepository userRepository;
+    private final AuthUserRepository authUserRepository;
     private final RoleRepository roleRepository;
     private final KarateClubClient karateClubClient;
+    private final UserClient userClient;
 
     @Transactional
     public RegistrationResultDto register(RegisterUserDto registerUserDto) {
@@ -37,11 +40,24 @@ public class AuthService {
         RoleEntity roleEntity = roleRepository.findByName(RoleName.valueOf("ROLE_" + registerUserDto.role().toUpperCase()))
                 .orElseThrow(() -> new InvalidUserCredentialsException("Role not found"));
 
-        UserEntity user = UserMapper.mapFromUserDto(registerUserDto, karateClubDto.karateClubId(), roleEntity);
-        user.setKarateClubId(karateClubDto.karateClubId());
-        user.getRoleEntities().add(roleEntity);
+        AuthUserEntity authUser = AuthUserEntity.builder()
+                .username(registerUserDto.username())
+                .password(registerUserDto.password())
+                .roleEntities(Set.of(roleEntity))
+                .build();
 
-        UserEntity savedUser = userRepository.save(user);
+        AuthUserEntity savedUser = authUserRepository.save(authUser);
+
+        Long userId = savedUser.getUserId();
+
+        userClient.createUser(
+                new NewUserRequestDto(
+                        userId,
+                        registerUserDto.email(),
+                        karateClubDto.karateClubId(),
+                        registerUserDto.karateRank()
+                )
+        );
 
         return RegistrationResultDto.builder()
                 .userId(savedUser.getUserId())
@@ -83,21 +99,27 @@ public class AuthService {
 
     @Transactional
     public UserDto findByUsername(String username) {
-        UserEntity userEntity = userRepository.findByUsername(username)
+        AuthUserEntity authUserEntity = authUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        Set<RoleName> roles = userEntity.getRoleEntities().stream()
+        Set<RoleName> roles = authUserEntity.getRoleEntities().stream()
                 .map(RoleEntity::getName)
                 .collect(Collectors.toSet());
 
-        KarateClubDto karateClub = karateClubClient.getClubById(userEntity.getKarateClubId());
+        UserInfoDto userInfo = userClient.getUserById(authUserEntity.getUserId());
+        KarateClubDto karateClub = karateClubClient.getClubById(userInfo.karateClubId());
 
         return new UserDto(
-                userEntity.getUserId(),
-                userEntity.getUsername(),
-                userEntity.getPassword(),
+                authUserEntity.getUserId(),
+                authUserEntity.getUsername(),
+                authUserEntity.getPassword(),
                 roles,
                 karateClub.name()
         );
+    }
+
+    public AuthUserEntity findByUserId(Long userId) {
+        return authUserRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Auth user not found"));
     }
 }

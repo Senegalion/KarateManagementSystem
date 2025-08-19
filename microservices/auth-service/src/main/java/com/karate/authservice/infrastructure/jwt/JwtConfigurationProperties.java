@@ -1,4 +1,4 @@
-package com.karate.userservice.infrastructure.security.jwt;
+package com.karate.authservice.infrastructure.jwt;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

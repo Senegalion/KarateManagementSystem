@@ -1,4 +1,4 @@
-package com.karate.userservice.infrastructure.clock;
+package com.karate.authservice.infrastructure.clock;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

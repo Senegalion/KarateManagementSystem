@@ -1,7 +1,7 @@
-package com.karate.userservice.domain.repository;
+package com.karate.authservice.domain.repository;
 
-import com.karate.userservice.domain.model.RoleEntity;
-import com.karate.userservice.domain.model.RoleName;
+import com.karate.authservice.domain.model.RoleEntity;
+import com.karate.authservice.domain.model.RoleName;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

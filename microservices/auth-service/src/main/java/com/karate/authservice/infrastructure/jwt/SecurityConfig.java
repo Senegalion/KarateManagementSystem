@@ -1,6 +1,6 @@
-package com.karate.userservice.infrastructure.security.jwt;
+package com.karate.authservice.infrastructure.jwt;
 
-import com.karate.userservice.domain.service.AuthService;
+import com.karate.authservice.domain.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

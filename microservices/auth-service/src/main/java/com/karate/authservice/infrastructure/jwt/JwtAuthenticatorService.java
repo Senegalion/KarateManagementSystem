@@ -1,9 +1,9 @@
-package com.karate.userservice.infrastructure.security.jwt;
+package com.karate.authservice.infrastructure.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.karate.userservice.api.dto.LoginResponseDto;
-import com.karate.userservice.api.dto.TokenRequestDto;
+import com.karate.authservice.api.dto.LoginResponseDto;
+import com.karate.authservice.api.dto.TokenRequestDto;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
