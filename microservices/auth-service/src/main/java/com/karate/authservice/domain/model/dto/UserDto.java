@@ -1,0 +1,14 @@
+package com.karate.authservice.domain.model.dto;
+
+import com.karate.authservice.domain.model.RoleName;
+
+import java.util.Set;
+
+public record UserDto(
+        Long userId,
+        String username,
+        String password,
+        Set<RoleName> roles,
+        String karateClubName
+) {
+}
