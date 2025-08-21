@@ -9,18 +9,26 @@ spring:
       server:
         webflux:
           routes:
-            - id: user-service-users
+            - id: user-service
               uri: lb://user-service
               predicates:
                 - Path=/users/**
-            - id: user-service-auth
-              uri: lb://user-service
-              predicates:
-                - Path=/auth/**
             - id: club-service
               uri: lb://club-service
               predicates:
                 - Path=/clubs/**
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/auth/**
+            - id: training-service
+              uri: lb://training-service
+              predicates:
+                - Path=/trainings/**
+            - id: feedback-service
+              uri: lb://feedback-service
+              predicates:
+                - Path=/feedbacks/**
           discovery:
             locator:
               enabled: true
