@@ -3,6 +3,7 @@ package com.karate.userservice.domain.service;
 import com.karate.userservice.api.dto.NewUserRequestDto;
 import com.karate.userservice.api.dto.UserFromClubDto;
 import com.karate.userservice.api.dto.UserInfoDto;
+import com.karate.userservice.domain.model.AddressEntity;
 import com.karate.userservice.domain.model.KarateRank;
 import com.karate.userservice.domain.model.UserEntity;
 import com.karate.userservice.domain.repository.UserRepository;
@@ -50,12 +51,23 @@ public class UserService {
     }
 
     public Long createUser(NewUserRequestDto dto) {
+        AddressEntity address = AddressEntity.builder()
+                .city(dto.city())
+                .street(dto.street())
+                .number(dto.number())
+                .postalCode(dto.postalCode())
+                .build();
+
         UserEntity user = UserEntity.builder()
+                .userId(dto.userId())
                 .email(dto.email())
                 .karateRank(KarateRank.valueOf(dto.karateRank()))
                 .karateClubId(dto.karateClubId())
                 .registrationDate(LocalDate.now())
+                .addressEntity(address)
                 .build();
+
+        address.setUserEntity(user);
 
         return userRepository.save(user).getUserId();
     }
