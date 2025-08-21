@@ -2,9 +2,11 @@ spring:
   application:
     name: club-service
   config:
-    import: optional:configserver:http://config-server:8888
+    import: optional:configserver:http://localhost:8888
+#    import: optional:configserver:http://config-server:8888
   rabbitmq:
-    host: rabbitmq
+    host: localhost
+#    host: rabbitmq
     port: 5672
     username: guest
     password: guest

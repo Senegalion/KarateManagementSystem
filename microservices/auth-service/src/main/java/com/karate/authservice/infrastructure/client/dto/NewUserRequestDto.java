@@ -7,6 +7,10 @@ public record NewUserRequestDto(
         Long userId,
         String email,
         Long karateClubId,
-        String karateRank
+        String karateRank,
+        String city,
+        String street,
+        String number,
+        String postalCode
 ) {
 }
