@@ -7,6 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -22,7 +23,7 @@ public class AuthUserEntity implements UserDetails {
     @Column(name = "auth_user_id")
     private Long authUserId;
 
-    @Column(name = "user_id", unique = true, nullable = false)
+    @Column(name = "user_id", unique = true)
     private Long userId;
 
     @Column(name = "username", unique = true, nullable = false)
@@ -37,7 +38,7 @@ public class AuthUserEntity implements UserDetails {
             joinColumns = {@JoinColumn(name = "auth_user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")}
     )
-    private Set<RoleEntity> roleEntities;
+    private Set<RoleEntity> roleEntities = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

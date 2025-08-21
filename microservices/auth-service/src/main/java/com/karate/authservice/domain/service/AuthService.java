@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,24 +44,28 @@ public class AuthService {
         AuthUserEntity authUser = AuthUserEntity.builder()
                 .username(registerUserDto.username())
                 .password(registerUserDto.password())
-                .roleEntities(Set.of(roleEntity))
+                .roleEntities(new HashSet<>(Set.of(roleEntity)))
                 .build();
+        AuthUserEntity savedAuthUser = authUserRepository.save(authUser);
 
-        AuthUserEntity savedUser = authUserRepository.save(authUser);
-
-        Long userId = savedUser.getUserId();
-
-        userClient.createUser(
-                new NewUserRequestDto(
-                        userId,
-                        registerUserDto.email(),
-                        karateClubDto.karateClubId(),
-                        registerUserDto.karateRank()
-                )
+        NewUserRequestDto newUserRequest = new NewUserRequestDto(
+                savedAuthUser.getAuthUserId(),
+                registerUserDto.email(),
+                karateClubDto.karateClubId(),
+                registerUserDto.karateRank(),
+                registerUserDto.city(),
+                registerUserDto.street(),
+                registerUserDto.number(),
+                registerUserDto.postalCode()
         );
 
+        Long createdUserId = userClient.createUser(newUserRequest);
+
+        savedAuthUser.setUserId(createdUserId);
+        authUserRepository.save(savedAuthUser);
+
         return RegistrationResultDto.builder()
-                .userId(savedUser.getUserId())
+                .userId(savedAuthUser.getUserId())
                 .username(registerUserDto.username())
                 .email(registerUserDto.email())
                 .build();
