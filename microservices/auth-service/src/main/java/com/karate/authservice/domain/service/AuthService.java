@@ -12,6 +12,7 @@ import com.karate.authservice.domain.repository.AuthUserRepository;
 import com.karate.authservice.domain.repository.RoleRepository;
 import com.karate.authservice.infrastructure.client.KarateClubClient;
 import com.karate.authservice.infrastructure.client.UserClient;
+import com.karate.authservice.infrastructure.client.dto.AddressDto;
 import com.karate.authservice.infrastructure.client.dto.KarateClubDto;
 import com.karate.authservice.infrastructure.client.dto.NewUserRequestDto;
 import com.karate.authservice.infrastructure.client.dto.UserInfoDto;
@@ -53,10 +54,12 @@ public class AuthService {
                 registerUserDto.email(),
                 karateClubDto.karateClubId(),
                 registerUserDto.karateRank(),
-                registerUserDto.city(),
-                registerUserDto.street(),
-                registerUserDto.number(),
-                registerUserDto.postalCode()
+                new AddressDto(
+                        registerUserDto.address().city(),
+                        registerUserDto.address().street(),
+                        registerUserDto.address().number(),
+                        registerUserDto.address().postalCode()
+                )
         );
 
         Long createdUserId = userClient.createUser(newUserRequest);

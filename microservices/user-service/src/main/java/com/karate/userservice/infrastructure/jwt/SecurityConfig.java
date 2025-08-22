@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/v2/api-docs*/**").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
                         .requestMatchers("/swagger-resources/**").permitAll()
-                        .requestMatchers("/internal/users").permitAll()
+                        .requestMatchers("/internal/users/**").permitAll()
                         .requestMatchers("/users/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
