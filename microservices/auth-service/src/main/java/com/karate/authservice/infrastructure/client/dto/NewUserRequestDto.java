@@ -8,9 +8,6 @@ public record NewUserRequestDto(
         String email,
         Long karateClubId,
         String karateRank,
-        String city,
-        String street,
-        String number,
-        String postalCode
+        AddressDto addressDto
 ) {
 }
