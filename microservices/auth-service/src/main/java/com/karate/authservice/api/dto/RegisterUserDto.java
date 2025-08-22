@@ -31,4 +31,10 @@ public record RegisterUserDto(
         @NotEmpty(message = "{password.not.empty}")
         String password
 ) {
+    public RegisterUserDto withEncodedPassword(String encodedPassword) {
+        return new RegisterUserDto(
+                username(), email(), address(), karateClubName(),
+                karateRank(), role(), encodedPassword
+        );
+    }
 }

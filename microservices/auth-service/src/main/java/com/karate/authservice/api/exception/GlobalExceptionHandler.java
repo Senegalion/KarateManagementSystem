@@ -3,8 +3,10 @@ package com.karate.authservice.api.exception;
 import com.karate.authservice.api.exception.dto.ErrorResponse;
 import com.karate.authservice.api.exception.dto.ValidationError;
 import com.karate.authservice.domain.exception.UsernameWhileTryingToLogInNotFoundException;
+import feign.FeignException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -111,7 +113,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
-    // 409 - conflict
+    // 409 - conflict (business logic conflict)
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> handleConflict(
             IllegalStateException ex,
@@ -126,6 +128,62 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    // 409 - conflict (DB unique constraint violations)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "Username or email already exists",
+                null,
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    // 409 - conflict (user-service already has email/username)
+    @ExceptionHandler(FeignException.Conflict.class)
+    public ResponseEntity<ErrorResponse> handleFeignConflict(
+            FeignException.Conflict ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "Username or email already exists",
+                null,
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    // 4xx from Feign (fallback for other client errors)
+    @ExceptionHandler(FeignException.FeignClientException.class)
+    public ResponseEntity<ErrorResponse> handleFeignClientException(
+            FeignException.FeignClientException ex,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.resolve(ex.status());
+        if (status == null) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+        ErrorResponse response = new ErrorResponse(
+                status.value(),
+                "Upstream service error: " + ex.getMessage(),
+                null,
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(status).body(response);
     }
 
     // 500 - internal server error (fallback)
