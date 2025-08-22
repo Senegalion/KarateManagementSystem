@@ -31,8 +31,7 @@ public class AuthRESTController {
                 authService.register(
                         new RegisterUserDto(
                                 registerUserDto.username(), registerUserDto.email(),
-                                registerUserDto.city(), registerUserDto.street(),
-                                registerUserDto.number(), registerUserDto.postalCode(),
+                                registerUserDto.address(),
                                 registerUserDto.karateClubName(), registerUserDto.karateRank(),
                                 registerUserDto.role(), encodedPassword
                         )
@@ -41,7 +40,7 @@ public class AuthRESTController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> authenticateAndGenerateToken(@Valid @RequestBody TokenRequestDto tokenRequestDto) throws UsernameWhileTryingToLogInNotFoundException {
+    public ResponseEntity<LoginResponseDto> authenticateAndGenerateToken(@Valid @RequestBody TokenRequestDto tokenRequestDto) {
         try {
             UserDto user = authService.findByUsername(tokenRequestDto.username());
             if (!user.karateClubName().equalsIgnoreCase(tokenRequestDto.karateClubName())) {
