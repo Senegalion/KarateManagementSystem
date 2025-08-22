@@ -1,8 +1,11 @@
 package com.karate.authservice.domain.service;
 
+import com.karate.authservice.api.dto.AuthUserDto;
 import com.karate.authservice.api.dto.RegisterUserDto;
 import com.karate.authservice.api.dto.RegistrationResultDto;
+import com.karate.authservice.api.dto.TokenRequestDto;
 import com.karate.authservice.domain.exception.InvalidUserCredentialsException;
+import com.karate.authservice.domain.exception.UsernameWhileTryingToLogInNotFoundException;
 import com.karate.authservice.domain.model.AuthUserEntity;
 import com.karate.authservice.domain.model.KarateRank;
 import com.karate.authservice.domain.model.RoleEntity;
@@ -129,5 +132,31 @@ public class AuthService {
     public AuthUserEntity findByUserId(Long userId) {
         return authUserRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Auth user not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public void validateUserForLogin(TokenRequestDto tokenRequestDto) {
+        UserDto user;
+        try {
+            user = findByUsername(tokenRequestDto.username());
+        } catch (UsernameNotFoundException e) {
+            throw new UsernameWhileTryingToLogInNotFoundException("Invalid username or password");
+        }
+
+        if (!user.karateClubName().equalsIgnoreCase(tokenRequestDto.karateClubName())) {
+            throw new UsernameWhileTryingToLogInNotFoundException("Invalid club for this user");
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public AuthUserDto getAuthUserDto(Long userId) {
+        AuthUserEntity entity = findByUserId(userId);
+        return new AuthUserDto(
+                entity.getUserId(),
+                entity.getUsername(),
+                entity.getRoleEntities().stream()
+                        .map(r -> r.getName().name())
+                        .collect(Collectors.toSet())
+        );
     }
 }
