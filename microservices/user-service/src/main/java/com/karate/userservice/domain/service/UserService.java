@@ -52,10 +52,10 @@ public class UserService {
 
     public Long createUser(NewUserRequestDto dto) {
         AddressEntity address = AddressEntity.builder()
-                .city(dto.city())
-                .street(dto.street())
-                .number(dto.number())
-                .postalCode(dto.postalCode())
+                .city(dto.addressDto().city())
+                .street(dto.addressDto().street())
+                .number(dto.addressDto().number())
+                .postalCode(dto.addressDto().postalCode())
                 .build();
 
         UserEntity user = UserEntity.builder()
