@@ -14,6 +14,9 @@ public interface AuthClient {
     @GetMapping("/auth/users/by-ids")
     Map<Long, AuthUserDto> getAuthUsers(@RequestParam("ids") List<Long> userIds);
 
-    @GetMapping("/auth/users/{userId}")
+    @GetMapping("/internal/users/{userId}")
     AuthUserDto getAuthUserByUserId(@PathVariable("userId") Long userId);
+
+    @GetMapping("/internal/users/by-username/{username}")
+    AuthUserDto getAuthUserByUsername(@PathVariable("username") String username);
 }

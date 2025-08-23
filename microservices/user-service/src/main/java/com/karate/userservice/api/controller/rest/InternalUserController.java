@@ -26,4 +26,10 @@ public class InternalUserController {
         UserInfoDto userInfo = userService.getUserById(userId);
         return ResponseEntity.ok(userInfo);
     }
+
+    @GetMapping("/{username}/club-id")
+    public ResponseEntity<Long> getUserClubId(@PathVariable String username) {
+        Long clubId = userService.getCurrentUserClubIdByUsername(username);
+        return ResponseEntity.ok(clubId);
+    }
 }

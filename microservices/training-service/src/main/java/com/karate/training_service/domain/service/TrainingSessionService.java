@@ -2,11 +2,15 @@ package com.karate.training_service.domain.service;
 
 import com.karate.training_service.api.dto.TrainingSessionDto;
 import com.karate.training_service.api.dto.TrainingSessionRequestDto;
+import com.karate.training_service.domain.exception.TrainingSessionClubMismatchException;
+import com.karate.training_service.domain.exception.TrainingSessionNotFoundException;
 import com.karate.training_service.domain.model.TrainingSessionEntity;
 import com.karate.training_service.domain.repository.TrainingSessionRepository;
 import com.karate.training_service.infrastructure.client.UserServiceClient;
 import com.karate.training_service.infrastructure.persistence.mapper.TrainingSessionMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +23,8 @@ public class TrainingSessionService {
     private final UserServiceClient userServiceClient;
 
     public List<TrainingSessionDto> getAllTrainingSessionsForCurrentUserClub() {
-        Long clubId = userServiceClient.getCurrentUserClubId();
+        String username = getCurrentUsername();
+        Long clubId = userServiceClient.getUserClubId(username);
         List<TrainingSessionEntity> trainingSessions = trainingSessionRepository.findAllByClubId(clubId);
 
         return trainingSessions.stream()
@@ -29,15 +34,44 @@ public class TrainingSessionService {
 
     @Transactional
     public TrainingSessionDto createTrainingSession(TrainingSessionRequestDto dto) {
-        Long clubId = userServiceClient.getCurrentUserClubId();
+        if (dto.endTime().isBefore(dto.startTime()) || dto.endTime().isEqual(dto.startTime())) {
+            throw new IllegalArgumentException("End time must be after start time");
+        }
+
+        String username = getCurrentUsername();
+        Long clubId = userServiceClient.getUserClubId(username);
 
         TrainingSessionEntity trainingSession = new TrainingSessionEntity();
-        trainingSession.setDate(dto.date());
+        trainingSession.setStartTime(dto.startTime());
+        trainingSession.setEndTime(dto.endTime());
         trainingSession.setDescription(dto.description());
         trainingSession.setClubId(clubId);
 
         TrainingSessionEntity saved = trainingSessionRepository.save(trainingSession);
 
         return TrainingSessionMapper.mapToTrainingSessionDto(saved);
+    }
+
+    @Transactional
+    public void deleteTrainingSession(Long trainingId) {
+        String username = getCurrentUsername();
+        Long clubId = userServiceClient.getUserClubId(username);
+
+        TrainingSessionEntity training = trainingSessionRepository.findById(trainingId)
+                .orElseThrow(() -> new TrainingSessionNotFoundException("Training session not found"));
+
+        if (!training.getClubId().equals(clubId)) {
+            throw new TrainingSessionClubMismatchException("You cannot delete a training from another club");
+        }
+
+        trainingSessionRepository.delete(training);
+    }
+
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new IllegalStateException("No authenticated user found");
+        }
+        return authentication.getName();
     }
 }
