@@ -1,7 +1,9 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.5.3'
+	id 'org.jetbrains.kotlin.jvm' version '1.9.25'
+	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
+	id 'org.springframework.boot' version '3.5.5'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.jetbrains.kotlin.plugin.jpa' version '1.9.25'
 }
 
 ext {
@@ -17,14 +19,12 @@ java {
 	}
 }
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
 repositories {
 	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', "2025.0.0")
 }
 
 dependencies {
@@ -53,9 +53,9 @@ dependencies {
 	// --- Database driver ---
 	runtimeOnly 'org.postgresql:postgresql'
 
-	// --- Lombok for boilerplate code reduction ---
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+	// --- Kotlin helpers ---
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+	implementation("org.jetbrains.kotlin:kotlin-reflect")
 
 	// --- Testing dependencies ---
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -70,6 +70,18 @@ dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
+}
+
+kotlin {
+	compilerOptions {
+		freeCompilerArgs.addAll '-Xjsr305=strict'
+	}
+}
+
+allOpen {
+	annotation 'jakarta.persistence.Entity'
+	annotation 'jakarta.persistence.MappedSuperclass'
+	annotation 'jakarta.persistence.Embeddable'
 }
 
 tasks.named('test') {
