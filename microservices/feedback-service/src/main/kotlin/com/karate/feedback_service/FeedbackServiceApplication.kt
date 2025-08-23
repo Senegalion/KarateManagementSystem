@@ -10,7 +10,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients
 @EnableFeignClients
 @EnableConfigurationProperties(JwtConfigurationProperties::class)
 class FeedbackServiceApplication
-
 fun main(args: Array<String>) {
     runApplication<FeedbackServiceApplication>(*args)
 }
