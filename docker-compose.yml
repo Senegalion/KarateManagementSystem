@@ -106,6 +106,18 @@ services:
     volumes:
       - postgres-auth-data:/var/lib/postgresql/data
 
+  postgres-training-db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: training_db
+    ports:
+      - "5438:5432"
+    volumes:
+      - postgres-training-data:/var/lib/postgresql/data
+
   pgadmin:
     image: dpage/pgadmin4
     restart: always
@@ -233,6 +245,7 @@ volumes:
   postgres-club-data:
   postgres-feedback-data:
   postgres-auth-data:
+  postgres-training-data:
   jenkins_home:
   sonarqube_data:
   sonarqube_logs:
