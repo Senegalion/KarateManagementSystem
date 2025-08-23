@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 @Builder
 public record TrainingSessionDto(
         Long trainingSessionId,
-        LocalDateTime date,
+        LocalDateTime startTime,
+        LocalDateTime endTime,
         String description
 ) {
 }

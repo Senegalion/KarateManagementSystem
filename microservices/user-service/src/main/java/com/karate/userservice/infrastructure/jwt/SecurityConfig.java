@@ -18,6 +18,7 @@ import java.util.List;
 @Configuration
 @AllArgsConstructor
 public class SecurityConfig {
+    public static final String ADMIN = "ADMIN";
     private final JwtAuthTokenFilter jwtAuthTokenFilter;
 
     @Bean
@@ -33,8 +34,10 @@ public class SecurityConfig {
                         .requestMatchers("/v2/api-docs*/**").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
                         .requestMatchers("/swagger-resources/**").permitAll()
+                        .requestMatchers("/users/by-club").hasRole(ADMIN)
+                        .requestMatchers("/users/me").hasAnyRole("USER", ADMIN)
                         .requestMatchers("/internal/users/**").permitAll()
-                        .requestMatchers("/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/users/**").hasAnyRole("USER", ADMIN)
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

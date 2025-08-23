@@ -159,4 +159,18 @@ public class AuthService {
                         .collect(Collectors.toSet())
         );
     }
+
+    @Transactional(readOnly = true)
+    public AuthUserDto getAuthUserDtoByUsername(String username) {
+        AuthUserEntity user = authUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return new AuthUserDto(
+                user.getUserId(),
+                user.getUsername(),
+                user.getRoleEntities().stream()
+                        .map(r -> r.getName().name())
+                        .collect(Collectors.toSet())
+        );
+    }
 }

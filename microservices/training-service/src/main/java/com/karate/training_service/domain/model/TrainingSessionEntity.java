@@ -16,8 +16,11 @@ public class TrainingSessionEntity {
     @Column(name = "training_session_id")
     private Long trainingSessionId;
 
-    @Column(name = "date", nullable = false)
-    private LocalDateTime date;
+    @Column(name = "start_time", nullable = false)
+    private LocalDateTime startTime;
+
+    @Column(name = "end_time", nullable = false)
+    private LocalDateTime endTime;
 
     @Column(name = "description", nullable = false)
     private String description;

@@ -3,12 +3,14 @@ package com.karate.userservice.domain.service;
 import com.karate.userservice.api.dto.NewUserRequestDto;
 import com.karate.userservice.api.dto.UserFromClubDto;
 import com.karate.userservice.api.dto.UserInfoDto;
+import com.karate.userservice.api.dto.UserInformationDto;
 import com.karate.userservice.domain.model.AddressEntity;
 import com.karate.userservice.domain.model.KarateRank;
 import com.karate.userservice.domain.model.UserEntity;
 import com.karate.userservice.domain.repository.UserRepository;
 import com.karate.userservice.infrastructure.client.AuthClient;
 import com.karate.userservice.infrastructure.client.KarateClubClient;
+import com.karate.userservice.infrastructure.client.dto.AuthUserDto;
 import com.karate.userservice.infrastructure.client.dto.KarateClubDto;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,12 +46,6 @@ public class UserService {
                 .toList();
     }
 
-    public Long getCurrentUserClubId(Long userIdFromToken) {
-        UserEntity user = userRepository.findById(userIdFromToken)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return user.getKarateClubId();
-    }
-
     public Long createUser(NewUserRequestDto dto) {
         AddressEntity address = AddressEntity.builder()
                 .city(dto.addressDto().city())
@@ -83,5 +79,32 @@ public class UserService {
                 user.getKarateClubId(),
                 user.getKarateRank().toString()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public UserInformationDto getCurrentUserInfo(String username) {
+        AuthUserDto authUser = authClient.getAuthUserByUsername(username);
+
+        UserEntity user = userRepository.findById(authUser.userId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String clubName = karateClubClient.getClubById(user.getKarateClubId()).name();
+
+        return new UserInformationDto(
+                user.getUserId(),
+                authUser.username(),
+                user.getEmail(),
+                clubName,
+                user.getKarateRank().toString(),
+                authUser.roles()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Long getCurrentUserClubIdByUsername(String username) {
+        AuthUserDto authUser = authClient.getAuthUserByUsername(username);
+        UserEntity user = userRepository.findById(authUser.userId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getKarateClubId();
     }
 }
