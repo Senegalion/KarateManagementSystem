@@ -17,6 +17,29 @@ The app provides robust tools for instructors, such as:
 
 This project aims to modernize the management of karate schools and improve communication between instructors and students, with a strong focus on automation, ease of use, and scalability.
 
+## 🏗️ System Architecture
+
+The project follows a Spring Cloud microservices architecture with centralized configuration, service discovery, and API routing.
+
+🔑 Core Components
+Config Server – centralized configuration management for all services,
+Eureka Service Registry – service discovery and load balancing,
+API Gateway (Spring Cloud Gateway) – single entry point for routing requests, handling authentication (JWT), and request filtering.
+
+🧩 Microservices
+
+- **auth-service** – authentication & authorization (JWT-based security, role management),
+- **user-service** – user management (profiles, registration, contact information),
+- **club-service** – club management (structure, assigning users to clubs),
+- **training-service** – training sessions scheduling, attendance tracking,
+- **feedback-service** – feedback collection and communication between students and instructors.
+
+This architecture ensures:
+- Loose coupling between services,
+- Scalability (multiple instances per service),
+- Centralized configuration and discovery,
+- Secure and controlled access to backend services.
+
 ## 📷 Application Preview
 
 ### 🖥️ Dashboard View
@@ -31,7 +54,7 @@ Below is a screenshot of the main admin dashboard of the application:
 To manage and route incoming traffic efficiently across the microservices, the system includes an **API Gateway** built using **Spring Cloud Gateway**.
 
 This component serves as a single entry point to the system, enabling:
-- Centralized routing to `user-service`, `club-service`, etc.
+- Centralized routing to `user-service`, `auth-service`, `club-service`, `training-service`, `feedback-service` etc.
 - Load balancing and fault tolerance
 - Security handling (JWT filtering at the gateway level)
 - Path rewriting and filtering of requests
@@ -51,7 +74,8 @@ This setup enables:
 
 Below is a screenshot of the **Eureka Dashboard** with multiple registered instances (e.g., two `user-service` instances):
 
-![Eureka Service Registry](https://github.com/user-attachments/assets/2f78f5cd-8521-4e9a-931d-5699edc1b053)
+![Eureka Service Registry](https://github.com/user-attachments/assets/3c914c79-0687-447d-accd-ff1efa4176ad)
+
 
 
 ---
