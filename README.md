@@ -54,7 +54,7 @@ Below is a screenshot of the main admin dashboard of the application:
 To manage and route incoming traffic efficiently across the microservices, the system includes an **API Gateway** built using **Spring Cloud Gateway**.
 
 This component serves as a single entry point to the system, enabling:
-- Centralized routing to `user-service`, `club-service`, etc.
+- Centralized routing to `user-service`, `auth-service`, `club-service`, `training-service`, `feedback-service` etc.
 - Load balancing and fault tolerance
 - Security handling (JWT filtering at the gateway level)
 - Path rewriting and filtering of requests
