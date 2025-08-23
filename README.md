@@ -74,7 +74,8 @@ This setup enables:
 
 Below is a screenshot of the **Eureka Dashboard** with multiple registered instances (e.g., two `user-service` instances):
 
-![Eureka Service Registry](https://github.com/user-attachments/assets/2f78f5cd-8521-4e9a-931d-5699edc1b053)
+![Eureka Service Registry](https://github.com/user-attachments/assets/3c914c79-0687-447d-accd-ff1efa4176ad)
+
 
 
 ---
