@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 @Builder
 public record TrainingSessionRegistrationResponseDto(
         String message,
-        LocalDateTime date,
+        LocalDateTime startTime,
+        LocalDateTime endTime,
         String description
 ) {
 }
