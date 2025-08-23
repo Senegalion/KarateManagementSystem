@@ -17,6 +17,29 @@ The app provides robust tools for instructors, such as:
 
 This project aims to modernize the management of karate schools and improve communication between instructors and students, with a strong focus on automation, ease of use, and scalability.
 
+## 🏗️ System Architecture
+
+The project follows a Spring Cloud microservices architecture with centralized configuration, service discovery, and API routing.
+
+🔑 Core Components
+Config Server – centralized configuration management for all services,
+Eureka Service Registry – service discovery and load balancing,
+API Gateway (Spring Cloud Gateway) – single entry point for routing requests, handling authentication (JWT), and request filtering.
+
+🧩 Microservices
+
+- **auth-service** – authentication & authorization (JWT-based security, role management),
+- **user-service** – user management (profiles, registration, contact information),
+- **club-service** – club management (structure, assigning users to clubs),
+- **training-service** – training sessions scheduling, attendance tracking,
+- **feedback-service** – feedback collection and communication between students and instructors.
+
+This architecture ensures:
+- Loose coupling between services,
+- Scalability (multiple instances per service),
+- Centralized configuration and discovery,
+- Secure and controlled access to backend services.
+
 ## 📷 Application Preview
 
 ### 🖥️ Dashboard View
