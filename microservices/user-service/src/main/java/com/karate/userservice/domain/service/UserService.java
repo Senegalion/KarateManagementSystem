@@ -107,4 +107,8 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return user.getKarateClubId();
     }
+
+    public Boolean checkUserExists(Long userId) {
+        return userRepository.existsById(userId);
+    }
 }

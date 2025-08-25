@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: api-gateway
+  cache:
+    type: caffeine
   cloud:
     gateway:
       server:
