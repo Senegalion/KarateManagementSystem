@@ -74,4 +74,21 @@ public class TrainingSessionService {
         }
         return authentication.getName();
     }
+
+    public Boolean checkTrainingExists(Long trainingId) {
+        return trainingSessionRepository.existsById(trainingId);
+    }
+
+    @Transactional(readOnly = true)
+    public TrainingSessionDto getTrainingById(Long trainingId) {
+        TrainingSessionEntity trainingSessionEntity = trainingSessionRepository.findById(trainingId)
+                .orElseThrow(() -> new RuntimeException("Training Session not found"));
+
+        return new TrainingSessionDto(
+                trainingSessionEntity.getTrainingSessionId(),
+                trainingSessionEntity.getStartTime(),
+                trainingSessionEntity.getEndTime(),
+                trainingSessionEntity.getDescription()
+        );
+    }
 }

@@ -32,4 +32,9 @@ public class InternalUserController {
         Long clubId = userService.getCurrentUserClubIdByUsername(username);
         return ResponseEntity.ok(clubId);
     }
+
+    @GetMapping("/{userId}/exists")
+    public ResponseEntity<Boolean> checkUserExists(@PathVariable Long userId) {
+        return ResponseEntity.ok(userService.checkUserExists(userId));
+    }
 }
