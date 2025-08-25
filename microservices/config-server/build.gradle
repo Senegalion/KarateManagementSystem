@@ -22,12 +22,20 @@ ext {
 }
 
 dependencies {
-	// --- Spring Boot starters ---
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-
 	// --- Spring Cloud dependencies ---
 	implementation 'org.springframework.cloud:spring-cloud-config-server'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+	// --- Spring Boot starters ---
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	// --- Bean Validation (Hibernate Validator) ---
+	// Added to avoid NoProviderFoundException in logs
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// --- Caffeine cache ---
+	// Recommended by Spring Cloud LoadBalancer for production caching
+	implementation 'com.github.ben-manes.caffeine:caffeine'
 
 	// --- Testing dependencies ---
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
