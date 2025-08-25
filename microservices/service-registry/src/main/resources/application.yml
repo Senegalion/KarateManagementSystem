@@ -1,6 +1,8 @@
 spring:
   application:
     name: service-registry
+  cache:
+    type: caffeine
 
 server:
   port: 8761

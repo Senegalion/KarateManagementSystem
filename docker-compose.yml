@@ -118,6 +118,18 @@ services:
     volumes:
       - postgres-training-data:/var/lib/postgresql/data
 
+  postgres-enrollment-db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: enrollment_db
+    ports:
+      - "5439:5432"
+    volumes:
+      - postgres-enrollment-data:/var/lib/postgresql/data
+
   pgadmin:
     image: dpage/pgadmin4
     restart: always
@@ -246,6 +258,7 @@ volumes:
   postgres-feedback-data:
   postgres-auth-data:
   postgres-training-data:
+  postgres-enrollment-data:
   jenkins_home:
   sonarqube_data:
   sonarqube_logs:
