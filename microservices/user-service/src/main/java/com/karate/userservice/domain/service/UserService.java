@@ -43,6 +43,7 @@ public class UserService {
                 .toList();
     }
 
+    @Transactional
     public Long createUser(NewUserRequestDto dto) {
         AddressEntity address = AddressEntity.builder()
                 .city(dto.addressDto().city())
