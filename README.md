@@ -32,6 +32,7 @@ API Gateway (Spring Cloud Gateway) – single entry point for routing requests, 
 - **user-service** – user management (profiles, registration, contact information),
 - **club-service** – club management (structure, assigning users to clubs),
 - **training-service** – training sessions scheduling, attendance tracking,
+- **enrollment-service** – user enrollments for training sessions (sign-up, withdrawal, listing user/training enrollments),
 - **feedback-service** – feedback collection and communication between students and instructors.
 
 This architecture ensures:
@@ -54,7 +55,7 @@ Below is a screenshot of the main admin dashboard of the application:
 To manage and route incoming traffic efficiently across the microservices, the system includes an **API Gateway** built using **Spring Cloud Gateway**.
 
 This component serves as a single entry point to the system, enabling:
-- Centralized routing to `user-service`, `auth-service`, `club-service`, `training-service`, `feedback-service` etc.
+- Centralized routing to `user-service`, `auth-service`, `club-service`, `training-service`, `enrollment-service`, `feedback-service` etc.
 - Load balancing and fault tolerance
 - Security handling (JWT filtering at the gateway level)
 - Path rewriting and filtering of requests

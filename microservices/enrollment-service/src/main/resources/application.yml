@@ -3,6 +3,14 @@ spring:
     name: enrollment-service
   cache:
     type: caffeine
+  cloud:
+    stream:
+      default-binder: kafka
+      bindings:
+        springCloudBusInput:
+          binder: rabbit
+        springCloudBusOutput:
+          binder: rabbit
   config:
     import: optional:configserver:http://localhost:8888
   #    import: optional:configserver:http://config-server:8888
@@ -12,3 +20,14 @@ spring:
     port: 5672
     username: guest
     password: guest
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: enrollment-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"

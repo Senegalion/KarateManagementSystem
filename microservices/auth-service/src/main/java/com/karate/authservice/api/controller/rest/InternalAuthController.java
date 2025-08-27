@@ -24,4 +24,9 @@ public class InternalAuthController {
     public AuthUserDto getAuthUserByUsernameInternal(@PathVariable String username) {
         return authService.getAuthUserDtoByUsername(username);
     }
+
+    @GetMapping("/payload/{userId}")
+    public String getUsernameById(@PathVariable Long userId) {
+        return authService.getUsername(userId);
+    }
 }
