@@ -29,4 +29,9 @@ public class InternalAuthController {
     public String getUsernameById(@PathVariable Long userId) {
         return authService.getUsername(userId);
     }
+
+    @GetMapping("/username/by-id/{username}")
+    public Long getUserIdByUsername(@PathVariable String username) {
+        return authService.getUserIdByUsername(username);
+    }
 }

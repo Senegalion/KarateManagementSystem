@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "training-service")
 interface TrainingSessionClient {
-    @GetMapping("/training-sessions/{sessionId}/exists")
-    fun checkTrainingSessionExists(@PathVariable sessionId: Long): Boolean?
+    @GetMapping("/internal/trainings/{trainingId}/exists")
+    fun checkTrainingExists(@PathVariable trainingId: Long): Boolean?
 }
