@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: notification-service
+  cache:
+    type: caffeine
+  config:
+    import: optional:configserver:http://localhost:8888
+  #    import: optional:configserver:http://config-server:8888
+  cloud:
+    stream:
+      default-binder: rabbit
+      bindings:
+        user-events-in:
+          destination: user-events
+          group: notification-service
+          binder: kafka
+        enrollment-events-in:
+          destination: enrollment-events
+          group: notification-service
+          binder: kafka
+        feedback-events-in:
+          destination: feedback-events
+          group: notification-service
+          binder: kafka
+  rabbitmq:
+    host: localhost
+    #    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:3025}
+    username: ${MAIL_USERNAME:defaultUsername}
+    password: ${MAIL_PASSWORD:defaultPassword}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+      timeout: ${MAIL_PROPERTIES_TIMEOUT:5000}
+      connectiontimeout: ${MAIL_PROPERTIES_CONNECTION_TIMEOUT:5000}
+      writetimeout: ${MAIL_PROPERTIES_WRITE_TIMEOUT:5000}
