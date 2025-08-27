@@ -20,13 +20,17 @@ import com.karate.authservice.infrastructure.client.dto.AddressDto;
 import com.karate.authservice.infrastructure.client.dto.KarateClubDto;
 import com.karate.authservice.infrastructure.client.dto.NewUserRequestDto;
 import com.karate.authservice.infrastructure.client.dto.UserInfoDto;
+import com.karate.authservice.infrastructure.messaging.UserEventProducer;
+import com.karate.authservice.infrastructure.messaging.event.UserRegisteredEvent;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +40,7 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final KarateClubClient karateClubClient;
     private final UserClient userClient;
+    private final UserEventProducer userEventProducer;
 
     @Transactional
     public RegistrationResultDto register(RegisterUserDto registerUserDto) {
@@ -69,7 +74,25 @@ public class AuthService {
         Long createdUserId = userClient.createUser(newUserRequest);
 
         savedAuthUser.setUserId(createdUserId);
-        authUserRepository.save(savedAuthUser);
+        AuthUserEntity saved = authUserRepository.save(savedAuthUser);
+
+        UserInfoDto userInfoDto = userClient.getUserById(saved.getUserId());
+
+        UserRegisteredEvent event = new UserRegisteredEvent(
+                UUID.randomUUID().toString(),
+                "USER_REGISTERED",
+                Instant.now(),
+                new UserRegisteredEvent.Payload(
+                        saved.getUserId(),
+                        userInfoDto.email(),
+                        saved.getUsername(),
+                        karateClubDto.karateClubId(),
+                        karateClubDto.name(),
+                        userInfoDto.karateRank()
+                )
+        );
+
+        userEventProducer.sendUserRegisteredEvent(event);
 
         return RegistrationResultDto.builder()
                 .userId(savedAuthUser.getUserId())

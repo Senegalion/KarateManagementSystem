@@ -5,10 +5,10 @@ spring:
     type: caffeine
   config:
     import: optional:configserver:http://localhost:8888
-#    import: optional:configserver:http://config-server:8888
+  #    import: optional:configserver:http://config-server:8888
   rabbitmq:
     host: localhost
-#    host: rabbitmq
+    #    host: rabbitmq
     port: 5672
     username: guest
     password: guest
