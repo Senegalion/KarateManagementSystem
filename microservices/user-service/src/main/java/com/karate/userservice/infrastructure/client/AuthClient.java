@@ -19,4 +19,7 @@ public interface AuthClient {
 
     @GetMapping("/internal/users/by-username/{username}")
     AuthUserDto getAuthUserByUsername(@PathVariable("username") String username);
+
+    @GetMapping("/internal/users/payload/{userId}")
+    String getUsernameById(@PathVariable("userId") Long userId);
 }

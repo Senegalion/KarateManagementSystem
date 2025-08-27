@@ -1,6 +1,7 @@
 package com.karate.enrollment_service.infrastructure.client;
 
 import com.karate.enrollment_service.infrastructure.client.dto.UserInfoDto;
+import com.karate.enrollment_service.infrastructure.client.dto.UserPayload;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,4 +13,7 @@ public interface UserClient {
 
     @GetMapping("/internal/users/{id}")
     UserInfoDto getUserById(@PathVariable("id") Long userId);
+
+    @GetMapping("/internal/users/payload/{id}")
+    UserPayload getUser(@PathVariable("id") Long userId);
 }

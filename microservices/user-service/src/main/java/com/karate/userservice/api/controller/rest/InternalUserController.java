@@ -2,6 +2,7 @@ package com.karate.userservice.api.controller.rest;
 
 import com.karate.userservice.api.dto.NewUserRequestDto;
 import com.karate.userservice.api.dto.UserInfoDto;
+import com.karate.userservice.api.dto.UserPayload;
 import com.karate.userservice.domain.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,5 +37,11 @@ public class InternalUserController {
     @GetMapping("/{userId}/exists")
     public ResponseEntity<Boolean> checkUserExists(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.checkUserExists(userId));
+    }
+
+    @GetMapping("/payload/{id}")
+    public ResponseEntity<UserPayload> getUser(@PathVariable("id") Long userId) {
+        UserPayload userPayload = userService.getUser(userId);
+        return ResponseEntity.ok(userPayload);
     }
 }
