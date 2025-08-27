@@ -1,9 +1,6 @@
 package com.karate.userservice.domain.service;
 
-import com.karate.userservice.api.dto.NewUserRequestDto;
-import com.karate.userservice.api.dto.UserFromClubDto;
-import com.karate.userservice.api.dto.UserInfoDto;
-import com.karate.userservice.api.dto.UserInformationDto;
+import com.karate.userservice.api.dto.*;
 import com.karate.userservice.domain.model.AddressEntity;
 import com.karate.userservice.domain.model.KarateRank;
 import com.karate.userservice.domain.model.UserEntity;
@@ -110,5 +107,19 @@ public class UserService {
 
     public Boolean checkUserExists(Long userId) {
         return userRepository.existsById(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public UserPayload getUser(Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String username = authClient.getUsernameById(userId);
+
+        return new UserPayload(
+                user.getUserId(),
+                user.getEmail(),
+                username
+        );
     }
 }

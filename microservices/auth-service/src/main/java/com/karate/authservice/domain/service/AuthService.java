@@ -5,6 +5,7 @@ import com.karate.authservice.api.dto.RegisterUserDto;
 import com.karate.authservice.api.dto.RegistrationResultDto;
 import com.karate.authservice.api.dto.TokenRequestDto;
 import com.karate.authservice.domain.exception.InvalidUserCredentialsException;
+import com.karate.authservice.domain.exception.UserNotFoundException;
 import com.karate.authservice.domain.exception.UsernameWhileTryingToLogInNotFoundException;
 import com.karate.authservice.domain.model.AuthUserEntity;
 import com.karate.authservice.domain.model.KarateRank;
@@ -172,5 +173,13 @@ public class AuthService {
                         .map(r -> r.getName().name())
                         .collect(Collectors.toSet())
         );
+    }
+
+    @Transactional(readOnly = true)
+    public String getUsername(Long userId) {
+        AuthUserEntity user = authUserRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        return user.getUsername();
     }
 }
