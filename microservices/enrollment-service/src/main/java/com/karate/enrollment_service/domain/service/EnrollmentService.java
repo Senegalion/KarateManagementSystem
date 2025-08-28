@@ -115,4 +115,8 @@ public class EnrollmentService {
                 .map(enrollmentMapper::toDto)
                 .toList();
     }
+
+    public boolean isUserEnrolledInSession(Long userId, Long trainingId) {
+        return enrollmentRepository.findByUserIdAndTrainingId(userId, trainingId).isPresent();
+    }
 }

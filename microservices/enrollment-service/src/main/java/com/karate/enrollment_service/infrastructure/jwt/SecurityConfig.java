@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .requestMatchers("/v2/api-docs*/**").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
                         .requestMatchers("/swagger-resources/**").permitAll()
+                        .requestMatchers("/internal/enrollments/**").permitAll()
                         .requestMatchers("/enrollments/training/{trainingId}").hasRole(ADMIN)
                         .requestMatchers("/enrollments/{userId}/{trainingId}").hasAnyRole(USER, ADMIN)
                         .requestMatchers("/enrollments/user/{userId}").hasAnyRole(USER, ADMIN)
