@@ -2,9 +2,7 @@ package com.karate.userservice.infrastructure.client;
 
 import com.karate.userservice.infrastructure.client.dto.AuthUserDto;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -22,4 +20,10 @@ public interface AuthClient {
 
     @GetMapping("/internal/users/payload/{userId}")
     String getUsernameById(@PathVariable("userId") Long userId);
+
+    @PutMapping("/internal/users/{userId}/username")
+    void updateUsername(@PathVariable("userId") Long userId, @RequestBody String newUsername);
+
+    @DeleteMapping("/internal/users/{userId}")
+    void deleteUser(@PathVariable("userId") Long userId);
 }

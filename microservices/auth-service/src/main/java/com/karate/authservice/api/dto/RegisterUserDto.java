@@ -13,7 +13,7 @@ public record RegisterUserDto(
         String username,
         @NotNull(message = "{email.not.null}")
         @NotEmpty(message = "{email.not.empty}")
-        @Email
+        @Email(message = "{email.invalid}")
         String email,
         @NotNull(message = "{address.not.null}")
         @Valid

@@ -1,21 +1,21 @@
-package com.karate.userservice.api.exception;
+package com.karate.feedback_service.api.exception;
 
-import com.karate.userservice.api.exception.dto.ErrorResponse;
-import com.karate.userservice.api.exception.dto.ValidationError;
-import com.karate.userservice.domain.exception.UserAlreadyExistsException;
-import com.karate.userservice.domain.exception.UserNotFoundException;
+import com.karate.feedback_service.api.exception.dto.ErrorResponse;
+import com.karate.feedback_service.api.exception.dto.ValidationError;
+import com.karate.feedback_service.domain.exception.FeedbackNotFoundException;
+import com.karate.feedback_service.domain.exception.TrainingSessionNotFoundException;
+import com.karate.feedback_service.domain.exception.UserNotSignedUpException;
 import feign.FeignException;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -62,8 +62,40 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
-    // 404 - not found
-    @ExceptionHandler({NoSuchElementException.class, EntityNotFoundException.class})
+    // 401 - not authenticated
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUsernameNotFound(
+            UsernameNotFoundException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                ex.getMessage(),
+                null,
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    // 403 - user not enrolled
+    @ExceptionHandler(UserNotSignedUpException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotSignedUp(
+            UserNotSignedUpException ex,
+            HttpServletRequest request
+    ) {
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                ex.getMessage(),
+                null,
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    // 404 - training session or feedback not found
+    @ExceptionHandler({TrainingSessionNotFoundException.class, FeedbackNotFoundException.class})
     public ResponseEntity<ErrorResponse> handleNotFound(
             RuntimeException ex,
             HttpServletRequest request
@@ -79,19 +111,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex, HttpServletRequest request) {
-        ErrorResponse response = new ErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                ex.getMessage(),
-                null,
-                request.getRequestURI(),
-                LocalDateTime.now()
-        );
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
-
-    // 409 - conflict (user-service already has email/username)
+    // 409 - conflict (upstream user-service etc.)
     @ExceptionHandler(FeignException.Conflict.class)
     public ResponseEntity<ErrorResponse> handleFeignConflict(
             FeignException.Conflict ex,
@@ -99,24 +119,12 @@ public class GlobalExceptionHandler {
     ) {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.CONFLICT.value(),
-                "Username or email already exists",
+                "Conflict error from upstream service: " + ex.getMessage(),
                 null,
                 request.getRequestURI(),
                 LocalDateTime.now()
         );
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    }
-
-    @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException ex, HttpServletRequest request) {
-        ErrorResponse response = new ErrorResponse(
-                HttpStatus.CONFLICT.value(),
-                ex.getMessage(),
-                null,
-                request.getRequestURI(),
-                LocalDateTime.now()
-        );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
