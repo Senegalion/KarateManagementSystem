@@ -2,13 +2,13 @@ package com.karate.userservice.api.exception;
 
 import com.karate.userservice.api.exception.dto.ErrorResponse;
 import com.karate.userservice.api.exception.dto.ValidationError;
+import com.karate.userservice.domain.exception.UserAlreadyExistsException;
+import com.karate.userservice.domain.exception.UserNotFoundException;
 import feign.FeignException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -79,6 +79,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                null,
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
     // 409 - conflict (user-service already has email/username)
     @ExceptionHandler(FeignException.Conflict.class)
     public ResponseEntity<ErrorResponse> handleFeignConflict(
@@ -93,6 +105,18 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
 
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException ex, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                ex.getMessage(),
+                null,
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 

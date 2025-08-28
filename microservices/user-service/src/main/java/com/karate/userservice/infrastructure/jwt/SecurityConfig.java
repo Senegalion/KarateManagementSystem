@@ -37,7 +37,6 @@ public class SecurityConfig {
                         .requestMatchers("/users/by-club").hasRole(ADMIN)
                         .requestMatchers("/users/me").hasAnyRole("USER", ADMIN)
                         .requestMatchers("/internal/users/**").permitAll()
-                        .requestMatchers("/users/**").hasAnyRole("USER", ADMIN)
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

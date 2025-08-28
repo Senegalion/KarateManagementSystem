@@ -1,6 +1,7 @@
 package com.karate.userservice.domain.service;
 
 import com.karate.userservice.api.dto.*;
+import com.karate.userservice.domain.exception.UserNotFoundException;
 import com.karate.userservice.domain.model.AddressEntity;
 import com.karate.userservice.domain.model.KarateRank;
 import com.karate.userservice.domain.model.UserEntity;
@@ -69,7 +70,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserInfoDto getUserById(Long userId) {
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         return new UserInfoDto(
                 user.getUserId(),
@@ -84,7 +85,7 @@ public class UserService {
         AuthUserDto authUser = authClient.getAuthUserByUsername(username);
 
         UserEntity user = userRepository.findById(authUser.userId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         String clubName = karateClubClient.getClubById(user.getKarateClubId()).name();
 
@@ -102,7 +103,7 @@ public class UserService {
     public Long getCurrentUserClubIdByUsername(String username) {
         AuthUserDto authUser = authClient.getAuthUserByUsername(username);
         UserEntity user = userRepository.findById(authUser.userId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         return user.getKarateClubId();
     }
 
@@ -113,7 +114,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserPayload getUser(Long userId) {
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         String username = authClient.getUsernameById(userId);
 
@@ -122,5 +123,49 @@ public class UserService {
                 user.getEmail(),
                 username
         );
+    }
+
+    @Transactional
+    public void updateCurrentUser(String username, UpdateUserRequestDto dto) {
+        AuthUserDto authUser = authClient.getAuthUserByUsername(username);
+        UserEntity user = userRepository.findById(authUser.userId())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        authClient.updateUsername(authUser.userId(), dto.username());
+        user.setEmail(dto.email());
+        user.getAddressEntity().setCity(dto.address().city());
+        user.getAddressEntity().setStreet(dto.address().street());
+        user.getAddressEntity().setNumber(dto.address().number());
+        user.getAddressEntity().setPostalCode(dto.address().postalCode());
+
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void patchCurrentUser(String username, UpdateUserRequestDto dto) {
+        AuthUserDto authUser = authClient.getAuthUserByUsername(username);
+        UserEntity user = userRepository.findById(authUser.userId())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (dto.username() != null) authClient.updateUsername(authUser.userId(), dto.username());
+        if (dto.email() != null) user.setEmail(dto.email());
+        if (dto.address() != null) {
+            if (dto.address().city() != null) user.getAddressEntity().setCity(dto.address().city());
+            if (dto.address().street() != null) user.getAddressEntity().setStreet(dto.address().street());
+            if (dto.address().number() != null) user.getAddressEntity().setNumber(dto.address().number());
+            if (dto.address().postalCode() != null) user.getAddressEntity().setPostalCode(dto.address().postalCode());
+        }
+
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteCurrentUser(String username) {
+        AuthUserDto authUser = authClient.getAuthUserByUsername(username);
+        UserEntity user = userRepository.findById(authUser.userId())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        userRepository.delete(user);
+        authClient.deleteUser(user.getUserId());
     }
 }

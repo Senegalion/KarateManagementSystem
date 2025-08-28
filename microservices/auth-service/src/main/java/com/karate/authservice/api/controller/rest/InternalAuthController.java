@@ -3,10 +3,7 @@ package com.karate.authservice.api.controller.rest;
 import com.karate.authservice.api.dto.AuthUserDto;
 import com.karate.authservice.domain.service.AuthService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/internal/users")
@@ -33,5 +30,15 @@ public class InternalAuthController {
     @GetMapping("/username/by-id/{username}")
     public Long getUserIdByUsername(@PathVariable String username) {
         return authService.getUserIdByUsername(username);
+    }
+
+    @PutMapping("/{userId}/username")
+    public void updateUsername(@PathVariable Long userId, @RequestBody String newUsername) {
+        authService.updateUsername(userId, newUsername);
+    }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable("userId") Long userId) {
+        authService.deleteUser(userId);
     }
 }

@@ -214,4 +214,20 @@ public class AuthService {
                 );
         return user.getUserId();
     }
+
+    @Transactional
+    public void updateUsername(Long userId, String newUsername) {
+        AuthUserEntity user = authUserRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        user.setUsername(newUsername);
+        authUserRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        AuthUserEntity user = authUserRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        authUserRepository.delete(user);
+    }
 }
