@@ -1,15 +1,14 @@
 package com.karate.userservice.api.controller.rest;
 
+import com.karate.userservice.api.dto.UpdateUserRequestDto;
 import com.karate.userservice.api.dto.UserFromClubDto;
 import com.karate.userservice.api.dto.UserInformationDto;
 import com.karate.userservice.domain.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,5 +31,29 @@ public class UserRESTController {
     @GetMapping("/me")
     public ResponseEntity<UserInformationDto> getCurrentUserInfo(Authentication authentication) {
         return ResponseEntity.ok(userService.getCurrentUserInfo(authentication.getName()));
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<Void> updateCurrentUser(
+            Authentication authentication,
+            @Valid @RequestBody UpdateUserRequestDto updateUserRequest
+    ) {
+        userService.updateCurrentUser(authentication.getName(), updateUserRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<Void> patchCurrentUser(
+            Authentication authentication,
+            @RequestBody UpdateUserRequestDto updateUserRequest
+    ) {
+        userService.patchCurrentUser(authentication.getName(), updateUserRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteCurrentUser(Authentication authentication) {
+        userService.deleteCurrentUser(authentication.getName());
+        return ResponseEntity.noContent().build();
     }
 }

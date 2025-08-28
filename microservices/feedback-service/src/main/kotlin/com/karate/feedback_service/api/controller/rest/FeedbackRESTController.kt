@@ -22,4 +22,12 @@ class FeedbackRESTController(
         val feedback = feedbackService.addFeedbackToUserForTrainingSession(userId, trainingSessionId, feedbackRequestDto)
         return ResponseEntity(feedback, HttpStatus.CREATED)
     }
+
+    @GetMapping("/{trainingSessionId}")
+    fun getFeedback(
+        @PathVariable trainingSessionId: Long
+    ): ResponseEntity<FeedbackResponseDto> {
+        val feedback = feedbackService.getFeedbackForSession(trainingSessionId)
+        return ResponseEntity.ok(feedback)
+    }
 }

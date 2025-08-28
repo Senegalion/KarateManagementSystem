@@ -12,30 +12,28 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 class SecurityConfig(
-        private val jwtAuthTokenFilter: JwtAuthTokenFilter
+    private val jwtAuthTokenFilter: JwtAuthTokenFilter
 ) {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
-            http
-                    .cors { it.configurationSource(corsConfigurationSource()) }
-                    .csrf { it.disable() }
-                    .authorizeHttpRequests {
-                        it.requestMatchers(
-                                "/", "/swagger-ui/**", "/swagger-ui.html/**",
-                                "/v3/api-docs*/**", "/v2/api-docs*/**",
-                                "/webjars/**", "/swagger-resources/**"
-                        ).permitAll()
-                                .requestMatchers("/users/by-club").hasRole(ADMIN)
-                                .requestMatchers("/users/me").hasAnyRole("USER", ADMIN)
-                                .requestMatchers("/internal/users/**").permitAll()
-                                .requestMatchers("/users/**").hasAnyRole("USER", ADMIN)
-                                .anyRequest().authenticated()
-                    }
-                    .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-                    .httpBasic {}
-                    .addFilterBefore(jwtAuthTokenFilter, UsernamePasswordAuthenticationFilter::class.java)
-                    .build()
+        http
+            .cors { it.configurationSource(corsConfigurationSource()) }
+            .csrf { it.disable() }
+            .authorizeHttpRequests {
+                it.requestMatchers(
+                    "/", "/swagger-ui/**", "/swagger-ui.html/**",
+                    "/v3/api-docs*/**", "/v2/api-docs*/**",
+                    "/webjars/**", "/swagger-resources/**"
+                ).permitAll()
+                    .requestMatchers("/feedbacks/{userId}/{trainingSessionId}").hasRole("ADMIN")
+                    .requestMatchers("/feedbacks/{trainingSessionId}").hasAnyRole("USER", "ADMIN")
+                    .anyRequest().authenticated()
+            }
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .httpBasic {}
+            .addFilterBefore(jwtAuthTokenFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .build()
 
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
@@ -48,9 +46,5 @@ class SecurityConfig(
         return UrlBasedCorsConfigurationSource().apply {
             registerCorsConfiguration("/**", config)
         }
-    }
-
-    companion object {
-        const val ADMIN = "ADMIN"
     }
 }
