@@ -31,3 +31,23 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,loggers,metrics,prometheus
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0        # PROD: np. 0.1
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+logging:
+  level:
+    root: INFO
+    com.karate: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - traceId=%X{traceId} spanId=%X{spanId} cid=%X{correlationId} - %msg%n"
