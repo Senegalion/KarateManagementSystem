@@ -69,6 +69,13 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+	// --- Tracing and observability ---
+	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+	implementation 'io.micrometer:micrometer-tracing'
+	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
 	// --- Other libraries ---
 	implementation 'com.auth0:java-jwt:4.0.0'
 }
