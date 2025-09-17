@@ -1,0 +1,20 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging:
+  config: classpath:logback-dev.xml
+  level:
+    root: INFO
+    com.karate: DEBUG
+    org.springframework.cloud: WARN
+    com.zaxxer.hikari: WARN
+    org.hibernate: WARN
+    org.flywaydb: INFO
+    org.apache.catalina: WARN
