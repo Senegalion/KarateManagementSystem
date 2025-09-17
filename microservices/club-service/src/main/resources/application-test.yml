@@ -1,0 +1,16 @@
+spring:
+  config:
+    activate.on-profile: test
+
+management:
+  tracing:
+    enabled: false
+  prometheus:
+    metrics:
+      export:
+        enabled: false
+
+logging:
+  level:
+    root: INFO
+    com.karate: INFO

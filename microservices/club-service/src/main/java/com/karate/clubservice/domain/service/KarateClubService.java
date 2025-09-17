@@ -1,31 +1,43 @@
 package com.karate.clubservice.domain.service;
 
+import com.karate.clubservice.domain.exception.ClubNotFoundException;
+import com.karate.clubservice.domain.exception.InvalidClubNameException;
 import com.karate.clubservice.domain.model.KarateClubEntity;
 import com.karate.clubservice.domain.model.KarateClubName;
 import com.karate.clubservice.domain.model.dto.KarateClubDto;
 import com.karate.clubservice.domain.repository.KarateClubRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class KarateClubService {
     private final KarateClubRepository repository;
 
     public KarateClubDto getByName(String name) {
+        log.debug("Fetching club by name={}", name);
         KarateClubName clubName = parseClubName(name);
 
         KarateClubEntity entity = repository.findByName(clubName)
-                .orElseThrow(() -> new IllegalArgumentException("Club not found: " + name));
-        return toDto(entity);
+                .orElseThrow(() -> new ClubNotFoundException("Club not found: " + name));
+
+        KarateClubDto dto = toDto(entity);
+        log.debug("Fetched club by name={} -> id={}", name, dto.karateClubId());
+        return dto;
     }
 
     public KarateClubDto getById(Long id) {
+        log.debug("Fetching club by id={}", id);
         KarateClubEntity entity = repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Club not found with ID: " + id));
-        return toDto(entity);
+                .orElseThrow(() -> new ClubNotFoundException("Club not found with ID: " + id));
+
+        KarateClubDto dto = toDto(entity);
+        log.debug("Fetched club by id={} -> name={}", id, dto.name());
+        return dto;
     }
 
     private KarateClubDto toDto(KarateClubEntity entity) {
@@ -39,6 +51,6 @@ public class KarateClubService {
         return Arrays.stream(KarateClubName.values())
                 .filter(e -> e.name().equalsIgnoreCase(name))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Invalid club name: " + name));
+                .orElseThrow(() -> new InvalidClubNameException("Invalid club name: " + name));
     }
 }
