@@ -1,5 +1,6 @@
 package com.karate.userservice.infrastructure.client;
 
+import com.karate.userservice.infrastructure.client.config.FeignClientConfig;
 import com.karate.userservice.infrastructure.client.dto.AuthUserDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -7,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "auth-service")
+@FeignClient(name = "auth-service", configuration = FeignClientConfig.class)
 public interface AuthClient {
     @GetMapping("/auth/users/by-ids")
     Map<Long, AuthUserDto> getAuthUsers(@RequestParam("ids") List<Long> userIds);
