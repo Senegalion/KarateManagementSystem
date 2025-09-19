@@ -231,7 +231,7 @@ public class AuthService {
     private AuthUserEntity persistAuthUser(String username, String rawPassword, RoleEntity role) {
         AuthUserEntity entity = AuthUserEntity.builder()
                 .username(username)
-                .password(rawPassword) // TODO: prod: password encoder!
+                .password(rawPassword)
                 .roleEntities(new HashSet<>(Set.of(role)))
                 .build();
 
