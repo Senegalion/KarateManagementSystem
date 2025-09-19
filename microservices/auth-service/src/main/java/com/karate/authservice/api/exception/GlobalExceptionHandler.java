@@ -2,6 +2,7 @@ package com.karate.authservice.api.exception;
 
 import com.karate.authservice.api.exception.dto.ErrorResponse;
 import com.karate.authservice.api.exception.dto.ValidationError;
+import com.karate.authservice.domain.exception.UpstreamUnavailableException;
 import com.karate.authservice.domain.exception.UsernameWhileTryingToLogInNotFoundException;
 import feign.FeignException;
 import jakarta.persistence.EntityNotFoundException;
@@ -213,5 +214,21 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @ExceptionHandler(UpstreamUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleUpstreamUnavailable(
+            UpstreamUnavailableException ex,
+            HttpServletRequest request
+    ) {
+        log.warn("503 Upstream unavailable path={} msg={}", request.getRequestURI(), ex.getMessage());
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                ex.getMessage(),
+                null,
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
     }
 }
