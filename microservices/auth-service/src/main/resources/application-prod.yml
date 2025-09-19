@@ -16,3 +16,12 @@ logging:
   level:
     root: INFO
     com.karate: INFO
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        slidingWindowSize: 50
+        minimumNumberOfCalls: 20
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
