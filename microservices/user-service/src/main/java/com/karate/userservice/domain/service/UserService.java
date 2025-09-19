@@ -6,33 +6,38 @@ import com.karate.userservice.domain.model.AddressEntity;
 import com.karate.userservice.domain.model.KarateRank;
 import com.karate.userservice.domain.model.UserEntity;
 import com.karate.userservice.domain.repository.UserRepository;
-import com.karate.userservice.infrastructure.client.AuthClient;
-import com.karate.userservice.infrastructure.client.KarateClubClient;
 import com.karate.userservice.infrastructure.client.dto.AuthUserDto;
-import com.karate.userservice.infrastructure.client.dto.KarateClubDto;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UserService {
+    public static final String USER_NOT_FOUND = "User not found";
     private final UserRepository userRepository;
-    private final KarateClubClient karateClubClient;
-    private final AuthClient authClient;
+    private final UpstreamGateway upstream;
 
     @Transactional
     public List<UserFromClubDto> getUsersFromClubByName(String clubName) {
-        KarateClubDto clubDto = karateClubClient.getClubByName(clubName);
+        long t0 = System.currentTimeMillis();
+        var clubDto = upstream.getClubByName(clubName);
+        log.debug("club-service getClubByName name='{}' -> id={} took={}ms",
+                clubName, clubDto.karateClubId(), System.currentTimeMillis() - t0);
         Long karateClubId = clubDto.karateClubId();
 
         return userRepository.findAllByKarateClubId(karateClubId)
                 .stream()
                 .map(userEntity -> {
-                    var authUser = authClient.getAuthUserByUserId(userEntity.getUserId());
+                    long tAuth = System.currentTimeMillis();
+                    var authUser = upstream.getAuthUserByUserId(userEntity.getUserId());
+                    log.trace("auth-service getAuthUserByUserId userId={} took={}ms",
+                            userEntity.getUserId(), System.currentTimeMillis() - tAuth);
                     return new UserFromClubDto(
                             userEntity.getUserId(),
                             authUser.username(),
@@ -46,6 +51,7 @@ public class UserService {
 
     @Transactional
     public Long createUser(NewUserRequestDto dto) {
+        log.info("Create user userId={} email={} clubId={}", dto.userId(), dto.email(), dto.karateClubId());
         AddressEntity address = AddressEntity.builder()
                 .city(dto.addressDto().city())
                 .street(dto.addressDto().street())
@@ -64,13 +70,17 @@ public class UserService {
 
         address.setUserEntity(user);
 
-        return userRepository.save(user).getUserId();
+        long tDb = System.currentTimeMillis();
+        Long id = userRepository.save(user).getUserId();
+        log.info("User persisted userId={} took={}ms", id, System.currentTimeMillis() - tDb);
+        return id;
     }
 
     @Transactional(readOnly = true)
     public UserInfoDto getUserById(Long userId) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        log.debug("getUserById userId={}", userId);
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
         return new UserInfoDto(
                 user.getUserId(),
@@ -82,12 +92,15 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserInformationDto getCurrentUserInfo(String username) {
-        AuthUserDto authUser = authClient.getAuthUserByUsername(username);
+        log.info("Get current user info username={}", username);
+        long t0 = System.currentTimeMillis();
+        var authUser = upstream.getAuthUserByUsername(username);
 
-        UserEntity user = userRepository.findById(authUser.userId())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        var user = userRepository.findById(authUser.userId())
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
-        String clubName = karateClubClient.getClubById(user.getKarateClubId()).name();
+        var clubName = upstream.getClubById(user.getKarateClubId()).name();
+        log.debug("getCurrentUserInfo fetched userId={} took={}ms", user.getUserId(), System.currentTimeMillis() - t0);
 
         return new UserInformationDto(
                 user.getUserId(),
@@ -101,22 +114,26 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Long getCurrentUserClubIdByUsername(String username) {
-        AuthUserDto authUser = authClient.getAuthUserByUsername(username);
-        UserEntity user = userRepository.findById(authUser.userId())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-        return user.getKarateClubId();
+        log.debug("getCurrentUserClubIdByUsername username={}", username);
+        AuthUserDto authUser = upstream.getAuthUserByUsername(username);
+        return userRepository.findById(authUser.userId())
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND))
+                .getKarateClubId();
     }
 
     public Boolean checkUserExists(Long userId) {
-        return userRepository.existsById(userId);
+        boolean exists = userRepository.existsById(userId);
+        log.debug("checkUserExists userId={} -> {}", userId, exists);
+        return exists;
     }
 
     @Transactional(readOnly = true)
     public UserPayload getUser(Long userId) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        log.debug("getUser payload userId={}", userId);
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
-        String username = authClient.getUsernameById(userId);
+        String username = upstream.getAuthUserByUserId(userId).username();
 
         return new UserPayload(
                 user.getUserId(),
@@ -127,11 +144,13 @@ public class UserService {
 
     @Transactional
     public void updateCurrentUser(String username, UpdateUserRequestDto dto) {
-        AuthUserDto authUser = authClient.getAuthUserByUsername(username);
-        UserEntity user = userRepository.findById(authUser.userId())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        log.info("Update current user username={} newUsername={} newEmail={}",
+                username, dto.username(), dto.email());
+        var authUser = upstream.getAuthUserByUsername(username);
+        var user = userRepository.findById(authUser.userId())
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
-        authClient.updateUsername(authUser.userId(), dto.username());
+        upstream.updateUsername(authUser.userId(), dto.username()).join();
         user.setEmail(dto.email());
         user.getAddressEntity().setCity(dto.address().city());
         user.getAddressEntity().setStreet(dto.address().street());
@@ -139,15 +158,17 @@ public class UserService {
         user.getAddressEntity().setPostalCode(dto.address().postalCode());
 
         userRepository.save(user);
+        log.info("Update current user OK userId={}", user.getUserId());
     }
 
     @Transactional
     public void patchCurrentUser(String username, UpdateUserRequestDto dto) {
-        AuthUserDto authUser = authClient.getAuthUserByUsername(username);
-        UserEntity user = userRepository.findById(authUser.userId())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        log.info("Patch current user username={}", username);
+        var authUser = upstream.getAuthUserByUsername(username);
+        var user = userRepository.findById(authUser.userId())
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
-        if (dto.username() != null) authClient.updateUsername(authUser.userId(), dto.username());
+        if (dto.username() != null) upstream.updateUsername(authUser.userId(), dto.username());
         if (dto.email() != null) user.setEmail(dto.email());
         if (dto.address() != null) {
             if (dto.address().city() != null) user.getAddressEntity().setCity(dto.address().city());
@@ -157,15 +178,18 @@ public class UserService {
         }
 
         userRepository.save(user);
+        log.info("Patch current user OK userId={}", user.getUserId());
     }
 
     @Transactional
     public void deleteCurrentUser(String username) {
-        AuthUserDto authUser = authClient.getAuthUserByUsername(username);
-        UserEntity user = userRepository.findById(authUser.userId())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        log.info("Delete current user username={}", username);
+        var authUser = upstream.getAuthUserByUsername(username);
+        var user = userRepository.findById(authUser.userId())
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
         userRepository.delete(user);
-        authClient.deleteUser(user.getUserId());
+        upstream.deleteUser(user.getUserId());
+        log.info("Delete current user OK userId={}", user.getUserId());
     }
 }
