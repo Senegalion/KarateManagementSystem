@@ -13,4 +13,12 @@ management:
 logging:
   level:
     root: INFO
-    com.karate: INFO
+    com.karate:
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        registerHealthIndicator: false
+        slidingWindowSize: 1000
+        failureRateThreshold: 100
