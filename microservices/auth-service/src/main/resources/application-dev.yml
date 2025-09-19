@@ -24,3 +24,11 @@ feign:
     config:
       default:
         loggerLevel: FULL
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        slidingWindowSize: 5
+        failureRateThreshold: 20
+        waitDurationInOpenState: 2s
