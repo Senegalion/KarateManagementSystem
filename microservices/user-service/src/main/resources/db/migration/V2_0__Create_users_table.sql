@@ -1,6 +1,7 @@
 CREATE TABLE users
 (
     user_id           BIGINT PRIMARY KEY,
+    version           INT                 NOT NULL DEFAULT 0,
     email             VARCHAR(100) UNIQUE NOT NULL,
     karate_club_id    BIGINT              NOT NULL,
     karate_rank       VARCHAR(50),
