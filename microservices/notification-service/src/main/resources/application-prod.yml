@@ -1,0 +1,27 @@
+spring:
+  config:
+    activate.on-profile: prod
+
+management:
+  tracing:
+    sampling:
+      probability: 0.1   # np. 10% sampling w prod
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logging:
+  config: classpath:logback-spring.xml
+  level:
+    root: INFO
+    com.karate: INFO
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        slidingWindowSize: 50
+        minimumNumberOfCalls: 20
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
