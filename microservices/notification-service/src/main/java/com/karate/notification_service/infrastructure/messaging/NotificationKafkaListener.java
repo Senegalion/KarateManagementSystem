@@ -2,9 +2,11 @@ package com.karate.notification_service.infrastructure.messaging;
 
 import com.karate.notification_service.infrastructure.messaging.dto.EnrollmentEvent;
 import com.karate.notification_service.infrastructure.messaging.dto.UserRegisteredEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class NotificationKafkaListener {
 
@@ -14,10 +16,8 @@ public class NotificationKafkaListener {
             containerFactory = "enrollmentKafkaListenerContainerFactory"
     )
     public void handleEnrollmentEvent(EnrollmentEvent event) {
-        System.out.println("[Enrollment Event] ID: " + event.getEventId());
-        System.out.println("[Enrollment Event] Type: " + event.getEventType());
-        System.out.println("[Enrollment Event] Timestamp: " + event.getTimestamp());
-        System.out.println("[Enrollment Event] Payload: " + event.getPayload());
+        log.info("[Enrollment Event] id={} type={} timestamp={} payload={}",
+                event.getEventId(), event.getEventType(), event.getTimestamp(), event.getPayload());
     }
 
     @KafkaListener(
@@ -26,9 +26,7 @@ public class NotificationKafkaListener {
             containerFactory = "userKafkaListenerContainerFactory"
     )
     public void handleUserRegistrationEvent(UserRegisteredEvent event) {
-        System.out.println("[Enrollment Event] ID: " + event.getEventId());
-        System.out.println("[Enrollment Event] Type: " + event.getEventType());
-        System.out.println("[Enrollment Event] Timestamp: " + event.getTimestamp());
-        System.out.println("[Enrollment Event] Payload: " + event.getPayload());
+        log.info("[UserRegistered Event] id={} type={} timestamp={} payload={}",
+                event.getEventId(), event.getEventType(), event.getTimestamp(), event.getPayload());
     }
 }
