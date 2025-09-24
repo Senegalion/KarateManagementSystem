@@ -11,6 +11,8 @@ import com.karate.feedback_service.infrastructure.client.AuthClient
 import com.karate.feedback_service.infrastructure.client.EnrollmentClient
 import com.karate.feedback_service.infrastructure.client.TrainingSessionClient
 import com.karate.feedback_service.infrastructure.client.UserClient
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
+import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
@@ -24,6 +26,7 @@ class FeedbackService(
     private val authClient: AuthClient,
     private val enrollmentClient: EnrollmentClient
 ) {
+    private val log = LoggerFactory.getLogger(FeedbackService::class.java)
 
     @Transactional
     fun addFeedbackToUserForTrainingSession(
@@ -31,55 +34,85 @@ class FeedbackService(
         trainingSessionId: Long,
         feedbackRequestDto: FeedbackRequestDto
     ): FeedbackResponseDto {
-        if (userClient.checkUserExists(userId) != true) {
+        log.info("Creating feedback for userId={} trainingId={}", userId, trainingSessionId)
+
+        if (!checkUser(userId)) {
+            log.warn("User {} not found", userId)
             throw UsernameNotFoundException("User not found")
         }
-
-        if (trainingSessionClient.checkTrainingExists(trainingSessionId) != true) {
+        if (!checkTraining(trainingSessionId)) {
+            log.warn("Training session {} not found", trainingSessionId)
             throw TrainingSessionNotFoundException("Training session not found")
         }
-
-        if (enrollmentClient.checkUserEnrolledInSession(userId, trainingSessionId) != true) {
-            throw TrainingSessionNotFoundException("User is not enrolled in the specified training session")
-        }
-
-        val feedbackEntity = FeedbackEntity(
-            userId = userId,
-            trainingSessionId = trainingSessionId,
-            comment = feedbackRequestDto.comment,
-            starRating = feedbackRequestDto.starRating
-        )
-
-        val savedFeedback = feedbackRepository.save(feedbackEntity)
-        return FeedbackResponseDto(savedFeedback.comment, savedFeedback.starRating)
-    }
-
-    @Transactional
-    fun getFeedbackForSession(sessionId: Long): FeedbackResponseDto {
-        println("SessionId: $sessionId")
-        val authentication = SecurityContextHolder.getContext().authentication
-            ?: throw UsernameNotFoundException("User not authenticated")
-
-        if (!authentication.isAuthenticated) {
-            throw UsernameNotFoundException("User not authenticated")
-        }
-
-        val username = authentication.name
-        val userId = authClient.getUserIdByUsername(username)
-            ?: throw UsernameNotFoundException("User not found")
-        println("UserId: $userId")
-
-        if (trainingSessionClient.checkTrainingExists(sessionId) != true) {
-            throw TrainingSessionNotFoundException("Training session not found")
-        }
-
-        if (enrollmentClient.checkUserEnrolledInSession(userId, sessionId) != true) {
+        if (!checkEnrollment(userId, trainingSessionId)) {
+            log.warn("User {} is not enrolled in training {}", userId, trainingSessionId)
             throw UserNotSignedUpException("User is not enrolled in the specified training session")
         }
 
-        val feedback = feedbackRepository.findByUserIdAndTrainingSessionId(userId, sessionId)
-            .orElseThrow { FeedbackNotFoundException("Feedback not found for this session") }
-
-        return FeedbackResponseDto(feedback.comment, feedback.starRating)
+        val saved = feedbackRepository.save(
+            FeedbackEntity(
+                userId = userId,
+                trainingSessionId = trainingSessionId,
+                comment = feedbackRequestDto.comment,
+                starRating = feedbackRequestDto.starRating
+            )
+        )
+        log.info("Feedback persisted id={} userId={} trainingId={}", saved.feedbackId, userId, trainingSessionId)
+        return FeedbackResponseDto(saved.comment, saved.starRating)
     }
+
+    @Transactional(readOnly = true)
+    fun getFeedbackForSession(sessionId: Long): FeedbackResponseDto {
+        val auth = SecurityContextHolder.getContext().authentication
+            ?: throw UsernameNotFoundException("User not authenticated")
+
+        log.debug("Fetching feedback for training session={} by user={}", sessionId, auth.name)
+
+        if (!auth.isAuthenticated) throw UsernameNotFoundException("User not authenticated")
+
+        val username = auth.name
+        val userId = getUserId(username) ?: throw UsernameNotFoundException("User not found")
+
+        if (!checkTraining(sessionId)) {
+            log.warn("Training session {} not found", sessionId)
+            throw TrainingSessionNotFoundException("Training session not found")
+        }
+        if (!checkEnrollment(userId, sessionId)) {
+            log.warn("User {} not enrolled in session {}", userId, sessionId)
+            throw UserNotSignedUpException("User is not enrolled in the specified training session")
+        }
+
+        val fb = feedbackRepository.findByUserIdAndTrainingSessionId(userId, sessionId)
+            .orElseThrow {
+                log.error("No feedback found for user {} session {}", userId, sessionId)
+                FeedbackNotFoundException("Feedback not found for this session")
+            }
+
+        log.info("Feedback retrieved userId={} sessionId={} stars={}", userId, sessionId, fb.starRating)
+        return FeedbackResponseDto(fb.comment, fb.starRating)
+    }
+
+    @CircuitBreaker(name = "upstream", fallbackMethod = "userExistsFallback")
+    fun checkUser(id: Long) = userClient.checkUserExists(id) == true
+
+    @SuppressWarnings("unused")
+    private fun userExistsFallback(id: Long, ex: Throwable) = false
+
+    @CircuitBreaker(name = "upstream", fallbackMethod = "trainingExistsFallback")
+    fun checkTraining(id: Long) = trainingSessionClient.checkTrainingExists(id) == true
+
+    @SuppressWarnings("unused")
+    private fun trainingExistsFallback(id: Long, ex: Throwable) = false
+
+    @CircuitBreaker(name = "upstream", fallbackMethod = "enrolledFallback")
+    fun checkEnrollment(uid: Long, sid: Long) = enrollmentClient.checkUserEnrolledInSession(uid, sid) == true
+
+    @SuppressWarnings("unused")
+    private fun enrolledFallback(uid: Long, sid: Long, ex: Throwable) = false
+
+    @CircuitBreaker(name = "upstream", fallbackMethod = "userIdByUsernameFallback")
+    fun getUserId(username: String) = authClient.getUserIdByUsername(username)
+
+    @SuppressWarnings("unused")
+    private fun userIdByUsernameFallback(username: String, ex: Throwable): Long? = null
 }
