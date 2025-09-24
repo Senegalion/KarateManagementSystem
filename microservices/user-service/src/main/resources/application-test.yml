@@ -1,6 +1,24 @@
 spring:
   config:
     activate.on-profile: test
+    import: ""
+  cloud:
+    config:
+      enabled: false
+    discovery:
+      enabled: false
+    bus:
+      enabled: false
+    stream:
+      enabled: false
+  main:
+    cloud-platform: none
+
+  eureka:
+    client:
+      enabled: false
+      register-with-eureka: false
+      fetch-registry: false
 
 management:
   tracing:

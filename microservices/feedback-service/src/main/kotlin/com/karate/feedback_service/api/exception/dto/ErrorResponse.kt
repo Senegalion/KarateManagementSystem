@@ -1,13 +1,11 @@
 package com.karate.feedback_service.api.exception.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-public record ErrorResponse(
-        int status,
-        String message,
-        List<ValidationError> errors,
-        String path,
-        LocalDateTime timestamp
-) {
-}
+data class ErrorResponse(
+    val status: Int,
+    val message: String,
+    val errors: List<ValidationError>?,
+    val path: String,
+    val timestamp: LocalDateTime
+)

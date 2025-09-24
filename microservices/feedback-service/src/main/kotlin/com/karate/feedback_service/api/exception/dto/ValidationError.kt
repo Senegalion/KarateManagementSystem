@@ -1,8 +1,7 @@
 package com.karate.feedback_service.api.exception.dto;
 
-public record ValidationError(
-        String field,
-        Object rejectedValue,
-        String message
-) {
-}
+data class ValidationError(
+    val field: String,
+    val rejectedValue: Any?,
+    val message: String
+)
