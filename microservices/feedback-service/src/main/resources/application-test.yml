@@ -1,0 +1,36 @@
+spring:
+  config:
+    activate.on-profile: test
+
+management:
+  tracing:
+    enabled: false
+  prometheus:
+    metrics:
+      export:
+        enabled: false
+
+logging:
+  level:
+    root: INFO
+    com.karate:
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      authService:
+        registerHealthIndicator: false
+        slidingWindowSize: 1000
+        failureRateThreshold: 100
+      enrollmentService:
+        registerHealthIndicator: false
+        slidingWindowSize: 1000
+        failureRateThreshold: 100
+      trainingService:
+        registerHealthIndicator: false
+        slidingWindowSize: 1000
+        failureRateThreshold: 100
+      userService:
+        registerHealthIndicator: false
+        slidingWindowSize: 1000
+        failureRateThreshold: 100

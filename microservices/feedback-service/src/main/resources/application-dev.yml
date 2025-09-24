@@ -1,0 +1,46 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging:
+  config: classpath:logback-dev.xml
+  level:
+    root: INFO
+    com.karate: DEBUG
+    org.springframework.cloud: WARN
+    com.zaxxer.hikari: WARN
+    org.hibernate: WARN
+    org.flywaydb: INFO
+    org.apache.catalina: WARN
+
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: FULL
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      authService:
+        slidingWindowSize: 5
+        failureRateThreshold: 20
+        waitDurationInOpenState: 2s
+      enrollmentService:
+        slidingWindowSize: 5
+        failureRateThreshold: 20
+        waitDurationInOpenState: 2s
+      trainingService:
+        slidingWindowSize: 5
+        failureRateThreshold: 20
+        waitDurationInOpenState: 2s
+      userService:
+        slidingWindowSize: 5
+        failureRateThreshold: 20
+        waitDurationInOpenState: 2s

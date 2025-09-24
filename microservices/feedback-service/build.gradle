@@ -52,6 +52,7 @@ dependencies {
 
 	// --- Database driver ---
 	runtimeOnly 'org.postgresql:postgresql'
+	runtimeOnly 'com.h2database:h2'
 
 	// --- Kotlin helpers ---
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -61,6 +62,22 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+	testImplementation 'org.testcontainers:rabbitmq'
+	testImplementation 'org.testcontainers:postgresql'
+	testImplementation 'io.mockk:mockk:1.14.5'
+
+	// --- Tracing and observability ---
+	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+	implementation 'io.github.resilience4j:resilience4j-spring-boot3'
+	implementation 'io.github.resilience4j:resilience4j-micrometer'
+	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+
+	// Circuit Breaker
+	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j'
 
 	// --- Other libraries ---
 	implementation 'com.auth0:java-jwt:4.0.0'
