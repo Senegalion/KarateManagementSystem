@@ -6,9 +6,10 @@ import { isAdmin } from "../utils/auth";
 import { useTranslation } from "react-i18next";
 
 type Training = {
-  id: number;
+  id?: number;
   description: string;
-  date: string;
+  startTime: string;
+  endTime?: string;
 };
 
 const Dashboard = () => {
@@ -18,13 +19,29 @@ const Dashboard = () => {
   const search = searchContext?.search ?? "";
 
   useEffect(() => {
-    API.get("/users/trainings", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }).then((res) => {
-      setTrainings(res.data);
-    });
+    API.get("/trainings", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    })
+      .then((res) => {
+        const data = res.data;
+        if (!Array.isArray(data)) return;
+
+        const mapped: Training[] = data
+          .filter((x) => x && typeof x.description === "string")
+          .map((x) => ({
+            id:
+              (x.id as number) ?? (x.trainingSessionId as number) ?? undefined,
+            description: x.description as string,
+            startTime: (x.startTime as string) ?? (x.date as string) ?? "",
+            endTime: (x.endTime as string) ?? undefined,
+          }))
+          .filter((x) => !!x.startTime);
+
+        setTrainings(mapped);
+      })
+      .catch((err) => {
+        console.error("Failed to load trainings", err);
+      });
   }, []);
 
   const filteredTrainings = trainings.filter((t) =>
@@ -34,13 +51,15 @@ const Dashboard = () => {
   const now = dayjs();
 
   const upcoming = filteredTrainings
-    .filter((t) => dayjs(t.date).isAfter(now))
-    .sort((a, b) => dayjs(a.date).diff(dayjs(b.date)))
+    .filter((t) => dayjs(t.startTime).valueOf() > now.valueOf())
+    .sort((a, b) => dayjs(a.startTime).valueOf() - dayjs(b.startTime).valueOf())
     .slice(0, 5);
 
   const past = filteredTrainings
-    .filter((t) => dayjs(t.date).isBefore(now))
-    .sort((a, b) => dayjs(b.date).diff(dayjs(a.date)));
+    .filter((t) => dayjs(t.startTime).valueOf() <= now.valueOf())
+    .sort(
+      (a, b) => dayjs(b.startTime).valueOf() - dayjs(a.startTime).valueOf()
+    );
 
   const last = past[0];
 
@@ -60,7 +79,13 @@ const Dashboard = () => {
             </li>
             <li>
               ⏪ {t("lastSession")}:{" "}
-              {last ? dayjs(last.date).format("MMM DD, YYYY HH:mm") : t("none")}
+              {last
+                ? `${dayjs(last.startTime).format("MMM DD, YYYY HH:mm")}${
+                    last.endTime
+                      ? ` – ${dayjs(last.endTime).format("HH:mm")}`
+                      : ""
+                  }`
+                : t("none")}
             </li>
           </ul>
         </div>
@@ -92,13 +117,14 @@ const Dashboard = () => {
           <p className="text-gray-500 text-sm">{t("noTrainings")}</p>
         ) : (
           <ul className="space-y-2 text-sm">
-            {upcoming.map((t) => (
+            {upcoming.map((t, idx) => (
               <li
-                key={t.id}
+                key={t.id ?? `${t.startTime}-${idx}`}
                 className="p-2 bg-blue-50 border border-blue-200 rounded"
               >
                 <span className="font-medium">
-                  {dayjs(t.date).format("MMM DD, YYYY HH:mm")}
+                  {dayjs(t.startTime).format("MMM DD, YYYY HH:mm")}
+                  {t.endTime ? ` – ${dayjs(t.endTime).format("HH:mm")}` : ""}
                 </span>{" "}
                 – {t.description}
               </li>
@@ -113,13 +139,14 @@ const Dashboard = () => {
           <p className="text-gray-500 text-sm">{t("noPastTrainings")}</p>
         ) : (
           <ul className="space-y-2 text-sm">
-            {past.map((t) => (
+            {past.map((t, idx) => (
               <li
-                key={t.id}
+                key={t.id ?? `${t.startTime}-${idx}`}
                 className="p-2 bg-gray-50 border border-gray-300 rounded"
               >
                 <span className="font-medium">
-                  {dayjs(t.date).format("MMM DD, YYYY HH:mm")}
+                  {dayjs(t.startTime).format("MMM DD, YYYY HH:mm")}
+                  {t.endTime ? ` – ${dayjs(t.endTime).format("HH:mm")}` : ""}
                 </span>{" "}
                 – {t.description}
               </li>
