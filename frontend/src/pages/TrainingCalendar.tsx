@@ -1,13 +1,14 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, type JSX } from "react";
 import dayjs from "dayjs";
 import { API } from "../api";
 import { SearchContext } from "../context/SearchContext";
 import { useTranslation } from "react-i18next";
 
 type Training = {
-  id: number;
+  id?: number;
   description: string;
-  date: string;
+  startTime: string;
+  endTime?: string;
 };
 
 const TrainingCalendar = () => {
@@ -28,42 +29,33 @@ const TrainingCalendar = () => {
     setLoading(true);
     setError(null);
 
-    API.get("/users/trainings", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
+    API.get("/trainings", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => {
         const data = res.data;
-
         if (!Array.isArray(data)) throw new Error("Invalid response format");
 
-        const validTrainings = data
-          .filter(
-            (t) =>
-              t &&
-              typeof t.trainingSessionId === "number" &&
-              typeof t.description === "string" &&
-              typeof t.date === "string"
-          )
+        const mapped: Training[] = data
+          .filter((t) => t && typeof t.description === "string")
           .map((t) => ({
-            id: t.trainingSessionId,
-            description: t.description,
-            date: t.date,
-          }));
+            id:
+              (t.id as number) ?? (t.trainingSessionId as number) ?? undefined,
+            description: t.description as string,
+            startTime: (t.startTime as string) ?? (t.date as string) ?? "",
+            endTime: (t.endTime as string) ?? undefined,
+          }))
+          .filter((t) => !!t.startTime);
 
-        setTrainings(validTrainings);
+        setTrainings(mapped);
       })
       .catch((err) => {
         console.error("Failed to load trainings", err);
         setError("Failed to load trainings.");
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
   }, []);
 
-  // Filtrujemy wg search
   const filteredTrainings = trainings.filter((t) =>
     t.description.toLowerCase().includes(search.toLowerCase())
   );
@@ -93,20 +85,12 @@ const TrainingCalendar = () => {
     }
   };
 
-  const closeModal = () => {
-    setModalVisible(false);
-    setTimeout(() => {
-      setModalMounted(false);
-      setSelectedDate(null);
-    }, 200);
-  };
-
   const startOfMonth = currentDate.startOf("month");
   const endOfMonth = currentDate.endOf("month");
   const daysInMonth = endOfMonth.date();
   const startDay = startOfMonth.day();
 
-  const days = [];
+  const days: JSX.Element[] = [];
 
   for (let i = 0; i < startDay; i++) {
     days.push(<div key={`empty-${i}`} />);
@@ -117,12 +101,12 @@ const TrainingCalendar = () => {
     const isToday = date === today;
 
     const dayTrainings = filteredTrainings.filter(
-      (t) => typeof t.date === "string" && t.date.startsWith(date)
+      (t) => dayjs(t.startTime).format("YYYY-MM-DD") === date
     );
 
     days.push(
       <div
-        key={i}
+        key={date}
         onClick={() => handleDayClick(date)}
         className={`border p-2 rounded-xl shadow-sm h-32 bg-white relative cursor-pointer transition-transform duration-200 hover:scale-[1.01] ${
           isToday ? "bg-yellow-50 border-yellow-300 ring-2 ring-yellow-400" : ""
@@ -136,15 +120,17 @@ const TrainingCalendar = () => {
             </span>
           )}
         </div>
-        {dayTrainings.slice(0, 2).map((t) => (
+
+        {dayTrainings.slice(0, 2).map((tr, idx) => (
           <div
-            key={t.id}
+            key={tr.id ?? `${tr.startTime}-${idx}`}
             className="text-xs bg-blue-100 text-blue-800 rounded px-1 py-0.5 mb-1 truncate"
-            title={t.description}
+            title={tr.description}
           >
-            {t.description}
+            {tr.description}
           </div>
         ))}
+
         {dayTrainings.length > 2 && (
           <div className="text-xs text-blue-500">
             +{dayTrainings.length - 2} more
@@ -156,7 +142,9 @@ const TrainingCalendar = () => {
 
   const selectedTrainings =
     selectedDate &&
-    filteredTrainings.filter((t) => t.date.startsWith(selectedDate));
+    filteredTrainings.filter(
+      (t) => dayjs(t.startTime).format("YYYY-MM-DD") === selectedDate
+    );
 
   return (
     <div className="p-4 relative">
@@ -205,7 +193,7 @@ const TrainingCalendar = () => {
         </>
       )}
 
-      {modalMounted && (
+      {modalMounted && selectedDate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
           <div
             className={`bg-white border border-gray-300 rounded-2xl shadow-2xl p-6 w-full max-w-md pointer-events-auto transform transition-all duration-300 ${
@@ -216,10 +204,16 @@ const TrainingCalendar = () => {
           >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-800">
-                {dayjs(selectedDate!).format("DD MMMM YYYY")}
+                {dayjs(selectedDate).format("DD MMMM YYYY")}
               </h3>
               <button
-                onClick={closeModal}
+                onClick={() => {
+                  setModalVisible(false);
+                  setTimeout(() => {
+                    setModalMounted(false);
+                    setSelectedDate(null);
+                  }, 200);
+                }}
                 className="text-sm text-gray-500 hover:text-red-500"
               >
                 ✕
@@ -227,12 +221,14 @@ const TrainingCalendar = () => {
             </div>
             <div className="space-y-2 max-h-80 overflow-y-auto">
               {selectedTrainings && selectedTrainings.length > 0 ? (
-                selectedTrainings.map((t) => (
+                selectedTrainings.map((tr, idx) => (
                   <div
-                    key={t.id}
+                    key={tr.id ?? `${tr.startTime}-${idx}`}
                     className="bg-blue-100 text-blue-900 rounded px-3 py-2 text-sm shadow-sm"
                   >
-                    {t.description}
+                    <div className="font-medium">
+                      {dayjs(tr.startTime).format("HH:mm")} – {tr.description}
+                    </div>
                   </div>
                 ))
               ) : (

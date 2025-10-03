@@ -18,6 +18,7 @@ import SettingsLayout from "./layouts/SettingsLayout";
 import LanguageSettings from "./pages/settings/LanguageSettings";
 import RequireAdmin from "./components/RequireAdmin";
 import UsersList from "./pages/UsersList";
+import ProfileSettings from "./pages/settings/ProfileSettings";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -48,6 +49,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           >
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="profile" element={<ProfileSettings />} />
             <Route
               path="users"
               element={

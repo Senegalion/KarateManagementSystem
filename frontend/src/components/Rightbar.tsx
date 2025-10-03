@@ -13,6 +13,7 @@ const Rightbar = () => {
       <button
         title="Profile"
         className="text-gray-600 hover:text-blue-600 text-xl"
+        onClick={() => navigate("/app/profile")}
       >
         <FaUserCircle />
       </button>
