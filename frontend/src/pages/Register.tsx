@@ -61,14 +61,32 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+
+    const payload = {
+      username: form.username,
+      email: form.email,
+      address: {
+        city: form.city,
+        street: form.street,
+        number: form.number,
+        postalCode: form.postalCode,
+      },
+      karateClubName: form.karateClubName,
+      karateRank: form.karateRank,
+      role: "USER",
+      password: form.password,
+    };
+
     try {
-      await API.post("/auth/register", {
-        ...form,
-        role: "USER",
-      });
+      await API.post("/auth/register", payload);
       navigate("/login");
-    } catch {
-      setError("Registration failed. Please check your data.");
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Registration failed. Please check your data.";
+      setError(msg);
     }
   };
 
