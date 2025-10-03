@@ -5,50 +5,67 @@ import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 
 type Training = {
-  id: number;
+  id?: number;
   description: string;
-  date: string;
+  startTime: string;
+  endTime: string;
 };
 
 const CreateTraining = () => {
   const { t } = useTranslation();
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState("");
+  const [startTime, setStartTime] = useState(""); // YYYY-MM-DDTHH:mm
+  const [endTime, setEndTime] = useState(""); // YYYY-MM-DDTHH:mm
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [trainings, setTrainings] = useState<Training[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    API.get("/users/trainings", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }).then((res) => {
-      setTrainings(res.data);
-    });
+    API.get("/trainings", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    }).then((res) => setTrainings(res.data));
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setLoading(true);
 
-    try {
-      await API.post(
-        "/users/trainings",
-        { description, date },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+    // Walidacja: pola ustawione i koniec > początek
+    if (!startTime || !endTime) {
+      setError(t("pleaseFillAllFields") || "Please fill all fields.");
+      return;
+    }
+    const start = dayjs(startTime);
+    const end = dayjs(endTime);
+    if (!(end.valueOf() > start.valueOf())) {
+      setError(
+        t("endMustBeAfterStart") || "End time must be after start time."
       );
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const payload = {
+        description,
+        startTime: start.format("YYYY-MM-DDTHH:mm:ss"),
+        endTime: end.format("YYYY-MM-DDTHH:mm:ss"),
+      };
+
+      await API.post("/trainings/create", payload, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+
       setLoading(false);
       navigate("/app/dashboard");
     } catch (err: any) {
       setLoading(false);
-      setError(err.response?.data?.message || t("failedToCreateTraining"));
+      setError(
+        err?.response?.data?.message ||
+          t("failedToCreateTraining") ||
+          "Failed to create training."
+      );
     }
   };
 
@@ -81,18 +98,53 @@ const CreateTraining = () => {
             />
           </div>
 
-          <div>
-            <label className="block mb-1 font-semibold" htmlFor="date">
-              {t("dateAndTime")}
-            </label>
-            <input
-              id="date"
-              type="datetime-local"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
-              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-1 font-semibold" htmlFor="startTime">
+                {t("startTime") || "Start time"}
+              </label>
+              <input
+                id="startTime"
+                type="datetime-local"
+                value={startTime}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setStartTime(val);
+                  // jeśli end ustawiony i przypadkiem <= start, wyczyść end
+                  if (
+                    endTime &&
+                    dayjs(endTime).valueOf() <= dayjs(val).valueOf()
+                  ) {
+                    setEndTime("");
+                  }
+                }}
+                required
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-semibold" htmlFor="endTime">
+                {t("endTime") || "End time"}
+              </label>
+              <input
+                id="endTime"
+                type="datetime-local"
+                value={endTime}
+                min={startTime || undefined} // prosty guard po stronie UI
+                onChange={(e) => setEndTime(e.target.value)}
+                required
+                className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
+              />
+              {!!startTime &&
+                !!endTime &&
+                dayjs(endTime).valueOf() <= dayjs(startTime).valueOf() && (
+                  <p className="text-xs text-red-600 mt-1">
+                    {t("endMustBeAfterStart") ||
+                      "End time must be after start time."}
+                  </p>
+                )}
+            </div>
           </div>
 
           <button
@@ -100,7 +152,9 @@ const CreateTraining = () => {
             disabled={loading}
             className="w-full px-4 py-3 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-300 transition font-semibold"
           >
-            {loading ? t("creating") : t("createTraining")}
+            {loading
+              ? t("creating") || "Creating..."
+              : t("createTraining") || "Create training"}
           </button>
         </form>
       </div>
@@ -116,15 +170,16 @@ const CreateTraining = () => {
             {trainings
               .slice(-5)
               .reverse()
-              .map((t) => (
+              .map((tr, idx) => (
                 <li
-                  key={t.id}
+                  key={tr.id ?? `${tr.startTime}-${idx}`}
                   className="p-2 border border-gray-300 rounded bg-gray-50"
                 >
                   <span className="font-medium">
-                    {dayjs(t.date).format("MMM DD, YYYY HH:mm")}
+                    {dayjs(tr.startTime).format("MMM DD, YYYY HH:mm")} –{" "}
+                    {dayjs(tr.endTime).format("HH:mm")}
                   </span>{" "}
-                  – {t.description}
+                  – {tr.description}
                 </li>
               ))}
           </ul>
