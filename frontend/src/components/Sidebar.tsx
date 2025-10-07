@@ -29,6 +29,14 @@ const Sidebar = () => {
             {t("createTraining")}
           </NavLink>
         )}
+        {isAdmin() && (
+          <NavLink to="/app/enrollments" className={navItemClass}>
+            {t("enrollmentsAdmin")}
+          </NavLink>
+        )}
+        <NavLink to="/app/my-trainings" className={navItemClass}>
+          {t("myTrainings")}
+        </NavLink>
       </nav>
     </aside>
   );

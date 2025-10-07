@@ -3,6 +3,9 @@ import dayjs from "dayjs";
 import { API } from "../api";
 import { SearchContext } from "../context/SearchContext";
 import { useTranslation } from "react-i18next";
+import { useEnrollments } from "../hooks/useEnrollments";
+import { isAdmin } from "../utils/auth";
+import { useNavigate } from "react-router-dom";
 
 type Training = {
   id?: number;
@@ -13,6 +16,7 @@ type Training = {
 
 const TrainingCalendar = () => {
   const { t } = useTranslation();
+  const { isEnrolled, enroll, unenroll } = useEnrollments();
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [currentDate, setCurrentDate] = useState(dayjs());
   const [loading, setLoading] = useState(true);
@@ -25,13 +29,13 @@ const TrainingCalendar = () => {
   const searchContext = useContext(SearchContext);
   const search = searchContext?.search ?? "";
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     setLoading(true);
     setError(null);
 
-    API.get("/trainings", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    })
+    API.get("/trainings")
       .then((res) => {
         const data = res.data;
         if (!Array.isArray(data)) throw new Error("Invalid response format");
@@ -121,15 +125,23 @@ const TrainingCalendar = () => {
           )}
         </div>
 
-        {dayTrainings.slice(0, 2).map((tr, idx) => (
-          <div
-            key={tr.id ?? `${tr.startTime}-${idx}`}
-            className="text-xs bg-blue-100 text-blue-800 rounded px-1 py-0.5 mb-1 truncate"
-            title={tr.description}
-          >
-            {tr.description}
-          </div>
-        ))}
+        {dayTrainings.slice(0, 2).map((tr, idx) => {
+          const enrolled = !!tr.id && isEnrolled(tr.id);
+          return (
+            <div
+              key={tr.id ?? `${tr.startTime}-${idx}`}
+              className={
+                "text-xs rounded px-1 py-0.5 mb-1 truncate " +
+                (enrolled
+                  ? "bg-green-100 text-green-800"
+                  : "bg-blue-100 text-blue-800")
+              }
+              title={tr.description}
+            >
+              {tr.description} {enrolled && "✓"}
+            </div>
+          );
+        })}
 
         {dayTrainings.length > 2 && (
           <div className="text-xs text-blue-500">
@@ -221,16 +233,59 @@ const TrainingCalendar = () => {
             </div>
             <div className="space-y-2 max-h-80 overflow-y-auto">
               {selectedTrainings && selectedTrainings.length > 0 ? (
-                selectedTrainings.map((tr, idx) => (
-                  <div
-                    key={tr.id ?? `${tr.startTime}-${idx}`}
-                    className="bg-blue-100 text-blue-900 rounded px-3 py-2 text-sm shadow-sm"
-                  >
-                    <div className="font-medium">
-                      {dayjs(tr.startTime).format("HH:mm")} – {tr.description}
+                selectedTrainings.map((tr, idx) => {
+                  const enrolled = !!tr.id && isEnrolled(tr.id);
+                  return (
+                    <div
+                      key={tr.id ?? `${tr.startTime}-${idx}`}
+                      className="bg-blue-50 border border-blue-200 rounded px-3 py-2 text-sm shadow-sm flex items-center justify-between"
+                    >
+                      <div>
+                        <div className="font-medium">
+                          {dayjs(tr.startTime).format("HH:mm")} –{" "}
+                          {tr.description}
+                        </div>
+                        {enrolled && (
+                          <div className="text-xs text-green-700 mt-0.5">
+                            ✓ {t("enrolled")}
+                          </div>
+                        )}
+                      </div>
+                      {tr.id && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            className={
+                              "px-3 py-1 rounded text-white " +
+                              (enrolled
+                                ? "bg-red-600 hover:bg-red-700"
+                                : "bg-green-600 hover:bg-green-700")
+                            }
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              enrolled ? unenroll(tr.id!) : enroll(tr.id!);
+                            }}
+                          >
+                            {enrolled ? t("unenroll") : t("enroll")}
+                          </button>
+
+                          {isAdmin() && (
+                            <button
+                              className="px-3 py-1 text-sm rounded border hover:bg-gray-50"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(
+                                  `/app/enrollments?trainingId=${tr.id}`
+                                );
+                              }}
+                            >
+                              {t("viewParticipants")}
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <p className="text-sm text-gray-500">
                   {t("noTrainingsOnThisDay")}

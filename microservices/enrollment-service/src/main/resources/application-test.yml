@@ -1,0 +1,42 @@
+spring:
+  config:
+    activate.on-profile: test
+    import: ""
+  cloud:
+    config:
+      enabled: false
+    discovery:
+      enabled: false
+    bus:
+      enabled: false
+    stream:
+      enabled: false
+  main:
+    cloud-platform: none
+
+  eureka:
+    client:
+      enabled: false
+      register-with-eureka: false
+      fetch-registry: false
+
+management:
+  tracing:
+    enabled: false
+  prometheus:
+    metrics:
+      export:
+        enabled: false
+
+logging:
+  level:
+    root: INFO
+    com.karate:
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        registerHealthIndicator: false
+        slidingWindowSize: 1000
+        failureRateThreshold: 100

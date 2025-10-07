@@ -18,14 +18,12 @@ import java.util.List;
 @Configuration
 @AllArgsConstructor
 public class SecurityConfig {
-    private static final String ADMIN = "ADMIN";
-    private static final String USER = "USER";
     private final JwtAuthTokenFilter jwtAuthTokenFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/").permitAll()
@@ -36,28 +34,16 @@ public class SecurityConfig {
                         .requestMatchers("/webjars/**").permitAll()
                         .requestMatchers("/swagger-resources/**").permitAll()
                         .requestMatchers("/internal/enrollments/**").permitAll()
-                        .requestMatchers("/enrollments/training/{trainingId}").hasRole(ADMIN)
-                        .requestMatchers("/enrollments/{userId}/{trainingId}").hasAnyRole(USER, ADMIN)
-                        .requestMatchers("/enrollments/user/{userId}").hasAnyRole(USER, ADMIN)
-                        .requestMatchers("/enrollments/training/{trainingId}").hasRole(ADMIN)
+                        .requestMatchers("/enrollments/me").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/enrollments/me/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/enrollments/training/{trainingId}").hasRole("ADMIN")
+                        .requestMatchers("/enrollments/{userId}/{trainingId}").hasRole("ADMIN")
+                        .requestMatchers("/enrollments/user/{userId}").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtAuthTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
     }
 }
