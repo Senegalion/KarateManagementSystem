@@ -22,6 +22,7 @@ const Topbar = () => {
       ...(isAdmin()
         ? [{ name: "Create Training", path: "/app/trainings/new" }]
         : []),
+      { name: "My Trainings", path: "/app/my-trainings" },
     ];
     return basePages;
   }, []);
