@@ -2,12 +2,10 @@ package com.karate.enrollment_service.api.exception;
 
 import com.karate.enrollment_service.api.exception.dto.ErrorResponse;
 import com.karate.enrollment_service.api.exception.dto.ValidationError;
-import com.karate.enrollment_service.domain.exception.TrainingNotFoundException;
-import com.karate.enrollment_service.domain.exception.UserAlreadyEnrolledException;
-import com.karate.enrollment_service.domain.exception.UserNotEnrolledException;
-import com.karate.enrollment_service.domain.exception.UserNotFoundException;
+import com.karate.enrollment_service.domain.exception.*;
 import feign.FeignException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -26,6 +25,7 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException ex,
             HttpServletRequest request
     ) {
+        log.warn("400 Validation failed path={} msg={}", request.getRequestURI(), ex.getMessage());
         List<ValidationError> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -52,6 +52,7 @@ public class GlobalExceptionHandler {
             org.springframework.http.converter.HttpMessageNotReadableException ex,
             HttpServletRequest request
     ) {
+        log.warn("400 Malformed body path={} msg={}", request.getRequestURI(), ex.getMessage());
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Request body is missing or malformed",
@@ -65,6 +66,7 @@ public class GlobalExceptionHandler {
     // 404 - not found
     @ExceptionHandler({UserNotFoundException.class, TrainingNotFoundException.class, UserNotEnrolledException.class})
     public ResponseEntity<ErrorResponse> handleNotFound(RuntimeException ex, HttpServletRequest request) {
+        log.warn("404 Not found path={} msg={}", request.getRequestURI(), ex.getMessage());
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage(),
@@ -78,6 +80,7 @@ public class GlobalExceptionHandler {
     // 409 - conflict (user has been already enrolled for this training)
     @ExceptionHandler(UserAlreadyEnrolledException.class)
     public ResponseEntity<ErrorResponse> handleConflict(RuntimeException ex, HttpServletRequest request) {
+        log.warn("409 Conflict path={} msg={}", request.getRequestURI(), ex.getMessage());
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.CONFLICT.value(),
                 ex.getMessage(),
@@ -94,6 +97,7 @@ public class GlobalExceptionHandler {
             FeignException.FeignClientException ex,
             HttpServletRequest request
     ) {
+        log.warn("4xx Upstream client error path={} status={} msg={}", request.getRequestURI(), ex.status(), ex.getMessage());
         HttpStatus status = HttpStatus.resolve(ex.status());
         if (status == null) {
             status = HttpStatus.BAD_REQUEST;
@@ -116,6 +120,7 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request
     ) {
+        log.error("500 Unexpected error path={} msg={}", request.getRequestURI(), ex.getMessage(), ex);
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Unexpected error: " + ex.getMessage(),
@@ -125,5 +130,13 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @ExceptionHandler(UpstreamUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleUpstreamUnavailable(UpstreamUnavailableException ex, HttpServletRequest request) {
+        log.warn("503 Upstream unavailable path={} msg={}", request.getRequestURI(), ex.getMessage());
+        var body = new ErrorResponse(HttpStatus.SERVICE_UNAVAILABLE.value(), ex.getMessage(),
+                null, request.getRequestURI(), LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
     }
 }

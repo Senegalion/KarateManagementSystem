@@ -19,6 +19,8 @@ import LanguageSettings from "./pages/settings/LanguageSettings";
 import RequireAdmin from "./components/RequireAdmin";
 import UsersList from "./pages/UsersList";
 import ProfileSettings from "./pages/settings/ProfileSettings";
+import MyTrainings from "./pages/MyTrainings";
+import AdminEnrollments from "./pages/AdminEnrollments";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -59,6 +61,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               }
             />
             <Route path="calendar" element={<TrainingCalendar />} />
+            <Route path="my-trainings" element={<MyTrainings />} />
+            <Route
+              path="enrollments"
+              element={
+                <RequireAdmin>
+                  <AdminEnrollments />
+                </RequireAdmin>
+              }
+            />
             <Route
               path="trainings/new"
               element={
