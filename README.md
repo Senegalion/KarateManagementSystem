@@ -46,8 +46,21 @@ This architecture ensures:
 
 ### 🖥️ Dashboard View
 
+(https://github.com/user-attachments/assets/f02fb80e-4ab2-48ab-a85f-835491a19a66)
+(https://github.com/user-attachments/assets/c137bec9-2667-4eca-a129-aa9dde6fc809)
+(https://github.com/user-attachments/assets/9f69e539-852b-4639-ad3e-dd2957d8e0cc)
+
+
+
 Below is a screenshot of the main admin dashboard of the application:
-![Dashboard View](https://github.com/user-attachments/assets/32298e6e-a42c-468c-8f66-8ebcd27c7d6c)
+![Dashboard View](https://github.com/user-attachments/assets/fec20397-becf-4026-b6cc-85bdbd7fc6b1)
+(https://github.com/user-attachments/assets/39f2006d-6440-495c-bf2b-39ca6557c8cd)
+(https://github.com/user-attachments/assets/33545b84-51bb-4451-b72e-a9e2b72653c2)
+(https://github.com/user-attachments/assets/82eb1c68-bb83-4e9b-b04b-b0277aeb7b88)
+(https://github.com/user-attachments/assets/a51d1244-dfd8-46e5-8f5e-375050b7fab8)
+(https://github.com/user-attachments/assets/c162d8f1-4c10-473f-b675-93376d0adf0f)
+
+
 
 ---
 
