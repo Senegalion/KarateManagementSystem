@@ -54,11 +54,11 @@ This architecture ensures:
 
 Below is a screenshot of the main admin dashboard of the application:
 ![Dashboard View](https://github.com/user-attachments/assets/fec20397-becf-4026-b6cc-85bdbd7fc6b1)
-(https://github.com/user-attachments/assets/39f2006d-6440-495c-bf2b-39ca6557c8cd)
-(https://github.com/user-attachments/assets/33545b84-51bb-4451-b72e-a9e2b72653c2)
-(https://github.com/user-attachments/assets/82eb1c68-bb83-4e9b-b04b-b0277aeb7b88)
-(https://github.com/user-attachments/assets/a51d1244-dfd8-46e5-8f5e-375050b7fab8)
-(https://github.com/user-attachments/assets/c162d8f1-4c10-473f-b675-93376d0adf0f)
+![Dashboard View](https://github.com/user-attachments/assets/39f2006d-6440-495c-bf2b-39ca6557c8cd)
+![Dashboard View](https://github.com/user-attachments/assets/33545b84-51bb-4451-b72e-a9e2b72653c2)
+![Dashboard View](https://github.com/user-attachments/assets/82eb1c68-bb83-4e9b-b04b-b0277aeb7b88)
+![Dashboard View](https://github.com/user-attachments/assets/a51d1244-dfd8-46e5-8f5e-375050b7fab8)
+![Dashboard View](https://github.com/user-attachments/assets/c162d8f1-4c10-473f-b675-93376d0adf0f)
 
 
 
