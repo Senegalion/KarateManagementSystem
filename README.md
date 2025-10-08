@@ -46,9 +46,9 @@ This architecture ensures:
 
 ### 🖥️ Dashboard View
 
-(https://github.com/user-attachments/assets/f02fb80e-4ab2-48ab-a85f-835491a19a66)
-(https://github.com/user-attachments/assets/c137bec9-2667-4eca-a129-aa9dde6fc809)
-(https://github.com/user-attachments/assets/9f69e539-852b-4639-ad3e-dd2957d8e0cc)
+![Main Page View](https://github.com/user-attachments/assets/f02fb80e-4ab2-48ab-a85f-835491a19a66)
+![Main Page View](https://github.com/user-attachments/assets/c137bec9-2667-4eca-a129-aa9dde6fc809)
+![Main Page View](https://github.com/user-attachments/assets/9f69e539-852b-4639-ad3e-dd2957d8e0cc)
 
 
 
@@ -106,7 +106,7 @@ This screenshot shows the Jenkins pipeline and build status:
 
 Currently running Docker containers related to the project:
 
-![Docker Containers](https://github.com/user-attachments/assets/69fe19a1-3774-4530-9163-f5a7748fc7b7)
+![Docker Containers](https://github.com/user-attachments/assets/75079697-d0b8-410e-a129-2d94da039b87)
 
 ## ✨ Features
 
