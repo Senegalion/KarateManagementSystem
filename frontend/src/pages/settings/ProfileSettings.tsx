@@ -15,7 +15,6 @@ type UserInfo = {
 };
 
 type UpdateUserRequestDto = Partial<UserInfo>;
-
 const emptyUser: UserInfo = {
   username: "",
   email: "",
@@ -27,8 +26,6 @@ const emptyUser: UserInfo = {
   karateRank: "",
   roles: [],
 };
-
-// Pola, których NIE wolno zmieniać ani wysyłać w patchu
 const IMMUTABLE_FIELDS: (keyof UserInfo)[] = ["karateClubName", "roles"];
 
 const ProfileSettings = () => {
@@ -41,7 +38,6 @@ const ProfileSettings = () => {
   const [saved, setSaved] = useState<null | "ok" | "err">(null);
   const [error, setError] = useState<string | null>(null);
 
-  // token -> nagłówek autoryzacji
   const token = localStorage.getItem("token");
   const authHeaders = token ? { Authorization: `Bearer ${token}` } : undefined;
 
@@ -50,7 +46,6 @@ const ProfileSettings = () => {
       window.location.href = "/login";
       return;
     }
-
     setLoading(true);
     API.get("/users/me", { headers: authHeaders })
       .then((res) => {
@@ -60,12 +55,8 @@ const ProfileSettings = () => {
         setForm(merged);
         setError(null);
       })
-      .catch((e) => {
-        console.error(e);
-        setError(t("failedToLoadUser") || "Failed to load user.");
-      })
+      .catch(() => setError(t("failedToLoadUser") || "Failed to load user."))
       .finally(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [t, token]);
 
   const hasChanges = useMemo(
@@ -87,10 +78,8 @@ const ProfileSettings = () => {
 
       const diff: UpdateUserRequestDto = {};
       (Object.keys(form) as (keyof UserInfo)[]).forEach((k) => {
-        if (IMMUTABLE_FIELDS.includes(k)) return; // nie wysyłamy niezmienialnych pól
-        if (form[k] !== initial[k]) {
-          (diff as any)[k] = form[k];
-        }
+        if (IMMUTABLE_FIELDS.includes(k)) return;
+        if (form[k] !== initial[k]) (diff as any)[k] = form[k];
       });
 
       if (Object.keys(diff).length === 0) {
@@ -102,8 +91,7 @@ const ProfileSettings = () => {
       await API.patch("/users/me", diff, { headers: authHeaders });
       setInitial(form);
       setSaved("ok");
-    } catch (e: any) {
-      console.error(e);
+    } catch {
       setSaved("err");
     } finally {
       setSaving(false);
@@ -117,41 +105,37 @@ const ProfileSettings = () => {
   const canDelete = confirmDelete === form.username;
 
   const handleDelete = async () => {
-    if (!token) return;
-    if (!canDelete) return;
+    if (!token || !canDelete) return;
     if (!window.confirm(t("confirmDeleteAccount") || "Are you sure?")) return;
-
     try {
       await API.delete("/users/me", { headers: authHeaders });
       localStorage.removeItem("token");
       window.location.href = "/login";
-    } catch (e) {
-      console.error(e);
+    } catch {
       alert(t("failedToDeleteAccount") || "Failed to delete account.");
     }
   };
 
-  if (loading) {
-    return <div className="p-6">{t("loading")}...</div>;
-  }
-  if (error) {
-    return <div className="p-6 text-red-600">{error}</div>;
-  }
+  if (loading) return <div className="p-6">{t("loading")}...</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md max-w-3xl">
-      <h1 className="text-2xl font-bold mb-1">👤 {t("profileSettings")}</h1>
-      <p className="text-sm text-gray-500 mb-6">
-        {t("profileSettingsSubtitle")}
-      </p>
+    <div className="bg-white border rounded-2xl p-6 shadow-sm max-w-4xl">
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold mb-1">
+          👤 {t("profileSettings")}
+        </h2>
+        <p className="text-sm text-gray-500">{t("profileSettingsSubtitle")}</p>
+      </div>
 
+      {/* FORM */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block mb-1 text-sm font-medium">
             {t("username")}
           </label>
           <input
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded-lg"
             value={form.username}
             onChange={onChange("username")}
           />
@@ -160,7 +144,7 @@ const ProfileSettings = () => {
           <label className="block mb-1 text-sm font-medium">{t("email")}</label>
           <input
             type="email"
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded-lg"
             value={form.email}
             onChange={onChange("email")}
           />
@@ -169,7 +153,7 @@ const ProfileSettings = () => {
         <div>
           <label className="block mb-1 text-sm font-medium">{t("city")}</label>
           <input
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded-lg"
             value={form.city || ""}
             onChange={onChange("city")}
           />
@@ -179,7 +163,7 @@ const ProfileSettings = () => {
             {t("postalCode")}
           </label>
           <input
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded-lg"
             value={form.postalCode || ""}
             onChange={onChange("postalCode")}
           />
@@ -190,7 +174,7 @@ const ProfileSettings = () => {
             {t("street")}
           </label>
           <input
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded-lg"
             value={form.street || ""}
             onChange={onChange("street")}
           />
@@ -200,7 +184,7 @@ const ProfileSettings = () => {
             {t("number")}
           </label>
           <input
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded-lg"
             value={form.number || ""}
             onChange={onChange("number")}
           />
@@ -211,14 +195,12 @@ const ProfileSettings = () => {
             {t("karateClubName")}
           </label>
           <input
-            className="w-full p-2 border rounded bg-gray-50 text-gray-700"
+            className="w-full p-2 border rounded-lg bg-gray-50 text-gray-700"
             value={form.karateClubName || ""}
             readOnly
             aria-readonly="true"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            {t("fieldIsImmutable") || "This field is not editable."}
-          </p>
+          <p className="text-xs text-gray-500 mt-1">{t("fieldIsImmutable")}</p>
         </div>
 
         <div>
@@ -226,7 +208,7 @@ const ProfileSettings = () => {
             {t("karateRank")}
           </label>
           <input
-            className="w-full p-2 border rounded bg-gray-50 text-gray-700"
+            className="w-full p-2 border rounded-lg bg-gray-50 text-gray-700"
             value={form.karateRank || ""}
             readOnly
             aria-readonly="true"
@@ -235,17 +217,18 @@ const ProfileSettings = () => {
 
         <div className="md:col-span-2">
           <label className="block mb-1 text-sm font-medium">{t("roles")}</label>
-          <div className="p-2 border rounded bg-gray-50 text-sm">
+          <div className="p-2 border rounded-lg bg-gray-50 text-sm">
             {(form.roles ?? []).join(", ") || t("none")}
           </div>
         </div>
       </div>
 
-      <div className="mt-6 flex gap-2">
+      {/* Actions */}
+      <div className="mt-6 flex flex-wrap gap-2">
         <button
           onClick={handleSave}
           disabled={!hasChanges || saving}
-          className={`px-4 py-2 rounded text-white ${
+          className={`px-4 py-2 rounded-lg text-white ${
             hasChanges ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400"
           }`}
         >
@@ -254,7 +237,7 @@ const ProfileSettings = () => {
         <button
           onClick={handleReset}
           disabled={!hasChanges || saving}
-          className="px-4 py-2 rounded border"
+          className="px-4 py-2 rounded-lg border hover:bg-gray-50"
         >
           {t("reset")}
         </button>
@@ -266,15 +249,16 @@ const ProfileSettings = () => {
         )}
       </div>
 
+      {/* Danger zone */}
       <div className="mt-10 border-t pt-6">
-        <h2 className="text-lg font-semibold text-red-600 mb-2">
+        <h3 className="text-lg font-semibold text-red-600 mb-2">
           {t("dangerZone")}
-        </h2>
+        </h3>
         <p className="text-sm text-gray-600 mb-3">
           {t("typeUsernameToConfirmDelete")}
         </p>
         <input
-          className="w-full md:w-1/2 p-2 border rounded mb-3"
+          className="w-full md:w-1/2 p-2 border rounded-lg mb-3"
           placeholder={form.username}
           value={confirmDelete}
           onChange={(e) => setConfirmDelete(e.target.value)}
@@ -282,7 +266,7 @@ const ProfileSettings = () => {
         <button
           onClick={handleDelete}
           disabled={!canDelete}
-          className={`px-4 py-2 rounded text-white ${
+          className={`px-4 py-2 rounded-lg text-white ${
             canDelete ? "bg-red-600 hover:bg-red-700" : "bg-red-300"
           }`}
         >

@@ -1,0 +1,107 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.6'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.karate'
+version = '0.0.1-SNAPSHOT'
+description = 'payment-service'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', "2025.0.0")
+}
+
+dependencies {
+	// --- Spring Boot starters ---
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	// --- Spring Cloud dependencies ---
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+	// --- Caffeine cache ---
+	// Recommended by Spring Cloud LoadBalancer for production caching
+	implementation 'com.github.ben-manes.caffeine:caffeine'
+
+	// --- Messaging (RabbitMQ) ---
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+	testImplementation 'org.springframework.amqp:spring-rabbit-test'
+
+	// --- Database migration (Flyway) ---
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-database-postgresql'
+
+	// --- Database driver ---
+	runtimeOnly 'org.postgresql:postgresql'
+	runtimeOnly 'com.h2database:h2'
+
+	// Kafka
+	implementation 'org.springframework.kafka:spring-kafka'
+	implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka'
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
+
+	// --- Lombok for boilerplate code reduction ---
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// --- Testing dependencies ---
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+	testImplementation 'org.testcontainers:rabbitmq'
+	testImplementation 'org.testcontainers:postgresql'
+
+	// --- Tracing and observability ---
+	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+	implementation 'io.github.resilience4j:resilience4j-spring-boot3'
+	implementation 'io.github.resilience4j:resilience4j-micrometer'
+	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+
+	// Circuit Breaker
+	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j'
+
+	// PayPal API
+	implementation 'com.paypal.sdk:checkout-sdk:1.0.4'
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+	// --- Other libraries ---
+	implementation 'com.auth0:java-jwt:4.0.0'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
