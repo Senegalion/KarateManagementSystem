@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next";
 import { useEnrollments } from "../hooks/useEnrollments";
 import { isAdmin } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
+import FeedbackModal from "../components/FeedbackModal";
+import { useFeedback } from "../hooks/useFeedbacks";
 
 type Training = {
   id?: number;
@@ -30,6 +32,15 @@ const TrainingCalendar = () => {
   const search = searchContext?.search ?? "";
 
   const navigate = useNavigate();
+
+  const { getForTraining, loading: fbLoading } = useFeedback();
+  const [fbOpen, setFbOpen] = useState(false);
+  const [fbData, setFbData] = useState<{
+    comment: string;
+    starRating: number;
+  } | null>(null);
+  const [fbNotFound, setFbNotFound] = useState(false);
+  const [fbTitle, setFbTitle] = useState("");
 
   useEffect(() => {
     setLoading(true);
@@ -235,6 +246,7 @@ const TrainingCalendar = () => {
               {selectedTrainings && selectedTrainings.length > 0 ? (
                 selectedTrainings.map((tr, idx) => {
                   const enrolled = !!tr.id && isEnrolled(tr.id);
+                  const isPast = dayjs(tr.startTime).isBefore(dayjs());
                   return (
                     <div
                       key={tr.id ?? `${tr.startTime}-${idx}`}
@@ -268,6 +280,26 @@ const TrainingCalendar = () => {
                             {enrolled ? t("unenroll") : t("enroll")}
                           </button>
 
+                          {isPast && (
+                            <button
+                              className="px-3 py-1 text-sm rounded border hover:bg-gray-50"
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                setFbTitle(
+                                  `${dayjs(tr.startTime).format(
+                                    "DD.MM.YYYY HH:mm"
+                                  )} – ${tr.description}`
+                                );
+                                const res = await getForTraining(tr.id!);
+                                setFbData(res.feedback);
+                                setFbNotFound(!res.exists);
+                                setFbOpen(true);
+                              }}
+                            >
+                              {t("viewFeedback")}
+                            </button>
+                          )}
+
                           {isAdmin() && (
                             <button
                               className="px-3 py-1 text-sm rounded border hover:bg-gray-50"
@@ -295,6 +327,15 @@ const TrainingCalendar = () => {
           </div>
         </div>
       )}
+
+      <FeedbackModal
+        open={fbOpen}
+        onClose={() => setFbOpen(false)}
+        title={fbTitle}
+        feedback={fbData}
+        loading={fbLoading}
+        notFound={fbNotFound}
+      />
     </div>
   );
 };
