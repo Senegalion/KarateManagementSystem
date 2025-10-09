@@ -23,6 +23,13 @@ import MyTrainings from "./pages/MyTrainings";
 import AdminEnrollments from "./pages/AdminEnrollments";
 import AdminFeedbacks from "./pages/AdminFeedbacks";
 import MyFeedbacks from "./pages/MyFeedbacks";
+import MyPayments from "./pages/MyPayments";
+import AdminPayments from "./pages/AdminPayments";
+import PaymentReturn from "./pages/PaymentReturn";
+import PaymentCancel from "./pages/PaymentCancel";
+import NotificationSettings from "./pages/settings/NotificationSettings";
+import AppearanceSettings from "./pages/settings/AppearanceSettings";
+import SecuritySettings from "./pages/settings/SecuritySettings";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -89,11 +96,27 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               }
             />
             <Route path="my-feedbacks" element={<MyFeedbacks />} />
+            <Route path="my-payments" element={<MyPayments />} />
+
+            <Route
+              path="payments"
+              element={
+                <RequireAdmin>
+                  <AdminPayments />
+                </RequireAdmin>
+              }
+            />
           </Route>
+
+          <Route path="/app/payments/return" element={<PaymentReturn />} />
+          <Route path="/app/payments/cancel" element={<PaymentCancel />} />
 
           <Route path="/settings" element={<SettingsLayout />}>
             <Route index element={<Navigate to="language" replace />} />
             <Route path="language" element={<LanguageSettings />} />
+            <Route path="notifications" element={<NotificationSettings />} />
+            <Route path="security" element={<SecuritySettings />} />
+            <Route path="appearance" element={<AppearanceSettings />} />
           </Route>
         </Routes>
       </BrowserRouter>
