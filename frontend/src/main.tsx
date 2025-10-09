@@ -21,6 +21,8 @@ import UsersList from "./pages/UsersList";
 import ProfileSettings from "./pages/settings/ProfileSettings";
 import MyTrainings from "./pages/MyTrainings";
 import AdminEnrollments from "./pages/AdminEnrollments";
+import AdminFeedbacks from "./pages/AdminFeedbacks";
+import MyFeedbacks from "./pages/MyFeedbacks";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -78,6 +80,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 </RequireAdmin>
               }
             />
+            <Route
+              path="feedbacks"
+              element={
+                <RequireAdmin>
+                  <AdminFeedbacks />
+                </RequireAdmin>
+              }
+            />
+            <Route path="my-feedbacks" element={<MyFeedbacks />} />
           </Route>
 
           <Route path="/settings" element={<SettingsLayout />}>

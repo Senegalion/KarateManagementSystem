@@ -2,6 +2,7 @@ package com.karate.feedback_service.domain.service;
 
 import com.karate.feedback_service.api.dto.FeedbackRequestDto
 import com.karate.feedback_service.api.dto.FeedbackResponseDto
+import com.karate.feedback_service.api.dto.FeedbackResponseDtoExt
 import com.karate.feedback_service.domain.exception.FeedbackNotFoundException
 import com.karate.feedback_service.domain.exception.TrainingSessionNotFoundException
 import com.karate.feedback_service.domain.exception.UserNotSignedUpException
@@ -28,13 +29,25 @@ class FeedbackService(
 ) {
     private val log = LoggerFactory.getLogger(FeedbackService::class.java)
 
+    private fun toDto(e: FeedbackEntity) =
+        FeedbackResponseDto(comment = e.comment, starRating = e.starRating)
+
+    private fun toExt(e: FeedbackEntity) =
+        FeedbackResponseDtoExt(
+            feedbackId = e.feedbackId ?: 0L,
+            userId = e.userId,
+            trainingSessionId = e.trainingSessionId,
+            comment = e.comment,
+            starRating = e.starRating
+        )
+
     @Transactional
     fun addFeedbackToUserForTrainingSession(
         userId: Long,
         trainingSessionId: Long,
         feedbackRequestDto: FeedbackRequestDto
     ): FeedbackResponseDto {
-        log.info("Creating feedback for userId={} trainingId={}", userId, trainingSessionId)
+        log.info("Creating/updating feedback for userId={} trainingId={}", userId, trainingSessionId)
 
         if (!checkUser(userId)) {
             log.warn("User {} not found", userId)
@@ -49,16 +62,26 @@ class FeedbackService(
             throw UserNotSignedUpException("User is not enrolled in the specified training session")
         }
 
-        val saved = feedbackRepository.save(
-            FeedbackEntity(
-                userId = userId,
-                trainingSessionId = trainingSessionId,
-                comment = feedbackRequestDto.comment,
-                starRating = feedbackRequestDto.starRating
-            )
-        )
+        val saved = feedbackRepository.findByUserIdAndTrainingSessionId(userId, trainingSessionId)
+            .map { existing ->
+                val updated = existing.copy(
+                    comment = feedbackRequestDto.comment,
+                    starRating = feedbackRequestDto.starRating
+                )
+                feedbackRepository.save(updated)
+            }.orElseGet {
+                feedbackRepository.save(
+                    FeedbackEntity(
+                        userId = userId,
+                        trainingSessionId = trainingSessionId,
+                        comment = feedbackRequestDto.comment,
+                        starRating = feedbackRequestDto.starRating
+                    )
+                )
+            }
+
         log.info("Feedback persisted id={} userId={} trainingId={}", saved.feedbackId, userId, trainingSessionId)
-        return FeedbackResponseDto(saved.comment, saved.starRating)
+        return toDto(saved)
     }
 
     @Transactional(readOnly = true)
@@ -89,30 +112,66 @@ class FeedbackService(
             }
 
         log.info("Feedback retrieved userId={} sessionId={} stars={}", userId, sessionId, fb.starRating)
-        return FeedbackResponseDto(fb.comment, fb.starRating)
+        return toDto(fb)
+    }
+
+    @Transactional(readOnly = true)
+    fun getAllForUser(userId: Long): List<FeedbackResponseDtoExt> {
+        log.info("Admin: listing feedbacks for userId={}", userId)
+        return feedbackRepository.findAllByUserId(userId).map(::toExt)
+    }
+
+    @Transactional(readOnly = true)
+    fun getAllForTraining(trainingSessionId: Long): List<FeedbackResponseDtoExt> {
+        log.info("Admin: listing feedbacks for trainingSessionId={}", trainingSessionId)
+        return feedbackRepository.findAllByTrainingSessionId(trainingSessionId).map(::toExt)
+    }
+
+    @Transactional(readOnly = true)
+    fun getForUserAndTraining(userId: Long, trainingSessionId: Long): FeedbackResponseDto {
+        log.info("Admin: get feedback for userId={} trainingSessionId={}", userId, trainingSessionId)
+        val fb = feedbackRepository.findByUserIdAndTrainingSessionId(userId, trainingSessionId)
+            .orElseThrow { FeedbackNotFoundException("Feedback not found") }
+        return toDto(fb)
+    }
+
+    @Transactional(readOnly = true)
+    fun getAllForCurrentUser(): List<FeedbackResponseDtoExt> {
+        val auth = SecurityContextHolder.getContext().authentication
+            ?: throw UsernameNotFoundException("User not authenticated")
+        val userId = getUserId(auth.name) ?: throw UsernameNotFoundException("User not found")
+        return feedbackRepository.findAllByUserId(userId).map {
+            FeedbackResponseDtoExt(
+                feedbackId = it.feedbackId ?: 0,
+                userId = it.userId,
+                trainingSessionId = it.trainingSessionId,
+                comment = it.comment,
+                starRating = it.starRating
+            )
+        }
     }
 
     @CircuitBreaker(name = "upstream", fallbackMethod = "userExistsFallback")
     fun checkUser(id: Long) = userClient.checkUserExists(id) == true
 
-    @SuppressWarnings("unused")
+    @Suppress("unused")
     private fun userExistsFallback(id: Long, ex: Throwable) = false
 
     @CircuitBreaker(name = "upstream", fallbackMethod = "trainingExistsFallback")
     fun checkTraining(id: Long) = trainingSessionClient.checkTrainingExists(id) == true
 
-    @SuppressWarnings("unused")
+    @Suppress("unused")
     private fun trainingExistsFallback(id: Long, ex: Throwable) = false
 
     @CircuitBreaker(name = "upstream", fallbackMethod = "enrolledFallback")
     fun checkEnrollment(uid: Long, sid: Long) = enrollmentClient.checkUserEnrolledInSession(uid, sid) == true
 
-    @SuppressWarnings("unused")
+    @Suppress("unused")
     private fun enrolledFallback(uid: Long, sid: Long, ex: Throwable) = false
 
     @CircuitBreaker(name = "upstream", fallbackMethod = "userIdByUsernameFallback")
     fun getUserId(username: String) = authClient.getUserIdByUsername(username)
 
-    @SuppressWarnings("unused")
+    @Suppress("unused")
     private fun userIdByUsernameFallback(username: String, ex: Throwable): Long? = null
 }
