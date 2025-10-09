@@ -35,6 +35,10 @@ spring:
               uri: lb://enrollment-service
               predicates:
                 - Path=/enrollments/**
+            - id: payment-service
+              uri: lb://payment-service
+              predicates:
+                - Path=/payments/**
 
 logging:
   level:

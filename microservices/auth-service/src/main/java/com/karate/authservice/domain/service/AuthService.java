@@ -19,7 +19,7 @@ import com.karate.authservice.infrastructure.client.dto.KarateClubDto;
 import com.karate.authservice.infrastructure.client.dto.NewUserRequestDto;
 import com.karate.authservice.infrastructure.client.dto.UserInfoDto;
 import com.karate.authservice.infrastructure.messaging.UserEventProducer;
-import com.karate.authservice.infrastructure.messaging.event.UserRegisteredEvent;
+import com.karate.authservice.infrastructure.messaging.dto.UserRegisteredEvent;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -279,7 +280,7 @@ public class AuthService {
     }
 
     private void publishUserRegistered(AuthUserEntity user, UserInfoDto info, KarateClubDto club) {
-        UserRegisteredEvent event = new UserRegisteredEvent(
+        var event = new UserRegisteredEvent(
                 UUID.randomUUID().toString(),
                 "USER_REGISTERED",
                 Instant.now(),
@@ -289,7 +290,8 @@ public class AuthService {
                         user.getUsername(),
                         club.karateClubId(),
                         club.name(),
-                        info.karateRank()
+                        info.karateRank(),
+                        info.registrationDate()
                 )
         );
         userEventProducer.sendUserRegisteredEvent(event);

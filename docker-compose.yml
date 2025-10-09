@@ -171,6 +171,18 @@ services:
     volumes:
       - postgres-enrollment-data:/var/lib/postgresql/data
 
+  postgres-payment-db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: payment_db
+    ports:
+      - "5440:5432"
+    volumes:
+      - postgres-payment-data:/var/lib/postgresql/data
+
   pgadmin:
     image: dpage/pgadmin4
     restart: always
@@ -300,6 +312,7 @@ volumes:
   postgres-auth-data:
   postgres-training-data:
   postgres-enrollment-data:
+  postgres-payment-data:
   jenkins_home:
   sonarqube_data:
   sonarqube_logs:

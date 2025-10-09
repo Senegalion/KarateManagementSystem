@@ -1,31 +1,46 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useSearch } from "../context/SearchContext";
 import { isAdmin } from "../utils/auth";
+import { useTranslation } from "react-i18next";
+
+type Page = { name: string; path: string };
 
 const Topbar = () => {
+  const { t } = useTranslation();
   const { search, setSearch } = useSearch();
   const [inputValue, setInputValue] = useState(search);
-  const [filtered, setFiltered] = useState<{ name: string; path: string }[]>(
-    []
-  );
+  const [filtered, setFiltered] = useState<Page[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const [inputWidth, setInputWidth] = useState<number>(0);
 
-  const pages = useMemo(() => {
-    const basePages = [
-      { name: "Dashboard", path: "/app/dashboard" },
-      ...(isAdmin() ? [{ name: "Users", path: "/app/users" }] : []),
-      { name: "Calendar", path: "/app/calendar" },
+  const pages = useMemo<Page[]>(() => {
+    const base: Page[] = [
+      { name: t("dashboard"), path: "/app/dashboard" },
+      ...(isAdmin() ? [{ name: t("users"), path: "/app/users" }] : []),
+      { name: t("calendar"), path: "/app/calendar" },
       ...(isAdmin()
-        ? [{ name: "Create Training", path: "/app/trainings/new" }]
+        ? [{ name: t("createTraining"), path: "/app/trainings/new" }]
         : []),
-      { name: "My Trainings", path: "/app/my-trainings" },
+      ...(isAdmin()
+        ? [{ name: t("enrollmentsAdmin"), path: "/app/enrollments" }]
+        : []),
+      { name: t("myTrainings"), path: "/app/my-trainings" },
+      ...(isAdmin()
+        ? [{ name: t("feedbacksAdmin"), path: "/app/feedbacks" }]
+        : []),
+      { name: t("myFeedbacks"), path: "/app/my-feedbacks" },
+      { name: t("myPayments"), path: "/app/my-payments" },
+      ...(isAdmin()
+        ? [{ name: t("paymentsAdmin"), path: "/app/payments" }]
+        : []),
+      { name: t("profile"), path: "/app/profile" },
+      { name: t("settings"), path: "/settings/language" },
     ];
-    return basePages;
-  }, []);
+    return base;
+  }, [t]);
 
   useEffect(() => {
     if (inputValue.trim() === "") {
@@ -33,19 +48,14 @@ const Topbar = () => {
       setShowSuggestions(false);
       return;
     }
-
-    const filt = pages.filter((p) =>
-      p.name.toLowerCase().includes(inputValue.toLowerCase())
-    );
-
+    const q = inputValue.toLowerCase();
+    const filt = pages.filter((p) => p.name.toLowerCase().includes(q));
     setFiltered(filt);
     setShowSuggestions(filt.length > 0);
   }, [inputValue, pages]);
 
   useEffect(() => {
-    if (inputRef.current) {
-      setInputWidth(inputRef.current.offsetWidth);
-    }
+    if (inputRef.current) setInputWidth(inputRef.current.offsetWidth);
   }, [inputValue]);
 
   useEffect(() => {
@@ -77,7 +87,6 @@ const Topbar = () => {
         setShowSuggestions(false);
       }
     };
-
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
@@ -88,7 +97,7 @@ const Topbar = () => {
         <input
           ref={inputRef}
           type="text"
-          placeholder="Search features..."
+          placeholder={t("searchFeatures")}
           className="w-1/2 px-4 py-2 border rounded shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
@@ -97,9 +106,7 @@ const Topbar = () => {
               setFiltered(pages);
               setShowSuggestions(true);
             }
-            if (inputRef.current) {
-              setInputWidth(inputRef.current.offsetWidth);
-            }
+            if (inputRef.current) setInputWidth(inputRef.current.offsetWidth);
           }}
           onKeyDown={handleKeyDown}
         />
