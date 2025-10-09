@@ -47,6 +47,14 @@ const Sidebar = () => {
         <NavLink to="/app/my-feedbacks" className={navItemClass}>
           {"⭐ " + t("myFeedbacks")}
         </NavLink>
+        <NavLink to="/app/my-payments" className={navItemClass}>
+          {"💳 " + t("myPayments")}
+        </NavLink>
+        {isAdmin() && (
+          <NavLink to="/app/payments" className={navItemClass}>
+            {"🧾 " + t("paymentsAdmin")}
+          </NavLink>
+        )}
       </nav>
     </aside>
   );

@@ -86,7 +86,8 @@ public class UserService {
                 user.getUserId(),
                 user.getEmail(),
                 user.getKarateClubId(),
-                user.getKarateRank().toString()
+                user.getKarateRank().toString(),
+                user.getRegistrationDate()
         );
     }
 
