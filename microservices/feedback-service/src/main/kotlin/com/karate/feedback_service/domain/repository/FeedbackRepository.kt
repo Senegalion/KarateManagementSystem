@@ -8,4 +8,6 @@ import java.util.*
 @Repository
 interface FeedbackRepository : JpaRepository<FeedbackEntity, Long> {
     fun findByUserIdAndTrainingSessionId(userId: Long, trainingSessionId: Long): Optional<FeedbackEntity>
+    fun findAllByUserId(userId: Long): List<FeedbackEntity>
+    fun findAllByTrainingSessionId(trainingSessionId: Long): List<FeedbackEntity>
 }
