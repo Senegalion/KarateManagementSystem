@@ -2,6 +2,7 @@ package com.karate.feedback_service.api.controller.rest;
 
 import com.karate.feedback_service.api.dto.FeedbackRequestDto
 import com.karate.feedback_service.api.dto.FeedbackResponseDto
+import com.karate.feedback_service.api.dto.FeedbackResponseDtoExt
 import com.karate.feedback_service.domain.service.FeedbackService
 import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
@@ -36,4 +37,23 @@ class FeedbackRESTController(
         val feedback = feedbackService.getFeedbackForSession(trainingSessionId)
         return ResponseEntity.ok(feedback)
     }
+
+    @GetMapping("/admin/by-user/{userId}")
+    fun getAllForUser(@PathVariable userId: Long): ResponseEntity<List<FeedbackResponseDtoExt>> =
+        ResponseEntity.ok(feedbackService.getAllForUser(userId))
+
+    @GetMapping("/admin/by-training/{trainingSessionId}")
+    fun getAllForTraining(@PathVariable trainingSessionId: Long): ResponseEntity<List<FeedbackResponseDtoExt>> =
+        ResponseEntity.ok(feedbackService.getAllForTraining(trainingSessionId))
+
+    @GetMapping("/admin/{userId}/{trainingSessionId}")
+    fun getForUserAndTraining(
+        @PathVariable userId: Long,
+        @PathVariable trainingSessionId: Long
+    ): ResponseEntity<FeedbackResponseDto> =
+        ResponseEntity.ok(feedbackService.getForUserAndTraining(userId, trainingSessionId))
+
+    @GetMapping("/me")
+    fun getMyFeedbacks(): ResponseEntity<List<FeedbackResponseDtoExt>> =
+        ResponseEntity.ok(feedbackService.getAllForCurrentUser())
 }
