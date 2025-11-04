@@ -28,6 +28,12 @@ spring:
     consumer:
       group-id: enrollment-service
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
-        spring.json.trusted.packages: "*"
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: "com.karate.*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: com.karate.enrollment_service.infrastructure.messaging.event.UserDeletedEvent
+
+topics:
+  user-deleted: user.deleted

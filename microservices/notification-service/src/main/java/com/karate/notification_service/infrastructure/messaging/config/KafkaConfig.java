@@ -1,8 +1,8 @@
 package com.karate.notification_service.infrastructure.messaging.config;
 
 import com.karate.notification_service.infrastructure.messaging.dto.EnrollmentEvent;
+import com.karate.notification_service.infrastructure.messaging.dto.FeedbackEvent;
 import com.karate.notification_service.infrastructure.messaging.dto.UserRegisteredEvent;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.Map;
@@ -18,39 +17,50 @@ import java.util.Map;
 @Configuration
 public class KafkaConfig {
 
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, EnrollmentEvent> enrollmentKafkaListenerContainerFactory(
-            ConsumerFactory<String, EnrollmentEvent> enrollmentConsumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, EnrollmentEvent> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(enrollmentConsumerFactory);
-        return factory;
+    private static <T> ConsumerFactory<String, T> factoryFor(KafkaProperties props, Class<T> type) {
+        Map<String, Object> cfg = props.buildConsumerProperties();
+        cfg.put(org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        cfg.put(org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        cfg.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        return new DefaultKafkaConsumerFactory<>(cfg, new StringDeserializer(), new JsonDeserializer<>(type, false));
     }
 
     @Bean
-    public ConsumerFactory<String, EnrollmentEvent> enrollmentConsumerFactory(KafkaProperties properties) {
-        Map<String, Object> props = properties.buildConsumerProperties();
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
-        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
-        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(),
-                new JsonDeserializer<>(EnrollmentEvent.class, false));
+    public ConsumerFactory<String, UserRegisteredEvent> userRegisteredConsumerFactory(KafkaProperties props) {
+        return factoryFor(props, UserRegisteredEvent.class);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, UserRegisteredEvent> userKafkaListenerContainerFactory(
-            ConsumerFactory<String, UserRegisteredEvent> userConsumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, UserRegisteredEvent> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(userConsumerFactory);
-        return factory;
+    public ConsumerFactory<String, EnrollmentEvent> enrollmentConsumerFactory(KafkaProperties props) {
+        return factoryFor(props, EnrollmentEvent.class);
     }
 
     @Bean
-    public ConsumerFactory<String, UserRegisteredEvent> userConsumerFactory(KafkaProperties properties) {
-        Map<String, Object> props = properties.buildConsumerProperties();
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
-        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
-        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(),
-                new JsonDeserializer<>(UserRegisteredEvent.class, false));
+    public ConsumerFactory<String, FeedbackEvent> feedbackConsumerFactory(KafkaProperties props) {
+        return factoryFor(props, FeedbackEvent.class);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, UserRegisteredEvent> userRegisteredListenerFactory(
+            ConsumerFactory<String, UserRegisteredEvent> cf) {
+        ConcurrentKafkaListenerContainerFactory<String, UserRegisteredEvent> f = new ConcurrentKafkaListenerContainerFactory<>();
+        f.setConsumerFactory(cf);
+        return f;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, EnrollmentEvent> enrollmentListenerFactory(
+            ConsumerFactory<String, EnrollmentEvent> cf) {
+        ConcurrentKafkaListenerContainerFactory<String, EnrollmentEvent> f = new ConcurrentKafkaListenerContainerFactory<>();
+        f.setConsumerFactory(cf);
+        return f;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, FeedbackEvent> feedbackListenerFactory(
+            ConsumerFactory<String, FeedbackEvent> cf) {
+        ConcurrentKafkaListenerContainerFactory<String, FeedbackEvent> f = new ConcurrentKafkaListenerContainerFactory<>();
+        f.setConsumerFactory(cf);
+        return f;
     }
 }
