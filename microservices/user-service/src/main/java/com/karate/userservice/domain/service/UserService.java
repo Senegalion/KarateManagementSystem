@@ -7,6 +7,7 @@ import com.karate.userservice.domain.model.KarateRank;
 import com.karate.userservice.domain.model.UserEntity;
 import com.karate.userservice.domain.repository.UserRepository;
 import com.karate.userservice.infrastructure.client.dto.AuthUserDto;
+import com.karate.userservice.infrastructure.messaging.UserEventPublisher;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class UserService {
     public static final String USER_NOT_FOUND = "User not found";
     private final UserRepository userRepository;
     private final UpstreamGateway upstream;
+    private final UserEventPublisher userEventPublisher;
 
     @Transactional
     public List<UserFromClubDto> getUsersFromClubByName(String clubName) {
@@ -189,8 +191,10 @@ public class UserService {
         var user = userRepository.findById(authUser.userId())
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
+        Long userId = user.getUserId();
         userRepository.delete(user);
-        upstream.deleteUser(user.getUserId());
-        log.info("Delete current user OK userId={}", user.getUserId());
+        userEventPublisher.publishUserDeleted(userId);
+
+        log.info("Delete current user OK userId={}", userId);
     }
 }

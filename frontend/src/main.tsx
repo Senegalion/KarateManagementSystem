@@ -30,6 +30,10 @@ import PaymentCancel from "./pages/PaymentCancel";
 import NotificationSettings from "./pages/settings/NotificationSettings";
 import AppearanceSettings from "./pages/settings/AppearanceSettings";
 import SecuritySettings from "./pages/settings/SecuritySettings";
+import { applyTheme, getSavedTheme, initThemeWatcher } from "./theme";
+
+applyTheme(getSavedTheme());
+initThemeWatcher();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

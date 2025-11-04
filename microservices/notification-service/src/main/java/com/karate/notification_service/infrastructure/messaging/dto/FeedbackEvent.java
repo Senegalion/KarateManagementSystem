@@ -1,0 +1,27 @@
+package com.karate.notification_service.infrastructure.messaging.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.Instant;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class FeedbackEvent {
+    private String eventId;
+    private String eventType;
+    private Instant timestamp;
+    private Payload payload;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Payload {
+        private Long userId;
+        private String userEmail;
+        private String username;
+        private String feedbackText;
+    }
+}
