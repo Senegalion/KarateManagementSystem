@@ -1,6 +1,16 @@
 spring:
   application:
     name: feedback-service
+  cache:
+    type: caffeine
+  cloud:
+    stream:
+      default-binder: kafka
+      bindings:
+        springCloudBusInput:
+          binder: rabbit
+        springCloudBusOutput:
+          binder: rabbit
   config:
     import: optional:configserver:http://localhost:8888
 #    import: optional:configserver:http://config-server:8888
@@ -10,4 +20,22 @@ spring:
     port: 5672
     username: guest
     password: guest
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+    consumer:
+      group-id: feedback-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: "com.karate.*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: com.karate.feedback_service.infrastructure.messaging.dto.UserDeletedEvent
 
+topics:
+  user-deleted: user.deleted

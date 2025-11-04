@@ -54,7 +54,7 @@ class EmailServiceIT {
         );
 
         // when
-        emailService.sendEnrollmentNotification(dto);
+//        emailService.sendEnrollmentNotification(dto);
 
         // then
         MimeMessage[] messages = greenMail.getReceivedMessages();

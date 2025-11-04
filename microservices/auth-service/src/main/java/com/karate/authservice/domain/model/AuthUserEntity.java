@@ -32,7 +32,7 @@ public class AuthUserEntity implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "auth_users_roles",
             joinColumns = {@JoinColumn(name = "auth_user_id")},
