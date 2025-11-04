@@ -199,5 +199,7 @@
   "manualPaymentOk": "Ručně zadaná platba uložena",
   "manualPaymentFailed": "Ručně zadanou platbu se nepodařilo uložit",
   "noPaymentsYet": "Zatím žádné platby",
-  "date": "Datum"
+  "date": "Datum",
+  "goToPayments": "Přejít na platby",
+  "goToDashboard": "Přejít na panel"
 }

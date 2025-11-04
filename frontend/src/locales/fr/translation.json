@@ -199,5 +199,7 @@
   "manualPaymentOk": "Paiement manuel enregistré",
   "manualPaymentFailed": "Échec de l’enregistrement du paiement manuel",
   "noPaymentsYet": "Aucun paiement pour l’instant",
-  "date": "Date"
+  "date": "Date",
+  "goToPayments": "Aller aux paiements",
+  "goToDashboard": "Aller au tableau de bord"
 }

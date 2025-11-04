@@ -1,7 +1,9 @@
 package com.karate.payment_service.domain.repository;
 
 import com.karate.payment_service.domain.model.PaymentEntity;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,4 +23,8 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from PaymentEntity p where p.userId = :userId")
     int deleteAllByUserId(@Param("userId") Long userId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select p from PaymentEntity p where p.providerOrderId = :orderId")
+    Optional<PaymentEntity> lockByProviderOrderId(@Param("orderId") String orderId);
 }
