@@ -122,7 +122,7 @@ public class PaymentApplicationService {
 
     @Transactional
     public CaptureResponse capture(String orderId) {
-        var payment = payments.findByProviderOrderId(orderId)
+        var payment = payments.lockByProviderOrderId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found: " + orderId));
 
         if (payment.getStatus() == PaymentStatus.PAID) {

@@ -199,5 +199,7 @@
   "manualPaymentOk": "Manual payment saved",
   "manualPaymentFailed": "Manual payment failed",
   "noPaymentsYet": "No payments yet",
-  "date": "Date"
+  "date": "Date",
+  "goToPayments": "Go to payments",
+  "goToDashboard": "Go to dashboard"
 }

@@ -199,5 +199,7 @@
   "manualPaymentOk": "Ręczna płatność zapisana",
   "manualPaymentFailed": "Nie udało się zapisać ręcznej płatności",
   "noPaymentsYet": "Brak płatności",
-  "date": "Data"
+  "date": "Data",
+  "goToPayments": "Przejdź do płatności",
+  "goToDashboard": "Przejdź do panelu"
 }

@@ -33,9 +33,9 @@ public class UserDeletedListener {
         Long userId = evt.userId();
         log.info("payment-service: UserDeletedEvent userId={}", userId);
 
+        int deletedPaymentItems = paymentItemRepository.deleteByUserId(userId);
         int deletedPayments = paymentRepository.deleteAllByUserId(userId);
         int deletedAccounts = userAccountRepository.deleteByUserId(userId);
-        int deletedPaymentItems = paymentItemRepository.deleteByUserId(userId);
 
         log.info(
                 "payment-service: deleted payments={}, user_account={}, items={} for userId={}",
