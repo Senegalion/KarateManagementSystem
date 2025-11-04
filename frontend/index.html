@@ -4,7 +4,48 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <title>Karate Management System</title>
+
+    <script>
+      (function () {
+        try {
+          const saved = localStorage.getItem("theme") || "system";
+          const mql = window.matchMedia("(prefers-color-scheme: dark)");
+          const isDark =
+            saved === "dark" || (saved === "system" && mql.matches);
+
+          document.documentElement.classList.toggle("dark", isDark);
+          document.documentElement.setAttribute("data-theme", saved);
+
+          const onSystemChange = function () {
+            const cur = localStorage.getItem("theme") || "system";
+            if (cur === "system") {
+              document.documentElement.classList.toggle("dark", mql.matches);
+              document.documentElement.setAttribute("data-theme", cur);
+              window.dispatchEvent(
+                new CustomEvent("themechange", { detail: { theme: cur } })
+              );
+            }
+          };
+          if (mql.addEventListener)
+            mql.addEventListener("change", onSystemChange);
+          else mql.addListener(onSystemChange);
+
+          window.addEventListener("storage", (e) => {
+            if (e.key === "theme") {
+              const next = e.newValue || "system";
+              const dark =
+                next === "dark" || (next === "system" && mql.matches);
+              document.documentElement.classList.toggle("dark", dark);
+              document.documentElement.setAttribute("data-theme", next);
+              window.dispatchEvent(
+                new CustomEvent("themechange", { detail: { theme: next } })
+              );
+            }
+          });
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

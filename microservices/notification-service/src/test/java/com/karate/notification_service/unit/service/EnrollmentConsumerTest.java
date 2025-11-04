@@ -1,7 +1,6 @@
 package com.karate.notification_service.unit.service;
 
 import com.karate.notification_service.infrastructure.email.EmailService;
-import com.karate.notification_service.infrastructure.messaging.EnrollmentConsumer;
 import com.karate.notification_service.infrastructure.messaging.dto.EnrollmentEvent;
 import org.junit.jupiter.api.Test;
 

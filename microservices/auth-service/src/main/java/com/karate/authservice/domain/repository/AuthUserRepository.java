@@ -13,4 +13,6 @@ public interface AuthUserRepository extends JpaRepository<AuthUserEntity, Long> 
     Optional<AuthUserEntity> getUserByUsername(String username);
 
     Optional<AuthUserEntity> findByUserId(Long userId);
+
+    void deleteByUserId(Long userId);
 }
