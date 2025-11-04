@@ -7,6 +7,7 @@ import com.paypal.orders.LinkDescription;
 import com.paypal.orders.Order;
 import com.paypal.orders.OrdersCreateRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PayPalClient {
@@ -63,10 +65,22 @@ public class PayPalClient {
                 .POST(HttpRequest.BodyPublishers.ofString("{}"))
                 .build();
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() == 201) {
-            // status==COMPLETED → zapłacone
-            return response.body().contains("\"status\":\"COMPLETED\"");
+        int sc = response.statusCode();
+        String body = response.body();
+
+        if (sc == 201 && body != null && body.contains("\"status\":\"COMPLETED\"")) {
+            return true;
         }
+
+        if (sc == 422 && body != null && body.contains("ORDER_ALREADY_CAPTURED")) {
+            return true;
+        }
+
+        if (sc == 200 && body != null && body.contains("\"status\":\"COMPLETED\"")) {
+            return true;
+        }
+
+        log.warn("PayPal capture non-success status={} body={}", sc, body);
         return false;
     }
 }
