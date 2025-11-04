@@ -222,8 +222,8 @@ Currently running Docker containers related to the project:
 
 ## 🛠️ Technologies
 
-- **Backend:** Java, Spring Boot, Spring Security, Spring Data JPA
-- **Database:** PostgreSQL, Flyway
+- **Backend:** Java, Kotlin, Spring Boot, Spring Cloud, Spring Security, Spring Data JPA
+- **Database:** PostgreSQL, Redis, Flyway
 - **Payments:** PayPal API (Sandbox mode)
 - **Email Handling:** Spring Mail, GreenMail (for testing)
 - **Testing:** JUnit, Awaitility, Testcontainers
@@ -233,7 +233,6 @@ Currently running Docker containers related to the project:
 ### 1️⃣ Requirements
 
 - Java 17+
-- Gradle
 - Docker
 
 ### 2️⃣ Configuration
