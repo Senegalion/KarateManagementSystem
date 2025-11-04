@@ -91,7 +91,110 @@ Below is a screenshot of the **Eureka Dashboard** with multiple registered insta
 
 ![Eureka Service Registry](https://github.com/user-attachments/assets/9f8fe226-09d0-4443-90a0-290f1bac4c4f)
 
+---
 
+### ⚡ Asynchronous Communication with Apache Kafka
+
+The **Karate Management System** uses **Apache Kafka** as an asynchronous message broker that enables event-driven communication between microservices.  
+Instead of using direct REST calls, the services publish and consume **domain events**, which allows for loose coupling, scalability, and fault tolerance.
+
+Kafka ensures that services can operate independently — for example, the `user-service` can emit events without waiting for the `notification-service` or `payment-service` to respond in real time.
+
+#### 🔄 Event-Driven Flow Overview
+
+1. **User Registration Event**  
+   When a new user registers, the `user-service` publishes a `USER_REGISTERED` event to the Kafka topic `user-events`.  
+   The `notification-service` consumes this event and sends a **welcome email** to the newly registered user.
+
+2. **User Deletion Event**  
+   When a user account is deleted, the `user-service` emits a `USER_DELETED` event to the topic `user.deleted`.  
+   The `payment-service` consumes this event and automatically removes all related payment records and user snapshots.
+
+3. **Training Enrollment Event**  
+   When a user enrolls in a training session, the `enrollment-service` publishes an `ENROLLMENT_CREATED` event.  
+   The `notification-service` listens to this topic and sends a **confirmation email** containing training details.
+
+4. **Feedback Event**  
+   After each training, a `FEEDBACK_CREATED` event is produced by the `feedback-service`.  
+   This triggers the `notification-service` to send a **thank-you email** confirming that the feedback has been received.
+
+5. **Payment Received Event**  
+   When the `payment-service` captures a PayPal transaction, it publishes a `PAYMENT_RECEIVED` event.  
+   The `notification-service` reacts to this event by sending a **payment confirmation email** to the user.
+
+#### 🧩 Kafka Topics
+
+| Topic name | Producer Service | Consumer Service(s) | Event Type | Description |
+|-------------|------------------|----------------------|-------------|--------------|
+| `user-events` | user-service | notification-service | `USER_REGISTERED` | Triggered when a new user is registered |
+| `user.deleted` | user-service | payment-service | `USER_DELETED` | Removes user-related data from payment DB |
+| `training.enrollment` | enrollment-service | notification-service | `ENROLLMENT_CREATED` | Confirms user’s training enrollment |
+| `feedback.events` | feedback-service | notification-service | `FEEDBACK_CREATED` | Sends a thank-you message for feedback |
+| `payment.events` | payment-service | notification-service | `PAYMENT_RECEIVED` | Confirms successful PayPal payment |
+
+#### 📬 Email Notification System (Kafka-driven)
+
+The **notification-service** acts as a central Kafka consumer responsible for processing domain events and generating email messages.  
+It uses **Spring Kafka** and **HTML templates** to render multilingual email content.
+
+Emails are sent automatically in response to specific Kafka events:
+
+| Event | Triggering Service | Email Type |
+|--------|-------------------|-------------|
+| `USER_REGISTERED` | user-service | Welcome email |
+| `ENROLLMENT_CREATED` | enrollment-service | Enrollment confirmation |
+| `FEEDBACK_CREATED` | feedback-service | Thank-you email |
+| `PAYMENT_RECEIVED` | payment-service | Payment confirmation |
+
+This approach makes the system **reactive and scalable** — adding a new type of notification only requires publishing a new event type, without modifying existing services.
+
+#### ⚙️ Example (User Registration Event)
+```java
+// user-service
+publisher.publishUserRegistered(
+    new UserRegisteredEvent(
+        UUID.randomUUID().toString(),
+        "USER_REGISTERED",
+        Instant.now(),
+        new UserRegisteredEvent.Payload(
+            user.getId(),
+            user.getEmail(),
+            user.getUsername(),
+            user.getClubId(),
+            user.getClubName(),
+            user.getKarateRank(),
+            user.getRegistrationDate()
+        )
+    )
+);
+```
+
+```java
+// notification-service
+@KafkaListener(topics = "user-events", groupId = "notification-service")
+public void onUserRegistered(UserRegisteredEvent event) {
+    String to = event.getPayload().getUserEmail();
+    String body = template.render("email/user-registered.html", Map.of(
+        "username", event.getPayload().getUsername(),
+        "clubName", event.getPayload().getClubName()
+    ));
+    emailService.sendHtml(to, "Welcome to Karate Management System", body);
+}
+```
+
+### ✅ Advantages of Kafka in this System
+
+- `Decoupled architecture`: services do not depend on synchronous HTTP calls.
+- `Resilience`: temporary downtime of one service doesn’t affect others.
+- `Scalability`: new consumers can subscribe to existing events easily.
+- `Extensibility`: adding new event types doesn’t require refactoring existing code.
+- `Auditability`: all domain events can be stored and replayed for debugging or analytics.
+
+### 🧠 Summary
+
+Using Apache Kafka allows the Karate Management System to implement a robust event-driven architecture.
+This ensures reliable asynchronous communication between microservices such as user-service, payment-service, and notification-service.
+The result is a scalable, fault-tolerant, and modern web application capable of automating communication and enhancing user experience.
 
 ---
 
