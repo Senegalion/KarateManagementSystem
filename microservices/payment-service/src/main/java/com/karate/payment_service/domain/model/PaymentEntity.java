@@ -21,6 +21,9 @@ public class PaymentEntity {
     @Column(name = "payment_id")
     private Long paymentId;
 
+    @Version
+    private Integer version;
+
     @Column(name = "user_id", nullable = false)
     private Long userId;
 

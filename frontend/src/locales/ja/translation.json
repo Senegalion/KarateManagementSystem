@@ -199,5 +199,7 @@
   "manualPaymentOk": "手動支払いを保存しました",
   "manualPaymentFailed": "手動支払いの保存に失敗しました",
   "noPaymentsYet": "まだ支払いはありません",
-  "date": "日付"
+  "date": "日付",
+  "goToPayments": "支払いに進む",
+  "goToDashboard": "ダッシュボードに進む"
 }
