@@ -101,6 +101,20 @@ services:
       retries: 10
     restart: always
 
+  redis-user-db:
+    image: redis:7-alpine
+    command: [ "redis-server", "--appendonly", "yes" ]
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-user-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: always
+
   postgres:
     image: postgres:15
     restart: always
@@ -324,6 +338,7 @@ services:
 
 volumes:
   redis-club-data:
+  redis-user-data:
   postgres-data:
   postgres-user-data:
   postgres-club-data:
