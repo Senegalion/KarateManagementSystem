@@ -2,7 +2,10 @@ spring:
   application:
     name: club-service
   cache:
-    type: caffeine
+    type: redis
+    cache-names:
+      - clubById
+      - clubByName
   config:
     import: optional:configserver:http://localhost:8888
 #    import: optional:configserver:http://config-server:8888
@@ -12,3 +15,14 @@ spring:
     port: 5672
     username: guest
     password: guest
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          time-between-eviction-runs: 60s
