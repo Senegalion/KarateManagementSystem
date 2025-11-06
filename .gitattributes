@@ -2,3 +2,4 @@
 *.bat text eol=crlf
 *.jar binary
 *.html linguist-detectable=false
+*.html linguist-generated
