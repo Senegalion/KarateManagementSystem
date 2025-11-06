@@ -1,3 +1,15 @@
 /gradlew text eol=lf
 *.bat text eol=crlf
 *.jar binary
+
+frontend/** linguist-vendored
+
+**/src/main/resources/static/**     linguist-vendored
+**/src/main/resources/public/**     linguist-vendored
+**/src/main/resources/templates/**  linguist-detectable=false
+
+*.min.js     linguist-generated
+*.bundle.js  linguist-generated
+*.map        linguist-generated
+
+*.java       linguist-detectable=true
