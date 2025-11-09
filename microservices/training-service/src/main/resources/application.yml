@@ -2,7 +2,12 @@ spring:
   application:
     name: training-service
   cache:
-    type: caffeine
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6381
+      timeout: 2s
   config:
     import: optional:configserver:http://localhost:8888
 #    import: optional:configserver:http://config-server:8888

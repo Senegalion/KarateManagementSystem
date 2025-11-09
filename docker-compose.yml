@@ -115,6 +115,20 @@ services:
       retries: 10
     restart: always
 
+  redis-training-db:
+    image: redis:7-alpine
+    command: [ "redis-server", "--appendonly", "yes" ]
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis-training-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: always
+
   postgres:
     image: postgres:15
     restart: always
@@ -339,6 +353,7 @@ services:
 volumes:
   redis-club-data:
   redis-user-data:
+  redis-training-data:
   postgres-data:
   postgres-user-data:
   postgres-club-data:
