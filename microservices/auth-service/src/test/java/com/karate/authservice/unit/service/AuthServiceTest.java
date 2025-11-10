@@ -24,6 +24,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -89,7 +90,7 @@ class AuthServiceTest {
         when(roleRepository.findByName(RoleName.ROLE_USER)).thenReturn(Optional.of(roleUser));
         when(upstream.createUserAsync(any())).thenReturn(java.util.concurrent.CompletableFuture.completedFuture(777L));
         when(authUserRepository.save(any(AuthUserEntity.class))).thenReturn(savedAuth, linked);
-        when(upstream.getUserById(777L)).thenReturn(new UserInfoDto(777L, "j@ex.com", 21L, "KYU_9"));
+        when(upstream.getUserById(777L)).thenReturn(new UserInfoDto(777L, "j@ex.com", 21L, "KYU_9", LocalDate.now()));
 
         // when
         RegistrationResultDto res = service.register(req);
@@ -172,7 +173,7 @@ class AuthServiceTest {
                 .build();
 
         when(authUserRepository.findByUsername("john")).thenReturn(Optional.of(entity));
-        when(upstream.getUserById(777L)).thenReturn(new UserInfoDto(777L, "j@ex.com", 21L, "KYU_9"));
+        when(upstream.getUserById(777L)).thenReturn(new UserInfoDto(777L, "j@ex.com", 21L, "KYU_9", LocalDate.now()));
         when(upstream.getClubById(21L)).thenReturn(new KarateClubDto(21L, "TOKYO"));
 
         // when
