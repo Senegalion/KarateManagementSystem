@@ -12,16 +12,14 @@ spring:
         springCloudBusOutput:
           binder: rabbit
   config:
-    import: optional:configserver:http://localhost:8888
-#    import: optional:configserver:http://config-server:8888
+    import: optional:configserver:http://config-server:8888
   rabbitmq:
-    host: localhost
-#    host: rabbitmq
+    host: rabbitmq
     port: 5672
     username: guest
     password: guest
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
