@@ -1,7 +1,12 @@
 import axios from "axios";
 
+const baseURL =
+  (import.meta.env.VITE_API_BASE_URL &&
+    import.meta.env.VITE_API_BASE_URL.trim()) ||
+  "/api";
+
 export const API = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:9191",
+  baseURL,
   timeout: 15000,
   headers: { "Content-Type": "application/json" },
 });
@@ -22,7 +27,7 @@ API.interceptors.response.use(
     if (status === 401) {
       localStorage.removeItem("token");
       if (window.location.pathname !== "/login") {
-        window.location.href = "/login";
+        window.location.replace("/login");
       }
     }
     return Promise.reject(err);
