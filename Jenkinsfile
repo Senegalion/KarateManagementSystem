@@ -82,13 +82,13 @@ pipeline {
             sh """
               git config user.email '${GIT_EMAIL}'
               git config user.name  '${GIT_NAME}'
+              git reset --hard HEAD
+              git clean -fd
               git checkout dev
               git pull origin dev
               git checkout test || git checkout -b test
               git pull origin test || true
-              # merge bez fast-forward, commit z [skip ci] by nie nakręcać pętli
               git merge --no-ff dev -m 'ci: promote dev → test [skip ci]'
-              # push z tokenem
               REPO="\$(git config --get remote.origin.url | sed -E 's#(git@|https?://)github.com[:/](.*)#\\2#' | sed 's/.git\$//')"
               git push "https://x-access-token:${GH_TOKEN}@github.com/\${REPO}" HEAD:test
             """
