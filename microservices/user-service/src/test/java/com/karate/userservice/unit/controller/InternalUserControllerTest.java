@@ -17,6 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
+
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -64,7 +66,7 @@ class InternalUserControllerTest {
     @DisplayName("GET /internal/users/{id} returns user info")
     void get_internal_users_by_id_returns_info() throws Exception {
         // given
-        var dto = new UserInfoDto(1L, "u@ex.com", 9L, "KYU_10");
+        var dto = new UserInfoDto(1L, "u@ex.com", 9L, "KYU_10", LocalDate.now());
         when(userService.getUserById(1L)).thenReturn(dto);
 
         // when
