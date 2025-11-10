@@ -198,10 +198,57 @@ The result is a scalable, fault-tolerant, and modern web application capable of 
 
 ---
 
-### 🛠️ Jenkins CI/CD
+## 🛠️ Jenkins CI/CD
 
-This screenshot shows the Jenkins pipeline and build status:
-![Jenkins Screenshot](https://github.com/user-attachments/assets/a2b2e2a8-c8c6-4743-a84f-8009a4dc8181)
+**Jenkins** serves as the core of the Continuous Integration / Continuous Delivery (CI/CD) process for the **Karate Management System**.  
+It fully automates the building, testing, and promotion of code changes across **development (dev)**, **quality assurance (test)**, and **production-ready (master)** environments.
+
+The pipeline is configured as a **Multibranch Pipeline**, which continuously monitors the repository and automatically triggers the process for incoming merges.
+
+---
+
+![Jenkins Screenshot](https://github.com/user-attachments/assets/a01eda72-1ccf-4338-a1dd-5848ea225e9c)
+
+
+## 🌳 Branching Strategy
+
+The project utilizes a simplified **GitFlow** approach to ensure a stable progression of code quality through controlled environments:
+
+- **Feature/Fix Branches:** Start from `dev`. They are merged into `dev` via Pull Requests (PRs).  
+- **`dev` (Development/Staging):** The initial integration environment. Successful tests automatically promote the code to `test`.  
+- **`test` (Quality Assurance/E2E):** The dedicated QA environment where the full suite of tests (including integration/E2E) is executed. Successful completion automatically promotes the code to `master`.  
+- **`master` (Production-Ready):** The stable branch that reflects the production state.
+
+---
+
+## ⚙️ Pipeline Stages (Jenkinsfile)
+
+The pipeline logic, defined in the **declarative Jenkinsfile**, is **conditional**, ensuring only necessary steps are executed based on the branch and detected changes:
+
+| **Stage** | **Trigger Condition** | **Function** |
+|------------|----------------------|---------------|
+| **Detect changed services** | Always | Uses `ci/changed-services.sh` to identify modified microservices for focused, faster builds. |
+| **Unit tests (changed)** | Branch `dev` & changes detected | Runs parallel unit tests only on affected microservices. |
+| **Build & push images (changed)** | Branch `dev` & changes detected | Builds and pushes Docker images only for updated services. |
+| **Promote dev → test** | Branch `dev` | Automatic merge using secured `github-token`. |
+| **Full test suite on test** | Branch `test` | Executes full test suite across all microservices (unit + integration). |
+| **Promote test → master** | Branch `test` | Automatic merge from `test` into `master` after successful tests. |
+| **Master: build & push all images** | Branch `master` *(Currently Disabled)* | Reserved for production image tagging and deployment. |
+
+---
+
+## 🔑 Security & Credentials
+
+Sensitive operations are securely managed using **Jenkins Credentials**:
+
+- **`github-token` (Secret Text):** Used for authenticated Git operations (dev → test and test → master promotions).  
+- **`docker-registry` (Username/Password):** Used to log into Docker Registry (`docker.io`) and push built images.
+
+---
+
+## 🟢 Status
+
+The **CI/CD pipeline** is fully functional — all primary branches are **Green** — providing a **robust, automated, and reliable** delivery process from development commit to production-ready code.
 
 ---
 

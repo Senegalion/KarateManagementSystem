@@ -29,6 +29,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "9191:9191"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
     depends_on:
       - service-registry
     restart: always
@@ -262,6 +264,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      SPRING_CACHE_TYPE: redis
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
     depends_on:
       - postgres-user-db
       - rabbitmq
