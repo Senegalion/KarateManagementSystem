@@ -14,6 +14,7 @@ import com.karate.userservice.domain.service.UpstreamGateway;
 import com.karate.userservice.domain.service.UserService;
 import com.karate.userservice.infrastructure.client.dto.AuthUserDto;
 import com.karate.userservice.infrastructure.client.dto.KarateClubDto;
+import com.karate.userservice.infrastructure.messaging.UserEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,8 @@ class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     private UpstreamGateway upstream;
+    @Mock
+    private UserEventPublisher userEventPublisher;
     @InjectMocks
     private UserService service;
 
@@ -387,20 +390,24 @@ class UserServiceTest {
 
     // ---------------- deleteCurrentUser ----------------
     @Test
-    @DisplayName("deleteCurrentUser deletes user from DB and calls upstream")
-    void delete_current_user_deletes_user_and_calls_upstream() {
+    @DisplayName("deleteCurrentUser deletes user from DB and publishes event")
+    void delete_current_user_deletes_user_and_publishes_event() {
         // given
         when(upstream.getAuthUserByUsername("john"))
                 .thenReturn(new AuthUserDto(77L, "john", Set.of("ROLE_USER")));
         var ent = user(77L, "x@x", 1L, KarateRank.KYU_10);
         when(userRepository.findById(77L)).thenReturn(Optional.of(ent));
+        doNothing().when(userEventPublisher).publishUserDeleted(77L);
 
         // when
         service.deleteCurrentUser("john");
 
         // then
         verify(userRepository).delete(ent);
-        verify(upstream).deleteUser(77L);
+        verify(userEventPublisher).publishUserDeleted(77L);
+
+        verify(upstream).getAuthUserByUsername("john");
+        verifyNoMoreInteractions(upstream);
     }
 
     @Test
@@ -417,6 +424,7 @@ class UserServiceTest {
                 .hasMessage(UserService.USER_NOT_FOUND);
         verify(userRepository, never()).delete(any());
         verify(upstream, never()).deleteUser(anyLong());
+        verify(userEventPublisher, never()).publishUserDeleted(anyLong());
     }
 
     // --- extra assertions for getUsersFromClubByName mapping ---

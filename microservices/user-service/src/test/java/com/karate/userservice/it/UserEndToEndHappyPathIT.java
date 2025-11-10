@@ -1,17 +1,13 @@
 package com.karate.userservice.it;
 
-import com.karate.userservice.api.dto.AddressRequestDto;
-import com.karate.userservice.api.dto.NewUserRequestDto;
-import com.karate.userservice.api.dto.UpdateUserRequestDto;
-import com.karate.userservice.api.dto.UserFromClubDto;
-import com.karate.userservice.api.dto.UserInfoDto;
-import com.karate.userservice.api.dto.UserInformationDto;
+import com.karate.userservice.api.dto.*;
 import com.karate.userservice.domain.model.KarateRank;
 import com.karate.userservice.domain.model.dto.AddressDto;
 import com.karate.userservice.domain.repository.UserRepository;
 import com.karate.userservice.domain.service.UpstreamGateway;
 import com.karate.userservice.infrastructure.client.dto.AuthUserDto;
 import com.karate.userservice.infrastructure.client.dto.KarateClubDto;
+import com.karate.userservice.infrastructure.messaging.UserEventPublisher;
 import com.karate.userservice.it.config.BaseIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +33,9 @@ class UserEndToEndHappyPathIT extends BaseIntegrationTest {
 
     @MockitoBean
     private UpstreamGateway upstream;
+
+    @MockitoBean
+    private UserEventPublisher userEventPublisher;
 
     @Test
     @DisplayName("End-to-end: create -> get by id -> me -> put -> patch -> by-club -> delete")
@@ -180,22 +179,19 @@ class UserEndToEndHappyPathIT extends BaseIntegrationTest {
         // ---------------------------------------------------------
         // 7) DELETE /users/me — user deletes himself
         // ---------------------------------------------------------
-        when(upstream.deleteUser(userId))
-                .thenReturn(CompletableFuture.completedFuture(null));
+        doNothing().when(userEventPublisher).publishUserDeleted(userId);
 
         asJohn.delete()
                 .uri("/users/me")
                 .exchange()
                 .expectStatus().isNoContent();
 
-        verify(upstream).deleteUser(userId);
-        assertThat(userRepository.findById(userId)).isEmpty();
+        verify(userEventPublisher).publishUserDeleted(userId);
+        verifyNoMoreInteractions(userEventPublisher);
 
-        // Optional follow-up: depends on your @ControllerAdvice mapping.
-        // If you map "user not found" to 404, swap to .isNotFound().
-        asJohn.get()
-                .uri("/users/me")
-                .exchange()
-                .expectStatus().isNotFound();
+        verify(upstream, atLeastOnce()).getAuthUserByUsername("john");
+        verify(upstream, never()).deleteUser(anyLong());
+
+        assertThat(userRepository.findById(userId)).isEmpty();
     }
 }
