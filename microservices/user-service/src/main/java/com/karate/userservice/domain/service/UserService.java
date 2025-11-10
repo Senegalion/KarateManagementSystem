@@ -10,6 +10,8 @@ import com.karate.userservice.infrastructure.client.dto.AuthUserDto;
 import com.karate.userservice.infrastructure.messaging.UserEventPublisher;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ public class UserService {
     private final UserEventPublisher userEventPublisher;
 
     @Transactional
+    @Cacheable(cacheNames = "usersByClubName", key = "#clubName.toUpperCase()")
     public List<UserFromClubDto> getUsersFromClubByName(String clubName) {
         long t0 = System.currentTimeMillis();
         var clubDto = upstream.getClubByName(clubName);
@@ -52,6 +55,13 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(
+            value = {
+                    "currentUserInfo", "userInfoById", "userClubIdByUsername",
+                    "userExists", "userPayloadById", "usersByClubName"
+            },
+            allEntries = true
+    )
     public Long createUser(NewUserRequestDto dto) {
         log.info("Create user userId={} email={} clubId={}", dto.userId(), dto.email(), dto.karateClubId());
         AddressEntity address = AddressEntity.builder()
@@ -79,6 +89,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "userInfoById", key = "#userId")
     public UserInfoDto getUserById(Long userId) {
         log.debug("getUserById userId={}", userId);
         var user = userRepository.findById(userId)
@@ -94,6 +105,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "currentUserInfo", key = "#username")
     public UserInformationDto getCurrentUserInfo(String username) {
         log.info("Get current user info username={}", username);
         long t0 = System.currentTimeMillis();
@@ -116,6 +128,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "userClubIdByUsername", key = "#username")
     public Long getCurrentUserClubIdByUsername(String username) {
         log.debug("getCurrentUserClubIdByUsername username={}", username);
         AuthUserDto authUser = upstream.getAuthUserByUsername(username);
@@ -124,6 +137,7 @@ public class UserService {
                 .getKarateClubId();
     }
 
+    @Cacheable(cacheNames = "userExists", key = "#userId")
     public Boolean checkUserExists(Long userId) {
         boolean exists = userRepository.existsById(userId);
         log.debug("checkUserExists userId={} -> {}", userId, exists);
@@ -131,6 +145,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "userPayloadById", key = "#userId")
     public UserPayload getUser(Long userId) {
         log.debug("getUser payload userId={}", userId);
         var user = userRepository.findById(userId)
@@ -146,6 +161,13 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(
+            value = {
+                    "currentUserInfo", "userInfoById", "userClubIdByUsername",
+                    "userExists", "userPayloadById", "usersByClubName"
+            },
+            allEntries = true
+    )
     public void updateCurrentUser(String username, UpdateUserRequestDto dto) {
         log.info("Update current user username={} newUsername={} newEmail={}",
                 username, dto.username(), dto.email());
@@ -165,6 +187,13 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(
+            value = {
+                    "currentUserInfo", "userInfoById", "userClubIdByUsername",
+                    "userExists", "userPayloadById", "usersByClubName"
+            },
+            allEntries = true
+    )
     public void patchCurrentUser(String username, UpdateUserRequestDto dto) {
         log.info("Patch current user username={}", username);
         var authUser = upstream.getAuthUserByUsername(username);
@@ -185,6 +214,13 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(
+            value = {
+                    "currentUserInfo", "userInfoById", "userClubIdByUsername",
+                    "userExists", "userPayloadById", "usersByClubName"
+            },
+            allEntries = true
+    )
     public void deleteCurrentUser(String username) {
         log.info("Delete current user username={}", username);
         var authUser = upstream.getAuthUserByUsername(username);

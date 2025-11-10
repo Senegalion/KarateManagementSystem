@@ -10,6 +10,7 @@ import io.github.resilience4j.retry.annotation.Retry;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -24,6 +25,7 @@ public class UpstreamGateway {
     private final KarateClubClient clubClient;
 
     // --- auth-service ---
+    @Cacheable(cacheNames = "authUserById", key = "#userId")
     @CircuitBreaker(name = "authService", fallbackMethod = "getAuthUserByUserIdFallback")
     @Retry(name = "authService")
     public AuthUserDto getAuthUserByUserId(Long userId) {
@@ -35,6 +37,7 @@ public class UpstreamGateway {
         throw new UpstreamUnavailableException("auth-service unavailable", ex);
     }
 
+    @Cacheable(cacheNames = "authUserByUsername", key = "#username")
     @CircuitBreaker(name = "authService", fallbackMethod = "getAuthUserByUsernameFallback")
     @Retry(name = "authService")
     public AuthUserDto getAuthUserByUsername(String username) {
@@ -82,6 +85,7 @@ public class UpstreamGateway {
     }
 
     // --- club-service ---
+    @Cacheable(cacheNames = "clubByName_upstream", key = "#name.toUpperCase()")
     @CircuitBreaker(name = "clubService", fallbackMethod = "getClubByNameFallback")
     @Retry(name = "clubService")
     public KarateClubDto getClubByName(String name) {
@@ -93,6 +97,7 @@ public class UpstreamGateway {
         throw new UpstreamUnavailableException("club-service unavailable", ex);
     }
 
+    @Cacheable(cacheNames = "clubById_upstream", key = "#id")
     @CircuitBreaker(name = "clubService", fallbackMethod = "getClubByIdFallback")
     @Retry(name = "clubService")
     public KarateClubDto getClubById(Long id) {
