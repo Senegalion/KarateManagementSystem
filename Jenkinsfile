@@ -101,16 +101,15 @@ pipeline {
       when { branch 'test' }
       steps {
         sh """
-          # rootowy gradle, jeśli masz; jeśli nie – odpalimy wszystkie serwisy po kolei
           if [ -f ./gradlew ]; then
             chmod +x ./gradlew
             ./gradlew --no-daemon clean test
-            # ./gradlew integrationTest || true   # odkomentuj jeśli istnieje task
+            # ./gradlew integrationTest || true
           else
             echo "Root gradle not found – running per service"
             for d in ${MICRO_ROOT}/*-service ; do
-              [ -d "$d" ] || continue
-              (cd "$d" && chmod +x ./gradlew || true && ./gradlew --no-daemon clean test || exit 1)
+              [ -d "\$d" ] || continue
+              (cd "\$d" && chmod +x ./gradlew || true && ./gradlew --no-daemon clean test || exit 1)
             done
           fi
         """
@@ -139,7 +138,12 @@ pipeline {
     }
 
     stage('Master: build & push all images') {
-      when { branch 'master' }
+      when {
+          allOf {
+              branch 'master'
+              expression { return false }
+          }
+      }
       steps {
         script {
           withCredentials([usernamePassword(credentialsId: env.DOCKER_CRED, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
