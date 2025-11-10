@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.concurrent.CompletionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,7 +31,7 @@ class UpstreamGatewayTest {
     @Test
     void getUserById_success_returnsUserInfo() {
         // given
-        when(userClient.getUserById(10L)).thenReturn(new UserInfoDto(10L, "a@b", 21L, "KYU_9"));
+        when(userClient.getUserById(10L)).thenReturn(new UserInfoDto(10L, "a@b", 21L, "KYU_9", LocalDate.now()));
 
         // when
         var gw = new UpstreamGateway(userClient, clubClient);
