@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   # --- Infrastructure ---
 
@@ -87,6 +85,7 @@ services:
 #    ports: [ "3001:3000" ]
 #    depends_on: [ prometheus ]
 
+
   # --- Databases ---
 
   redis-club-db:
@@ -130,18 +129,6 @@ services:
       timeout: 3s
       retries: 10
     restart: always
-
-  postgres:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: karate_management
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
 
   postgres-user-db:
     image: postgres:15
@@ -227,30 +214,8 @@ services:
     volumes:
       - postgres-payment-data:/var/lib/postgresql/data
 
-  pgadmin:
-    image: dpage/pgadmin4
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "5050:80"
 
   # --- Microservices ---
-
-  modular-monolith:
-    build:
-      context: ./modular-monolith
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/karate_management
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-    depends_on:
-      - postgres
-    restart: always
 
   user-service:
     build:
@@ -267,18 +232,13 @@ services:
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
-      SPRING_RABBITMQ_PASSWORD:
-      SPRING_CACHE_TYPE: redis
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: 6379
-        # ...
+      SPRING_RABBITMQ_PASSWORD: guest
     depends_on:
       - postgres-user-db
       - kafka
       - rabbitmq
       - service-registry
       - config-server
-      - redis-user-db
     restart: always
 
   club-service:
@@ -294,8 +254,12 @@ services:
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
       SPRING_CACHE_TYPE: redis
-      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_HOST: redis-club-db
       SPRING_DATA_REDIS_PORT: 6379
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
     depends_on:
       - postgres-club-db
       - rabbitmq
@@ -304,12 +268,63 @@ services:
       - redis-club-db
     restart: always
 
+  auth-service:
+    build:
+      context: ./microservices/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth-db:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    depends_on:
+      - postgres-auth-db
+      - kafka
+      - rabbitmq
+      - service-registry
+      - config-server
+    restart: always
+
+  training-service:
+    build:
+      context: ./microservices/training-service
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-training-db:5432/training_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      SPRING_CACHE_TYPE: redis
+      SPRING_DATA_REDIS_HOST: redis-training-db
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    depends_on:
+      - postgres-training-db
+      - rabbitmq
+      - service-registry
+      - config-server
+      - redis-training-db
+    restart: always
+
   feedback-service:
     build:
       context: ./microservices/feedback-service
       dockerfile: Dockerfile
     ports:
-      - "8083:8083"
+      - "8085:8085"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-feedback-db:5432/feedback_db
       SPRING_DATASOURCE_USERNAME: postgres
@@ -318,6 +333,59 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
     depends_on:
       - postgres-feedback-db
+      - rabbitmq
+      - service-registry
+      - config-server
+    restart: always
+
+  enrollment-service:
+    build:
+      context: ./microservices/enrollment-service
+      dockerfile: Dockerfile
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-enrollment-db:5432/enrollment_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+    depends_on:
+      - postgres-enrollment-db
+      - rabbitmq
+      - service-registry
+      - config-server
+    restart: always
+
+  notification-service:
+    build:
+      context: ./microservices/notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "8087:8087"
+    environment:
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+    depends_on:
+      - rabbitmq
+      - service-registry
+      - config-server
+    restart: always
+
+  payment-service:
+    build:
+      context: ./microservices/payment-service
+      dockerfile: Dockerfile
+    ports:
+      - "8088:8088"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-payment-db:5432/payment_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+    depends_on:
+      - postgres-payment-db
       - rabbitmq
       - service-registry
       - config-server
@@ -332,8 +400,9 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - modular-monolith
+      - api-gateway
     restart: always
+
 
   # --- CI/CD Tools ---
 
