@@ -6,6 +6,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -15,6 +16,7 @@ public class UpstreamGateway {
 
     private final UserServiceClient userClient;
 
+    @Cacheable(cacheNames = "userClubIdByUsername_upstream", key = "#username")
     @CircuitBreaker(name = "userService", fallbackMethod = "getUserClubIdFallback")
     @Retry(name = "userService")
     public Long getUserClubId(String username) {

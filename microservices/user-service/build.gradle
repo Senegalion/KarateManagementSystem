@@ -60,6 +60,9 @@ dependencies {
     // --- Database driver ---
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'com.h2database:h2'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     // --- Lombok for boilerplate code reduction ---
     compileOnly 'org.projectlombok:lombok'

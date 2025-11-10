@@ -11,6 +11,9 @@ import com.karate.training_service.domain.repository.TrainingSessionRepository;
 import com.karate.training_service.infrastructure.persistence.mapper.TrainingSessionMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -24,16 +27,20 @@ import java.util.List;
 public class TrainingSessionService {
     private final TrainingSessionRepository trainingSessionRepository;
     private final UpstreamGateway upstream;
+    private final CacheManager cacheManager;
 
-    public List<TrainingSessionDto> getAllTrainingSessionsForCurrentUserClub() {
+    public Long currentUserClubId() {
         String username = getCurrentUsername();
-        long t0 = System.currentTimeMillis();
-        Long clubId = upstream.getUserClubId(username);
-        log.debug("user-service getUserClubId username='{}' -> clubId={} took={}ms",
-                username, clubId, System.currentTimeMillis() - t0);
+        return upstream.getUserClubId(username);
+    }
 
+    @Cacheable(cacheNames = "trainingsByClub", key = "#root.target.currentUserClubId()")
+    public List<TrainingSessionDto> getAllTrainingSessionsForCurrentUserClub() {
+        Long clubId = currentUserClubId();
+        long tDb = System.currentTimeMillis();
         List<TrainingSessionEntity> trainingSessions = trainingSessionRepository.findAllByClubId(clubId);
-        log.info("Fetched {} trainings for clubId={}", trainingSessions.size(), clubId);
+        log.info("Fetched {} trainings for clubId={} took={}ms",
+                trainingSessions.size(), clubId, System.currentTimeMillis() - tDb);
 
         return trainingSessions.stream()
                 .map(TrainingSessionMapper::mapToTrainingSessionDto)
@@ -45,16 +52,11 @@ public class TrainingSessionService {
         log.info("Create training startTime={} endTime={} desc='{}'",
                 dto.startTime(), dto.endTime(), dto.description());
 
-        if (dto.endTime().isBefore(dto.startTime()) || dto.endTime().isEqual(dto.startTime())) {
-            log.warn("Invalid time range: start={} end={}", dto.startTime(), dto.endTime());
+        if (!dto.endTime().isAfter(dto.startTime())) {
             throw new InvalidTrainingTimeRangeException("End time must be after start time");
         }
 
-        String username = getCurrentUsername();
-        long t0 = System.currentTimeMillis();
-        Long clubId = upstream.getUserClubId(username);
-        log.debug("Resolved clubId={} for username='{}' took={}ms",
-                clubId, username, System.currentTimeMillis() - t0);
+        Long clubId = currentUserClubId();
 
         TrainingSessionEntity trainingSession = new TrainingSessionEntity();
         trainingSession.setStartTime(dto.startTime());
@@ -62,45 +64,37 @@ public class TrainingSessionService {
         trainingSession.setDescription(dto.description());
         trainingSession.setClubId(clubId);
 
-        long tDb = System.currentTimeMillis();
         TrainingSessionEntity saved = trainingSessionRepository.save(trainingSession);
-        log.info("Training persisted trainingId={} took={}ms",
-                saved.getTrainingSessionId(), System.currentTimeMillis() - tDb);
+        TrainingSessionDto result = TrainingSessionMapper.mapToTrainingSessionDto(saved);
 
-        return TrainingSessionMapper.mapToTrainingSessionDto(saved);
+        // precyzyjne czyszczenie cache
+        evictTrainingsByClub(clubId);
+        evictTrainingById(saved.getTrainingSessionId());
+        evictTrainingExists(saved.getTrainingSessionId());
+
+        return result;
     }
 
     @Transactional
     public void deleteTrainingSession(Long trainingId) {
         log.info("Delete training trainingId={}", trainingId);
-        String username = getCurrentUsername();
-        Long clubId = upstream.getUserClubId(username);
+        Long userClubId = currentUserClubId();
 
         TrainingSessionEntity training = trainingSessionRepository.findById(trainingId)
-                .orElseThrow(() -> {
-                    log.warn("Training not found trainingId={}", trainingId);
-                    return new TrainingSessionNotFoundException("Training session not found");
-                });
+                .orElseThrow(() -> new TrainingSessionNotFoundException("Training session not found"));
 
-        if (!training.getClubId().equals(clubId)) {
-            log.warn("Club mismatch trainingId={} trainingClubId={} userClubId={}",
-                    trainingId, training.getClubId(), clubId);
+        if (!training.getClubId().equals(userClubId)) {
             throw new TrainingSessionClubMismatchException("You cannot delete a training from another club");
         }
 
         trainingSessionRepository.delete(training);
-        log.info("Delete training OK trainingId={}", trainingId);
+
+        evictTrainingById(trainingId);
+        evictTrainingExists(trainingId);
+        evictTrainingsByClub(userClubId);
     }
 
-    private String getCurrentUsername() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
-            log.error("No authenticated user found in SecurityContext");
-            throw new AuthenticationMissingException("No authenticated user found");
-        }
-        return authentication.getName();
-    }
-
+    @Cacheable(cacheNames = "trainingExists", key = "#trainingId")
     public Boolean checkTrainingExists(Long trainingId) {
         boolean exists = trainingSessionRepository.existsById(trainingId);
         log.debug("checkTrainingExists trainingId={} -> {}", trainingId, exists);
@@ -108,16 +102,37 @@ public class TrainingSessionService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "trainingById", key = "#trainingId")
     public TrainingSessionDto getTrainingById(Long trainingId) {
-        log.debug("getTrainingById trainingId={}", trainingId);
-        TrainingSessionEntity trainingSessionEntity = trainingSessionRepository.findById(trainingId)
-                .orElseThrow(() -> new RuntimeException("Training Session not found"));
+        TrainingSessionEntity e = trainingSessionRepository.findById(trainingId)
+                .orElseThrow(() -> new TrainingSessionNotFoundException("Training Session not found"));
 
         return new TrainingSessionDto(
-                trainingSessionEntity.getTrainingSessionId(),
-                trainingSessionEntity.getStartTime(),
-                trainingSessionEntity.getEndTime(),
-                trainingSessionEntity.getDescription()
+                e.getTrainingSessionId(),
+                e.getStartTime(),
+                e.getEndTime(),
+                e.getDescription()
         );
+    }
+
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) throw new AuthenticationMissingException("No authenticated user found");
+        return authentication.getName();
+    }
+
+    private void evictTrainingsByClub(Long clubId) {
+        Cache c = cacheManager.getCache("trainingsByClub");
+        if (c != null) c.evictIfPresent(clubId);
+    }
+
+    private void evictTrainingById(Long trainingId) {
+        Cache c = cacheManager.getCache("trainingById");
+        if (c != null) c.evictIfPresent(trainingId);
+    }
+
+    private void evictTrainingExists(Long trainingId) {
+        Cache c = cacheManager.getCache("trainingExists");
+        if (c != null) c.evictIfPresent(trainingId);
     }
 }
