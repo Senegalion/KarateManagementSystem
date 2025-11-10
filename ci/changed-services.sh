@@ -1,3 +1,4 @@
+#!/bin/bash
 set -euo pipefail
 
 MICRO_ROOT="${1:-microservices}"
