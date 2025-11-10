@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -56,7 +57,7 @@ class AuthControllerIT extends BaseIntegrationTest {
         ensureRole(RoleName.ROLE_USER);
         when(upstream.getClubByName("TOKYO")).thenReturn(new KarateClubDto(21L, "TOKYO"));
         when(upstream.createUserAsync(any())).thenReturn(CompletableFuture.completedFuture(777L));
-        when(upstream.getUserById(777L)).thenReturn(new UserInfoDto(777L, "j@ex.com", 21L, "KYU_9"));
+        when(upstream.getUserById(777L)).thenReturn(new UserInfoDto(777L, "j@ex.com", 21L, "KYU_9", LocalDate.now()));
 
         var req = RegisterUserDto.builder()
                 .username("john")
@@ -166,7 +167,7 @@ class AuthControllerIT extends BaseIntegrationTest {
                 .build();
         authUserRepository.saveAndFlush(user);
 
-        when(upstream.getUserById(555L)).thenReturn(new UserInfoDto(555L, "j@ex.com", 21L, "KYU_9"));
+        when(upstream.getUserById(555L)).thenReturn(new UserInfoDto(555L, "j@ex.com", 21L, "KYU_9", LocalDate.now()));
         when(upstream.getClubById(21L)).thenReturn(new KarateClubDto(21L, "TOKYO"));
         when(jwtAuthenticatorService.authenticateAndGenerateToken(any()))
                 .thenReturn(LoginResponseDto.builder().username("john").token("abc").build());
@@ -199,7 +200,7 @@ class AuthControllerIT extends BaseIntegrationTest {
                 .roleEntities(new HashSet<>(Set.of(role))).build();
         authUserRepository.saveAndFlush(user);
 
-        when(upstream.getUserById(777L)).thenReturn(new UserInfoDto(777L, "m@ex.com", 22L, "KYU_8"));
+        when(upstream.getUserById(777L)).thenReturn(new UserInfoDto(777L, "m@ex.com", 22L, "KYU_8", LocalDate.now()));
         when(upstream.getClubById(22L)).thenReturn(new KarateClubDto(22L, "OSAKA"));
 
         var req = TokenRequestDto.builder()
