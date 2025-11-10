@@ -2,7 +2,12 @@ spring:
   application:
     name: user-service
   cache:
-    type: caffeine
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6380
+      timeout: 2s
   cloud:
     stream:
       default-binder: kafka

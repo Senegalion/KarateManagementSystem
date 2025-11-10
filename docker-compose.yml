@@ -87,6 +87,48 @@ services:
 
   # --- Databases ---
 
+  redis-club-db:
+    image: redis:7-alpine
+    command: [ "redis-server", "--appendonly", "yes" ]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-club-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: always
+
+  redis-user-db:
+    image: redis:7-alpine
+    command: [ "redis-server", "--appendonly", "yes" ]
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-user-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: always
+
+  redis-training-db:
+    image: redis:7-alpine
+    command: [ "redis-server", "--appendonly", "yes" ]
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis-training-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: always
+
   postgres:
     image: postgres:15
     restart: always
@@ -239,11 +281,15 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      SPRING_CACHE_TYPE: redis
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
     depends_on:
       - postgres-club-db
       - rabbitmq
       - service-registry
       - config-server
+      - redis-club-db
     restart: always
 
   feedback-service:
@@ -305,6 +351,9 @@ services:
     restart: always
 
 volumes:
+  redis-club-data:
+  redis-user-data:
+  redis-training-data:
   postgres-data:
   postgres-user-data:
   postgres-club-data:

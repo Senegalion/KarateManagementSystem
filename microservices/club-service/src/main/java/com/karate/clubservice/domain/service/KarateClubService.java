@@ -8,6 +8,7 @@ import com.karate.clubservice.domain.model.dto.KarateClubDto;
 import com.karate.clubservice.domain.repository.KarateClubRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -18,6 +19,7 @@ import java.util.Arrays;
 public class KarateClubService {
     private final KarateClubRepository repository;
 
+    @Cacheable(cacheNames = "clubByName", key = "#name.toUpperCase()", unless = "#result == null")
     public KarateClubDto getByName(String name) {
         log.debug("Fetching club by name={}", name);
         KarateClubName clubName = parseClubName(name);
@@ -30,6 +32,7 @@ public class KarateClubService {
         return dto;
     }
 
+    @Cacheable(cacheNames = "clubById", key = "#id", unless = "#result == null")
     public KarateClubDto getById(Long id) {
         log.debug("Fetching club by id={}", id);
         KarateClubEntity entity = repository.findById(id)
