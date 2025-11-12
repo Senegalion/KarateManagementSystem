@@ -56,6 +56,7 @@ class FeedbackServiceTest {
         every { userClient.checkUserExists(1) } returns true
         every { trainingClient.checkTrainingExists(2) } returns true
         every { enrollmentClient.checkUserEnrolledInSession(1, 2) } returns true
+        every { repo.findByUserIdAndTrainingSessionId(1, 2) } returns Optional.empty()
         every { repo.save(any<FeedbackEntity>()) } answers {
             val e = it.invocation.args[0] as FeedbackEntity
             e.copy(feedbackId = 10L)
