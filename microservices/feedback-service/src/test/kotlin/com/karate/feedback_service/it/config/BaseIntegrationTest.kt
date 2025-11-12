@@ -1,10 +1,12 @@
 package com.karate.feedback_service.it.config
 
+import com.karate.feedback_service.FeedbackServiceApplication
 import com.karate.feedback_service.infrastructure.jwt.JwtAuthTokenFilter
 import com.karate.feedback_service.it.config.security.TestSecurityConfig
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -21,7 +23,17 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = ["spring.config.import="]
+    properties = [
+        "spring.config.import=",
+        "spring.main.web-application-type=reactive"
+    ],
+    classes = [FeedbackServiceApplication::class]
+)
+@EnableAutoConfiguration(
+    exclude = [
+        org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration::class,
+        org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration::class
+    ]
 )
 @AutoConfigureWebTestClient
 @Testcontainers

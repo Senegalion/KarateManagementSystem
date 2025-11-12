@@ -18,6 +18,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -37,6 +38,9 @@ class TrainingSessionServiceTest {
 
     @Mock
     UpstreamGateway upstream;
+
+    @Mock
+    CacheManager cacheManager;
 
     @InjectMocks
     TrainingSessionService service;
@@ -112,6 +116,7 @@ class TrainingSessionServiceTest {
         saved.setClubId(7L);
 
         when(repo.save(any(TrainingSessionEntity.class))).thenReturn(saved);
+        when(cacheManager.getCache(anyString())).thenReturn(mock(org.springframework.cache.Cache.class));
 
         // when
         TrainingSessionDto dto = service.createTrainingSession(in);
@@ -150,6 +155,7 @@ class TrainingSessionServiceTest {
         ent.setEndTime(LocalDateTime.now().plusHours(1));
         ent.setDescription("d");
         when(repo.findById(5L)).thenReturn(Optional.of(ent));
+        when(cacheManager.getCache(anyString())).thenReturn(mock(org.springframework.cache.Cache.class));
 
         // when
         service.deleteTrainingSession(5L);

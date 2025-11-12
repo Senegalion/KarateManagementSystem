@@ -38,6 +38,7 @@ public class AuthUserEntity implements UserDetails {
             joinColumns = {@JoinColumn(name = "auth_user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")}
     )
+    @Builder.Default
     private Set<RoleEntity> roleEntities = new HashSet<>();
 
     @Override

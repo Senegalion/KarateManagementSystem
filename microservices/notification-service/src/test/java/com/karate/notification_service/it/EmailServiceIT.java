@@ -3,28 +3,36 @@ package com.karate.notification_service.it;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import com.karate.notification_service.TestOverrides;
 import com.karate.notification_service.infrastructure.email.EmailService;
-import com.karate.notification_service.infrastructure.messaging.dto.EnrollmentDto;
-import com.karate.notification_service.infrastructure.messaging.dto.TrainingSessionDto;
-import com.karate.notification_service.infrastructure.messaging.dto.UserInfoDto;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.time.LocalDateTime;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(
-        properties = {
-                "spring.cloud.config.enabled=false",
-                "spring.cloud.bus.enabled=false",
-                "eureka.client.enabled=false",
-                "spring.kafka.listener.auto-startup=false"
-        }
-)
+@SpringBootTest(properties = {
+        "spring.cloud.config.enabled=false",
+        "spring.cloud.bus.enabled=false",
+        "eureka.client.enabled=false",
+        "spring.cloud.stream.enabled=false",
+        "spring.kafka.enabled=false",
+
+        "spring.mail.host=localhost",
+        "spring.mail.port=3025",
+        "spring.mail.username=defaultUsername",
+        "spring.mail.password=defaultPassword",
+        "spring.mail.properties.mail.smtp.auth=true",
+        "spring.mail.properties.mail.smtp.starttls.enable=false",
+
+        "app.mail.from=no-reply@karate.local",
+        "app.mail.fromName=Karate Management System"
+})
+@ActiveProfiles("test")
+@org.springframework.context.annotation.Import(TestOverrides.class)
 class EmailServiceIT {
 
     @RegisterExtension
@@ -41,20 +49,18 @@ class EmailServiceIT {
     @Test
     void sendEnrollmentNotification_sendsRealMail() throws Exception {
         // given
-        var dto = new EnrollmentDto(
-                1L,
-                new UserInfoDto(100L, "john@ex.com", 1L, "KYU_10"),
-                new TrainingSessionDto(
-                        200L,
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusHours(1),
-                        "Karate training"
-                ),
-                LocalDateTime.now()
-        );
+        String to = "john@ex.com";
+        String subject = "Training enrollment confirmation";
+        String html = """
+                <html><body>
+                  <p>Hello</p>
+                  <p>You have been enrolled in training: <b>Karate training</b></p>
+                </body></html>
+                """;
 
         // when
-//        emailService.sendEnrollmentNotification(dto);
+        emailService.sendHtml(to, subject, html);
+        greenMail.waitForIncomingEmail(1);
 
         // then
         MimeMessage[] messages = greenMail.getReceivedMessages();
@@ -67,4 +73,3 @@ class EmailServiceIT {
                 .contains("You have been enrolled in training");
     }
 }
-
