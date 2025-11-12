@@ -1,6 +1,39 @@
 spring:
+  application:
+    name: notification-service
+  cloud:
+    config:
+      enabled: false
+    bus:
+      enabled: false
   config:
-    activate.on-profile: test
+    import: ""
+  kafka:
+    bootstrap-servers: localhost:0
+    listener:
+      auto-startup: false
+  rabbitmq:
+    host: localhost
+    port: 0
+  mail:
+    host: localhost
+    port: 3025
+    username: defaultUsername
+    password: defaultPassword
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: false
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password:
+
+eureka:
+  client:
+    enabled: false
 
 management:
   tracing:
@@ -13,12 +46,3 @@ management:
 logging:
   level:
     root: INFO
-    com.karate:
-
-resilience4j:
-  circuitbreaker:
-    instances:
-      userService:
-        registerHealthIndicator: false
-        slidingWindowSize: 1000
-        failureRateThreshold: 100

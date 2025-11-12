@@ -22,3 +22,5 @@ resilience4j:
         registerHealthIndicator: false
         slidingWindowSize: 1000
         failureRateThreshold: 100
+
+
