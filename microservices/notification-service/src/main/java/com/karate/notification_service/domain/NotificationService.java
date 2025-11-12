@@ -25,11 +25,11 @@ public class NotificationService {
     private final TemplateRenderer tpl;
     private final MessageSource messages;
 
-    @Value("${app.web.dashboard-url:http://localhost:5173/app/dashboard}")
+    @Value("${app.web.dashboard-url}")
     private String dashboardUrl;
-    @Value("${app.web.preferences-url:http://localhost:5173/settings/notifications}")
+    @Value("${app.web.preferences-url}")
     private String preferencesUrl;
-    @Value("${app.web.privacy-url:http://localhost:5173/settings/security}")
+    @Value("${app.web.privacy-url}")
     private String privacyUrl;
 
     private static final ZoneId ZONE = ZoneId.of("Europe/Warsaw");

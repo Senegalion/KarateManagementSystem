@@ -1,110 +1,128 @@
 package com.karate.notification_service.unit.service;
 
+import com.karate.notification_service.infrastructure.email.EmailProperties;
 import com.karate.notification_service.infrastructure.email.EmailService;
-import com.karate.notification_service.infrastructure.messaging.dto.EnrollmentDto;
-import com.karate.notification_service.infrastructure.messaging.dto.TrainingSessionDto;
-import com.karate.notification_service.infrastructure.messaging.dto.UserInfoDto;
+import jakarta.mail.Address;
+import jakarta.mail.Message;
+import jakarta.mail.Session;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.mail.MailSendException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import java.time.LocalDateTime;
+import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class EmailServiceTest {
 
+    private static MimeMessage newMime() {
+        // działa bez realnego serwera SMTP
+        return new MimeMessage(Session.getInstance(new Properties()));
+    }
+
     @Test
-    void sendEnrollmentNotification_sendsProperMail() {
+    void sendHtml_sendsMimeWithConfiguredFromSubjectAndHtmlBody() throws Exception {
         // given
         JavaMailSender mailSender = mock(JavaMailSender.class);
-        EmailService emailService = new EmailService(mailSender);
-        var dto = new EnrollmentDto(
-                1L,
-                new UserInfoDto(100L, "john@ex.com", 1L, "KYU_10"),
-                new TrainingSessionDto(200L, LocalDateTime.now(), LocalDateTime.now().plusHours(1), "Karate training"),
-                LocalDateTime.now()
-        );
+        when(mailSender.createMimeMessage()).thenReturn(newMime());
+
+        EmailProperties props = new EmailProperties();
+        props.setFrom("noreply@ex.com");
+        props.setFromName("Karate HQ");
+
+        EmailService emailService = new EmailService(mailSender, props);
 
         // when
-        emailService.sendEnrollmentNotification(dto);
+        emailService.sendHtml("john@ex.com", "Hello", "<b>Siema</b> karate!");
 
         // then
-        ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+        ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
         verify(mailSender).send(captor.capture());
-        SimpleMailMessage sent = captor.getValue();
-        assertThat(sent.getTo()).containsExactly("john@ex.com");
-        assertThat(sent.getSubject()).isEqualTo("Training enrollment confirmation");
-        assertThat(sent.getText()).contains("Karate training");
+
+        MimeMessage sent = captor.getValue();
+
+        // TO
+        Address[] to = sent.getRecipients(Message.RecipientType.TO);
+        assertThat(to).hasSize(1);
+        assertThat(((InternetAddress) to[0]).getAddress()).isEqualTo("john@ex.com");
+
+        // FROM + personal name
+        InternetAddress from = (InternetAddress) sent.getFrom()[0];
+        assertThat(from.getAddress()).isEqualTo("noreply@ex.com");
+        assertThat(from.getPersonal()).isEqualTo("Karate HQ");
+
+        // SUBJECT
+        assertThat(sent.getSubject()).isEqualTo("Hello");
+
+        // BODY (HTML)
+        Object content = sent.getContent();
+        // MimeMessageHelper z html=true ustawia "text/html"
+        if (content instanceof String s) {
+            assertThat(s).contains("Siema").contains("</b>");
+        } else {
+            // awaryjnie (gdyby vendor złożył to w multipart)
+            String asString = content.toString();
+            assertThat(asString).contains("Siema");
+        }
+        assertThat(sent.getDataHandler().getContentType()).containsIgnoringCase("text/html");
     }
 
     @Test
-    void sendEnrollmentNotification_throws_whenMailSenderFails() {
+    void sendHtml_usesDefaultsWhenPropsMissing() throws Exception {
         // given
         JavaMailSender mailSender = mock(JavaMailSender.class);
-        doThrow(new MailSendException("boom")).when(mailSender).send(any(SimpleMailMessage.class));
-        EmailService emailService = new EmailService(mailSender);
-        var dto = new EnrollmentDto(
-                1L,
-                new UserInfoDto(100L, "john@ex.com", 1L, "KYU_10"),
-                new TrainingSessionDto(200L, LocalDateTime.now(), LocalDateTime.now().plusHours(1), "Karate training"),
-                LocalDateTime.now()
-        );
+        when(mailSender.createMimeMessage()).thenReturn(newMime());
 
-        // when + then
-        assertThrows(MailSendException.class, () -> emailService.sendEnrollmentNotification(dto));
-        verify(mailSender, times(1)).send(any(SimpleMailMessage.class));
-    }
+        // brak konfiguracji => null
+        EmailProperties props = new EmailProperties();
 
-    @Test
-    void sendEnrollmentNotification_skips_whenEmailMissing() {
-        // given
-        JavaMailSender mailSender = mock(JavaMailSender.class);
-        EmailService emailService = new EmailService(mailSender);
-        var dto = new EnrollmentDto(
-                1L,
-                new UserInfoDto(100L, null, 1L, "KYU_10"),
-                new TrainingSessionDto(200L, LocalDateTime.now(), LocalDateTime.now().plusHours(1), "Karate training"),
-                LocalDateTime.now()
-        );
+        EmailService emailService = new EmailService(mailSender, props);
 
         // when
-        emailService.sendEnrollmentNotification(dto);
+        emailService.sendHtml("a@b.com", "Subj", "<i>x</i>");
 
         // then
-        verify(mailSender, never()).send(any(SimpleMailMessage.class));
-    }
-
-    @Test
-    void sendEnrollmentNotification_containsGreetingAndDetails() {
-        // given
-        JavaMailSender mailSender = mock(JavaMailSender.class);
-        EmailService emailService = new EmailService(mailSender);
-        var now = LocalDateTime.of(2025, 9, 23, 8, 30);
-        var dto = new EnrollmentDto(
-                1L,
-                new UserInfoDto(100L, "john@ex.com", 1L, "KYU_10"),
-                new TrainingSessionDto(200L, now, now.plusHours(1), "Karate training"),
-                now
-        );
-
-        // when
-        emailService.sendEnrollmentNotification(dto);
-
-        // then
-        ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+        ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
         verify(mailSender).send(captor.capture());
-        var msg = captor.getValue();
-        assertThat(msg.getTo()).containsExactly("john@ex.com");
-        assertThat(msg.getSubject()).isEqualTo("Training enrollment confirmation");
-        assertThat(msg.getText())
-                .contains("Hello")
-                .contains("You have been enrolled")
-                .contains("Karate training")
-                .contains(now.toString());
+        InternetAddress from = (InternetAddress) captor.getValue().getFrom()[0];
+        assertThat(from.getAddress()).isEqualTo("no-reply@karate.local");
+        assertThat(from.getPersonal()).isEqualTo("Karate Management System");
+    }
+
+    @Test
+    void sendHtml_skipsWhenRecipientMissing() {
+        // given
+        JavaMailSender mailSender = mock(JavaMailSender.class);
+        EmailProperties props = new EmailProperties();
+        EmailService emailService = new EmailService(mailSender, props);
+
+        // when
+        emailService.sendHtml(null, "x", "<b>y</b>");
+        emailService.sendHtml("   ", "x", "<b>y</b>");
+
+        // then — nic nie powinno być tworzone ani wysyłane
+        verify(mailSender, never()).createMimeMessage();
+        verify(mailSender, never()).send(any(MimeMessage.class));
+    }
+
+    @Test
+    void sendHtml_swallowExceptionsAndLogInsteadOfThrowing() {
+        // given
+        JavaMailSender mailSender = mock(JavaMailSender.class);
+        MimeMessage mime = newMime();
+        when(mailSender.createMimeMessage()).thenReturn(mime);
+        doThrow(new RuntimeException("boom")).when(mailSender).send(any(MimeMessage.class));
+
+        EmailService emailService = new EmailService(mailSender, new EmailProperties());
+
+        // when — brak wyjątku mimo awarii wysyłki
+        emailService.sendHtml("john@ex.com", "S", "<b>B</b>");
+
+        // then
+        verify(mailSender).send(any(MimeMessage.class));
+        // brak asercji na logi — wystarczy, że nie poleci exception
     }
 }

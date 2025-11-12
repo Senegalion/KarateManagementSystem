@@ -1,6 +1,24 @@
 spring:
+  flyway:
+    enabled: false
+  test:
+    database:
+      replace: NONE
+  cloud:
+    config:
+      enabled: false
+    bus:
+      enabled: false
+  rabbitmq:
+    listener:
+      simple:
+        auto-startup: false
   config:
     activate.on-profile: test
+    import: ""
+eureka:
+  client:
+    enabled: false
 
 management:
   tracing:
