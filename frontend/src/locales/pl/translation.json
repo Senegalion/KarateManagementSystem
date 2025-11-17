@@ -204,5 +204,9 @@
   "noPaymentsYet": "Brak płatności",
   "date": "Data",
   "goToPayments": "Przejdź do płatności",
-  "goToDashboard": "Przejdź do panelu"
+  "goToDashboard": "Przejdź do panelu",
+  "paymentSuccess": "Płatność zakończona sukcesem",
+  "notificationSettings": "Ustawienia powiadomień",
+  "securitySettings": "Ustawienia bezpieczeństwa",
+  "appearanceSettings": "Ustawienia wyglądu"
 }
