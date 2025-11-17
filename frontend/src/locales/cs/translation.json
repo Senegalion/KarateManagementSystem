@@ -204,5 +204,9 @@
   "noPaymentsYet": "Zatím žádné platby",
   "date": "Datum",
   "goToPayments": "Přejít na platby",
-  "goToDashboard": "Přejít na panel"
+  "goToDashboard": "Přejít na panel",
+  "paymentSuccess": "Platba byla úspěšná",
+  "notificationSettings": "Nastavení oznámení",
+  "securitySettings": "Nastavení zabezpečení",
+  "appearanceSettings": "Nastavení vzhledu"
 }

@@ -4,6 +4,8 @@ import com.karate.userservice.api.dto.NewUserRequestDto;
 import com.karate.userservice.api.dto.UserInfoDto;
 import com.karate.userservice.api.dto.UserPayload;
 import com.karate.userservice.domain.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/internal/users")
+@Tag(name = "Internal - Users", description = "Internal API used by other microservices.")
 public class InternalUserController {
     private final UserService userService;
 
@@ -19,6 +22,7 @@ public class InternalUserController {
     }
 
     @PostMapping
+    @Operation(summary = "Create user (internal)")
     public ResponseEntity<Long> createUser(@RequestBody NewUserRequestDto request) {
         log.info("POST /internal/users userId(auth)={}", request.userId());
         long t0 = System.currentTimeMillis();
@@ -28,6 +32,7 @@ public class InternalUserController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get user by ID (internal)")
     public ResponseEntity<UserInfoDto> getUserById(@PathVariable("id") Long userId) {
         log.info("GET /internal/users/{} ", userId);
         long t0 = System.currentTimeMillis();
@@ -37,6 +42,7 @@ public class InternalUserController {
     }
 
     @GetMapping("/{username}/club-id")
+    @Operation(summary = "Get user club ID by username (internal)")
     public ResponseEntity<Long> getUserClubId(@PathVariable String username) {
         log.info("GET /internal/users/{}/club-id", username);
         long t0 = System.currentTimeMillis();
@@ -46,6 +52,7 @@ public class InternalUserController {
     }
 
     @GetMapping("/{userId}/exists")
+    @Operation(summary = "Check if user exists (internal)")
     public ResponseEntity<Boolean> checkUserExists(@PathVariable Long userId) {
         log.info("GET /internal/users/{}/exists", userId);
         boolean exists = userService.checkUserExists(userId);
@@ -54,6 +61,7 @@ public class InternalUserController {
     }
 
     @GetMapping("/payload/{id}")
+    @Operation(summary = "Get user payload for token (internal)")
     public ResponseEntity<UserPayload> getUser(@PathVariable("id") Long userId) {
         log.info("GET /internal/users/payload/{}", userId);
         long t0 = System.currentTimeMillis();

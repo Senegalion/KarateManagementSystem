@@ -6,6 +6,11 @@ import com.karate.authservice.api.dto.RegistrationResultDto;
 import com.karate.authservice.api.dto.TokenRequestDto;
 import com.karate.authservice.domain.service.AuthService;
 import com.karate.authservice.infrastructure.jwt.JwtAuthenticatorService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +26,31 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "Registration and login endpoints.")
 public class AuthRESTController {
     private final AuthService authService;
     private final JwtAuthenticatorService jwtAuthenticatorService;
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
+    @Operation(
+            summary = "Register new user",
+            description = "Registers a new user in the system and creates corresponding user and auth records.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    description = "User registration data",
+                    content = @Content(schema = @Schema(implementation = RegisterUserDto.class))
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "User successfully registered",
+                            content = @Content(schema = @Schema(implementation = RegistrationResultDto.class))
+                    ),
+                    @ApiResponse(responseCode = "400", description = "Validation error"),
+                    @ApiResponse(responseCode = "409", description = "User with given username already exists")
+            }
+    )
     public ResponseEntity<RegistrationResultDto> registerUser(@Valid @RequestBody RegisterUserDto registerUserDto) {
         long t0 = System.currentTimeMillis();
         String username = registerUserDto.username();
@@ -41,6 +65,24 @@ public class AuthRESTController {
     }
 
     @PostMapping("/login")
+    @Operation(
+            summary = "Authenticate and obtain JWT",
+            description = "Authenticates user with username, password and club, then returns JWT access token.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+
+                    description = "Login credentials",
+                    content = @Content(schema = @Schema(implementation = TokenRequestDto.class))
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Login successful",
+                            content = @Content(schema = @Schema(implementation = LoginResponseDto.class))
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Invalid credentials")
+            }
+    )
     public ResponseEntity<LoginResponseDto> authenticateAndGenerateToken(@Valid @RequestBody TokenRequestDto tokenRequestDto) {
         long t0 = System.currentTimeMillis();
         String username = tokenRequestDto.username();

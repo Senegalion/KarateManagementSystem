@@ -79,6 +79,9 @@ dependencies {
     implementation 'io.github.resilience4j:resilience4j-micrometer'
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 
+    // --- OPEN API Documentation ---
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
+
     // Circuit Breaker
     implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j'
 
