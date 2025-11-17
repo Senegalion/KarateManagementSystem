@@ -7,6 +7,15 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8761:8761"
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    mem_limit: 512m
     restart: always
 
   config-server:
@@ -16,9 +25,18 @@ services:
     ports:
       - "8888:8888"
     environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
     depends_on:
-      - service-registry
+      service-registry:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    mem_limit: 512m
     restart: always
 
   api-gateway:
@@ -28,9 +46,20 @@ services:
     ports:
       - "9191:9191"
     environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
     depends_on:
-      - service-registry
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9191/actuator/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    mem_limit: 512m
     restart: always
 
   rabbitmq:
@@ -42,6 +71,12 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    mem_limit: 256m
     restart: always
 
   zookeeper:
@@ -51,12 +86,14 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    mem_limit: 512m
     restart: always
 
   kafka:
     image: confluentinc/cp-kafka:7.4.0
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_started
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -65,6 +102,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
       - "9092:9092"
+    mem_limit: 768m
     restart: always
 
   zipkin:
@@ -72,19 +110,24 @@ services:
     container_name: zipkin
     ports:
       - "9411:9411"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9411/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    mem_limit: 256m
     restart: unless-stopped
 
-#  prometheus:
-#    image: prom/prometheus:latest
-#    ports: [ "9090:9090" ]
-#    volumes:
-#      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-#
-#  grafana:
-#    image: grafana/grafana:latest
-#    ports: [ "3001:3000" ]
-#    depends_on: [ prometheus ]
-
+  #  prometheus:
+  #    image: prom/prometheus:latest
+  #    ports: [ "9090:9090" ]
+  #    volumes:
+  #      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+  #
+  #  grafana:
+  #    image: grafana/grafana:latest
+  #    ports: [ "3001:3000" ]
+  #    depends_on: [ prometheus ]
 
   # --- Databases ---
 
@@ -141,6 +184,11 @@ services:
       - "5434:5432"
     volumes:
       - postgres-user-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d user_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   postgres-club-db:
     image: postgres:15
@@ -153,6 +201,11 @@ services:
       - "5435:5432"
     volumes:
       - postgres-club-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d club_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   postgres-feedback-db:
     image: postgres:15
@@ -165,6 +218,11 @@ services:
       - "5436:5432"
     volumes:
       - postgres-feedback-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d feedback_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   postgres-auth-db:
     image: postgres:15
@@ -177,6 +235,11 @@ services:
       - "5437:5432"
     volumes:
       - postgres-auth-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   postgres-training-db:
     image: postgres:15
@@ -189,6 +252,11 @@ services:
       - "5438:5432"
     volumes:
       - postgres-training-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d training_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   postgres-enrollment-db:
     image: postgres:15
@@ -201,6 +269,11 @@ services:
       - "5439:5432"
     volumes:
       - postgres-enrollment-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d enrollment_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   postgres-payment-db:
     image: postgres:15
@@ -213,7 +286,11 @@ services:
       - "5440:5432"
     volumes:
       - postgres-payment-data:/var/lib/postgresql/data
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d payment_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   # --- Microservices ---
 
@@ -224,6 +301,7 @@ services:
     ports:
       - "8081:8081"
     environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user-db:5432/user_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
@@ -234,11 +312,19 @@ services:
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
     depends_on:
-      - postgres-user-db
-      - kafka
-      - rabbitmq
-      - service-registry
-      - config-server
+      postgres-user-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    mem_limit: 512m
     restart: always
 
   club-service:
@@ -248,6 +334,7 @@ services:
     ports:
       - "8082:8082"
     environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-club-db:5432/club_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
@@ -261,11 +348,19 @@ services:
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
     depends_on:
-      - postgres-club-db
-      - rabbitmq
-      - service-registry
-      - config-server
-      - redis-club-db
+      postgres-club-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis-club-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    mem_limit: 512m
     restart: always
 
   auth-service:
@@ -275,6 +370,7 @@ services:
     ports:
       - "8083:8083"
     environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth-db:5432/auth_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
@@ -285,11 +381,19 @@ services:
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
     depends_on:
-      - postgres-auth-db
-      - kafka
-      - rabbitmq
-      - service-registry
-      - config-server
+      postgres-auth-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    mem_limit: 512m
     restart: always
 
   training-service:
@@ -299,6 +403,7 @@ services:
     ports:
       - "8084:8084"
     environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-training-db:5432/training_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
@@ -312,11 +417,21 @@ services:
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
     depends_on:
-      - postgres-training-db
-      - rabbitmq
-      - service-registry
-      - config-server
-      - redis-training-db
+      postgres-training-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      redis-training-db:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    mem_limit: 512m
     restart: always
 
   feedback-service:
@@ -326,16 +441,24 @@ services:
     ports:
       - "8085:8085"
     environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-feedback-db:5432/feedback_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
     depends_on:
-      - postgres-feedback-db
-      - rabbitmq
-      - service-registry
-      - config-server
+      postgres-feedback-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    mem_limit: 512m
     restart: always
 
   enrollment-service:
@@ -345,16 +468,26 @@ services:
     ports:
       - "8086:8086"
     environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-enrollment-db:5432/enrollment_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
     depends_on:
-      - postgres-enrollment-db
-      - rabbitmq
-      - service-registry
-      - config-server
+      postgres-enrollment-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    mem_limit: 512m
     restart: always
 
   notification-service:
@@ -364,12 +497,21 @@ services:
     ports:
       - "8087:8087"
     environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
     depends_on:
-      - rabbitmq
-      - service-registry
-      - config-server
+      kafka:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    mem_limit: 512m
     restart: always
 
   payment-service:
@@ -379,18 +521,27 @@ services:
     ports:
       - "8088:8088"
     environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-payment-db:5432/payment_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
     depends_on:
-      - postgres-payment-db
-      - rabbitmq
-      - service-registry
-      - config-server
+      postgres-payment-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    mem_limit: 512m
     restart: always
-
 
   # --- Frontend ---
 
@@ -401,9 +552,9 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - api-gateway
+      api-gateway:
+        condition: service_healthy
     restart: always
-
 
   # --- CI/CD Tools ---
 
@@ -417,6 +568,7 @@ services:
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+    mem_limit: 1g
     restart: always
 
   sonarqube:
@@ -430,6 +582,7 @@ services:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_logs:/opt/sonarqube/logs
       - sonarqube_extensions:/opt/sonarqube/extensions
+    mem_limit: 1g
     restart: always
 
 volumes:
