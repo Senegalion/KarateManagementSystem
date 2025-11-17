@@ -314,7 +314,7 @@ const TrainingCalendar = () => {
                             </button>
                           )}
 
-                          {isAdmin() && tr.id && (
+                          {isAdmin() && tr.id && !isPast && (
                             <button
                               className="px-3 py-1 text-sm rounded border border-red-300 text-red-700 hover:bg-red-50"
                               onClick={async (e) => {
