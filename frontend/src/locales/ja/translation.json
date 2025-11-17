@@ -204,5 +204,9 @@
   "noPaymentsYet": "まだ支払いはありません",
   "date": "日付",
   "goToPayments": "支払いに進む",
-  "goToDashboard": "ダッシュボードに進む"
+  "goToDashboard": "ダッシュボードに進む",
+  "paymentSuccess": "支払いが成功しました",
+  "notificationSettings": "通知設定",
+  "securitySettings": "セキュリティ設定",
+  "appearanceSettings": "外観設定"
 }

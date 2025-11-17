@@ -2,6 +2,9 @@ package com.karate.enrollment_service.api.controller.rest;
 
 import com.karate.enrollment_service.api.dto.EnrollmentDto;
 import com.karate.enrollment_service.domain.service.EnrollmentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +17,14 @@ import java.util.List;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/enrollments")
+@Tag(name = "Enrollments", description = "Enrollment of users into trainings.")
+@SecurityRequirement(name = "bearerAuth")
 public class EnrollmentRESTController {
 
     private final EnrollmentService enrollmentService;
 
     @PostMapping("/{userId}/{trainingId}")
+    @Operation(summary = "Enroll arbitrary user in training", description = "Admin-level operation.")
     public ResponseEntity<EnrollmentDto> enrollUser(
             @PathVariable Long userId,
             @PathVariable Long trainingId) {
@@ -31,6 +37,7 @@ public class EnrollmentRESTController {
     }
 
     @DeleteMapping("/{userId}/{trainingId}")
+    @Operation(summary = "Withdraw arbitrary user from training", description = "Admin-level operation.")
     public ResponseEntity<Void> withdrawUser(
             @PathVariable Long userId,
             @PathVariable Long trainingId) {
@@ -43,6 +50,7 @@ public class EnrollmentRESTController {
     }
 
     @GetMapping("/user/{userId}")
+    @Operation(summary = "Get enrollments for given user")
     public ResponseEntity<List<EnrollmentDto>> getUserEnrollments(@PathVariable Long userId) {
         log.info("GET /enrollments/user/{}", userId);
         return ResponseEntity.ok(
@@ -51,6 +59,7 @@ public class EnrollmentRESTController {
     }
 
     @GetMapping("/training/{trainingId}")
+    @Operation(summary = "Get enrollments for given training")
     public ResponseEntity<List<EnrollmentDto>> getTrainingEnrollments(@PathVariable Long trainingId) {
         log.info("GET /enrollments/training/{}", trainingId);
         return ResponseEntity.ok(
@@ -59,6 +68,7 @@ public class EnrollmentRESTController {
     }
 
     @GetMapping("/me")
+    @Operation(summary = "Get my enrollments", description = "Uses authenticated user from JWT.")
     public ResponseEntity<List<EnrollmentDto>> getMyEnrollments(Authentication auth) {
         long t0 = System.currentTimeMillis();
         Long userId = enrollmentService.resolveUserId(auth);
@@ -69,6 +79,7 @@ public class EnrollmentRESTController {
     }
 
     @PostMapping("/me/{trainingId}")
+    @Operation(summary = "Enroll myself into training")
     public ResponseEntity<EnrollmentDto> enrollMe(
             Authentication auth,
             @PathVariable Long trainingId) {
@@ -82,6 +93,7 @@ public class EnrollmentRESTController {
     }
 
     @DeleteMapping("/me/{trainingId}")
+    @Operation(summary = "Withdraw myself from training")
     public ResponseEntity<Void> withdrawMe(
             Authentication auth,
             @PathVariable Long trainingId) {

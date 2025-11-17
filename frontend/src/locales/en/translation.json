@@ -204,5 +204,9 @@
   "noPaymentsYet": "No payments yet",
   "date": "Date",
   "goToPayments": "Go to payments",
-  "goToDashboard": "Go to dashboard"
+  "goToDashboard": "Go to dashboard",
+  "paymentSuccess": "Payment successful",
+  "notificationSettings": "Notification settings",
+  "securitySettings": "Security settings",
+  "appearanceSettings": "Appearance settings"
 }
