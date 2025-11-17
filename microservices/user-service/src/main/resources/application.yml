@@ -17,7 +17,7 @@ spring:
         springCloudBusOutput:
           binder: rabbit
   config:
-      import: optional:configserver:http://config-server:8888
+    import: optional:configserver:http://config-server:8888
   rabbitmq:
     host: rabbitmq
     port: 5672

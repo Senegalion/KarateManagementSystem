@@ -8,6 +8,8 @@ import com.karate.training_service.domain.exception.TrainingSessionClubMismatchE
 import com.karate.training_service.domain.exception.TrainingSessionNotFoundException;
 import com.karate.training_service.domain.model.TrainingSessionEntity;
 import com.karate.training_service.domain.repository.TrainingSessionRepository;
+import com.karate.training_service.infrastructure.messaging.TrainingEventProducer;
+import com.karate.training_service.infrastructure.messaging.event.TrainingDeletedEvent;
 import com.karate.training_service.infrastructure.persistence.mapper.TrainingSessionMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +21,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -28,6 +32,7 @@ public class TrainingSessionService {
     private final TrainingSessionRepository trainingSessionRepository;
     private final UpstreamGateway upstream;
     private final CacheManager cacheManager;
+    private final TrainingEventProducer trainingEventProducer;
 
     public Long currentUserClubId() {
         String username = getCurrentUsername();
@@ -84,14 +89,29 @@ public class TrainingSessionService {
                 .orElseThrow(() -> new TrainingSessionNotFoundException("Training session not found"));
 
         if (!training.getClubId().equals(userClubId)) {
+            log.warn("Club mismatch trainingId={} trainingClubId={} userClubId={}", trainingId, training.getClubId(), userClubId);
             throw new TrainingSessionClubMismatchException("You cannot delete a training from another club");
         }
 
+        Long clubId = training.getClubId();
+
         trainingSessionRepository.delete(training);
+        log.info("Training deleted trainingId={} clubId={}", trainingId, clubId);
+
+        TrainingDeletedEvent event = new TrainingDeletedEvent(
+                UUID.randomUUID().toString(),
+                "TrainingDeleted",
+                Instant.now(),
+                trainingId,
+                clubId
+        );
+        trainingEventProducer.sendTrainingDeletedEvent(event);
 
         evictTrainingById(trainingId);
         evictTrainingExists(trainingId);
         evictTrainingsByClub(userClubId);
+
+        log.info("Delete training OK trainingId={}", trainingId);
     }
 
     @Cacheable(cacheNames = "trainingExists", key = "#trainingId")

@@ -313,6 +313,27 @@ const TrainingCalendar = () => {
                               {t("viewParticipants")}
                             </button>
                           )}
+
+                          {isAdmin() && tr.id && (
+                            <button
+                              className="px-3 py-1 text-sm rounded border border-red-300 text-red-700 hover:bg-red-50"
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                if (!confirm(t("areYouSureToDelete"))) return;
+                                try {
+                                  await API.delete(`/trainings/${tr.id}`);
+                                  setTrainings((prev) =>
+                                    prev.filter((x) => x.id !== tr.id)
+                                  );
+                                } catch (err) {
+                                  console.error(err);
+                                  alert(t("failedToDeleteTraining"));
+                                }
+                              }}
+                            >
+                              {t("delete")}
+                            </button>
+                          )}
                         </div>
                       )}
                     </div>
