@@ -363,45 +363,12 @@ services:
     mem_limit: 512m
     restart: always
 
-  auth-service:
-    build:
-      context: ./microservices/auth-service
-      dockerfile: Dockerfile
-    ports:
-      - "8083:8083"
-    environment:
-      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth-db:5432/auth_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: guest
-      SPRING_RABBITMQ_PASSWORD: guest
-    depends_on:
-      postgres-auth-db:
-        condition: service_healthy
-      kafka:
-        condition: service_started
-      rabbitmq:
-        condition: service_healthy
-      service-registry:
-        condition: service_healthy
-      config-server:
-        condition: service_healthy
-      api-gateway:
-        condition: service_healthy
-    mem_limit: 512m
-    restart: always
-
   training-service:
     build:
       context: ./microservices/training-service
       dockerfile: Dockerfile
     ports:
-      - "8084:8084"
+      - "8083:8083"
     environment:
       JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-training-db:5432/training_db
@@ -439,7 +406,7 @@ services:
       context: ./microservices/feedback-service
       dockerfile: Dockerfile
     ports:
-      - "8085:8085"
+      - "8084:8084"
     environment:
       JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-feedback-db:5432/feedback_db
@@ -450,6 +417,39 @@ services:
     depends_on:
       postgres-feedback-db:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    mem_limit: 512m
+    restart: always
+
+  auth-service:
+    build:
+      context: ./microservices/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "8085:8085"
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth-db:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    depends_on:
+      postgres-auth-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
       rabbitmq:
         condition: service_healthy
       service-registry:

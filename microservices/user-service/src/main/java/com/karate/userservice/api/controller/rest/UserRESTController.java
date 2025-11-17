@@ -4,6 +4,9 @@ import com.karate.userservice.api.dto.UpdateUserRequestDto;
 import com.karate.userservice.api.dto.UserFromClubDto;
 import com.karate.userservice.api.dto.UserInformationDto;
 import com.karate.userservice.domain.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,8 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping("/users")
+@Tag(name = "Users", description = "User profile and club membership endpoints.")
+@SecurityRequirement(name = "bearerAuth")
 public class UserRESTController {
     private final UserService userService;
 
@@ -26,6 +31,7 @@ public class UserRESTController {
     }
 
     @GetMapping("/by-club")
+    @Operation(summary = "Get users from given club (by name)")
     public ResponseEntity<List<UserFromClubDto>> getUsersFromClub(@RequestParam("clubName") String clubName) {
         log.info("GET /users/by-club clubName={}", clubName);
         long t0 = System.currentTimeMillis();
@@ -36,6 +42,7 @@ public class UserRESTController {
     }
 
     @GetMapping("/me")
+    @Operation(summary = "Get current user info")
     public ResponseEntity<UserInformationDto> getCurrentUserInfo(Authentication authentication) {
         String username = authentication.getName();
         log.info("GET /users/me user={}", username);
@@ -46,6 +53,7 @@ public class UserRESTController {
     }
 
     @PutMapping("/me")
+    @Operation(summary = "Update current user data")
     public ResponseEntity<Void> updateCurrentUser(
             Authentication authentication,
             @Valid @RequestBody UpdateUserRequestDto updateUserRequest
@@ -59,6 +67,7 @@ public class UserRESTController {
     }
 
     @PatchMapping("/me")
+    @Operation(summary = "Partially update current user data")
     public ResponseEntity<Void> patchCurrentUser(
             Authentication authentication,
             @RequestBody UpdateUserRequestDto updateUserRequest
@@ -72,6 +81,7 @@ public class UserRESTController {
     }
 
     @DeleteMapping("/me")
+    @Operation(summary = "Delete current user")
     public ResponseEntity<Void> deleteCurrentUser(Authentication authentication) {
         String username = authentication.getName();
         log.info("DELETE /users/me user={}", username);

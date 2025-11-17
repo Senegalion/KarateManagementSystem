@@ -204,5 +204,9 @@
   "noPaymentsYet": "Aucun paiement pour l’instant",
   "date": "Date",
   "goToPayments": "Aller aux paiements",
-  "goToDashboard": "Aller au tableau de bord"
+  "goToDashboard": "Aller au tableau de bord",
+  "paymentSuccess": "Paiement réussi",
+  "notificationSettings": "Paramètres de notification",
+  "securitySettings": "Paramètres de sécurité",
+  "appearanceSettings": "Paramètres d’apparence"
 }
