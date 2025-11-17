@@ -2,10 +2,7 @@ package com.karate.training_service.domain.service;
 
 import com.karate.training_service.api.dto.TrainingSessionDto;
 import com.karate.training_service.api.dto.TrainingSessionRequestDto;
-import com.karate.training_service.domain.exception.AuthenticationMissingException;
-import com.karate.training_service.domain.exception.InvalidTrainingTimeRangeException;
-import com.karate.training_service.domain.exception.TrainingSessionClubMismatchException;
-import com.karate.training_service.domain.exception.TrainingSessionNotFoundException;
+import com.karate.training_service.domain.exception.*;
 import com.karate.training_service.domain.model.TrainingSessionEntity;
 import com.karate.training_service.domain.repository.TrainingSessionRepository;
 import com.karate.training_service.infrastructure.messaging.TrainingEventProducer;
@@ -22,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -91,6 +89,21 @@ public class TrainingSessionService {
         if (!training.getClubId().equals(userClubId)) {
             log.warn("Club mismatch trainingId={} trainingClubId={} userClubId={}", trainingId, training.getClubId(), userClubId);
             throw new TrainingSessionClubMismatchException("You cannot delete a training from another club");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if (training.getEndTime() != null) {
+            if (!training.getEndTime().isAfter(now)) {
+                log.warn("Attempt to delete past training trainingId={} endTime={}", trainingId, training.getEndTime());
+                throw new TrainingAlreadyOccurredException("Cannot delete a training session that already finished");
+            }
+        } else {
+            if (!training.getStartTime().isAfter(now)) {
+                log.warn("Attempt to delete past/ongoing training (no endTime) trainingId={} startTime={}",
+                        trainingId, training.getStartTime());
+                throw new TrainingAlreadyOccurredException("Cannot delete a training session that already started");
+            }
         }
 
         Long clubId = training.getClubId();
