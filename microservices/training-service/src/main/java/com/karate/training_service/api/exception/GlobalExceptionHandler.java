@@ -75,6 +75,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
+    @ExceptionHandler(TrainingAlreadyOccurredException.class)
+    public ResponseEntity<ErrorResponse> handleTrainingAlreadyOccurred(
+            TrainingAlreadyOccurredException ex,
+            HttpServletRequest request
+    ) {
+        log.warn("400 Training allready occurred path={} msg={}", request.getRequestURI(), ex.getMessage());
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Training allready occurred",
+                null,
+                request.getRequestURI(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.badRequest().body(response);
+    }
+
     // 401 - lack of authentication
     @ExceptionHandler(AuthenticationMissingException.class)
     public ResponseEntity<ErrorResponse> handleAuthMissing(
