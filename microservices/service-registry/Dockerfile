@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk-jammy
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 COPY build/libs/service-registry-0.0.1-SNAPSHOT.jar ./service-registry.jar
 ENV JAVA_OPTS="-Xms256m -Xmx512m"

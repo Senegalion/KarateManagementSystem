@@ -5,6 +5,7 @@ import com.karate.training_service.api.dto.TrainingSessionRequestDto;
 import com.karate.training_service.domain.model.TrainingSessionEntity;
 import com.karate.training_service.domain.repository.TrainingSessionRepository;
 import com.karate.training_service.domain.service.UpstreamGateway;
+import com.karate.training_service.infrastructure.messaging.TrainingEventProducer;
 import com.karate.training_service.it.config.BaseIntegrationTest;
 import com.karate.training_service.it.config.TestData;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +28,9 @@ class TrainingControllerIT extends BaseIntegrationTest {
 
     @MockitoBean
     UpstreamGateway upstream;
+
+    @MockitoBean
+    TrainingEventProducer trainingEventProducer;
 
     // ---------- /trainings (GET) ----------
 
@@ -181,9 +185,12 @@ class TrainingControllerIT extends BaseIntegrationTest {
     @Test
     @DisplayName("DELETE /trainings/{id} (ADMIN) -> 204 when club matches")
     void delete_204_ok_whenClubMatches() {
-        var now = LocalDateTime.of(2025, 1, 1, 10, 0);
-        TrainingSessionEntity saved = repo.save(TestData.training(5L, "to-del", now, now.plusHours(1)));
-        when(upstream.getUserClubId("admin")).thenReturn(5L);
+        var start = LocalDateTime.now().plusDays(1).withSecond(0).withNano(0);
+        var end = start.plusHours(1);
+
+        TrainingSessionEntity saved = repo.save(TestData.training(5L, "to-del", start, end));
+
+        when(upstream.getUserClubId("admin")).thenReturn(saved.getClubId());
 
         webTestClient.delete()
                 .uri("/trainings/{id}", saved.getTrainingSessionId())
@@ -193,6 +200,25 @@ class TrainingControllerIT extends BaseIntegrationTest {
                 .expectStatus().isNoContent();
 
         assertThat(repo.findById(saved.getTrainingSessionId())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("DELETE /trainings/{id} -> 400 when training already occurred")
+    void delete_400_whenPastTraining() {
+        var start = LocalDateTime.now().minusDays(2).withSecond(0).withNano(0);
+        var end = start.plusHours(1);
+
+        TrainingSessionEntity saved = repo.save(TestData.training(10L, "past", start, end));
+        when(upstream.getUserClubId("admin")).thenReturn(saved.getClubId());
+
+        webTestClient.delete()
+                .uri("/trainings/{id}", saved.getTrainingSessionId())
+                .header("X-Test-User", "admin")
+                .header("X-Test-Roles", "ADMIN")
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.message").value(org.hamcrest.Matchers.containsString("allready"));
     }
 
     @Test
