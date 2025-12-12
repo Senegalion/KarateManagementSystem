@@ -10,6 +10,7 @@ import com.karate.training_service.domain.model.TrainingSessionEntity;
 import com.karate.training_service.domain.repository.TrainingSessionRepository;
 import com.karate.training_service.domain.service.TrainingSessionService;
 import com.karate.training_service.domain.service.UpstreamGateway;
+import com.karate.training_service.infrastructure.messaging.TrainingEventProducer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,9 @@ class TrainingSessionServiceTest {
 
     @Mock
     CacheManager cacheManager;
+
+    @Mock
+    TrainingEventProducer trainingEventProducer;
 
     @InjectMocks
     TrainingSessionService service;
@@ -145,15 +149,17 @@ class TrainingSessionServiceTest {
     }
 
     @Test
-    void deleteTrainingSession_ok_sameClub_deletes() {
+    void deleteTrainingSession_ok_sameClub_deletes_and_sends_event() {
         // given
         when(upstream.getUserClubId("john")).thenReturn(10L);
+
         TrainingSessionEntity ent = new TrainingSessionEntity();
         ent.setTrainingSessionId(5L);
         ent.setClubId(10L);
         ent.setStartTime(LocalDateTime.now());
         ent.setEndTime(LocalDateTime.now().plusHours(1));
         ent.setDescription("d");
+
         when(repo.findById(5L)).thenReturn(Optional.of(ent));
         when(cacheManager.getCache(anyString())).thenReturn(mock(org.springframework.cache.Cache.class));
 
@@ -162,6 +168,7 @@ class TrainingSessionServiceTest {
 
         // then
         verify(repo).delete(ent);
+        verify(trainingEventProducer).sendTrainingDeletedEvent(any());
     }
 
     @Test

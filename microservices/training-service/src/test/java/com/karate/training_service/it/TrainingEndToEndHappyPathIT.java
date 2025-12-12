@@ -5,6 +5,7 @@ import com.karate.training_service.api.dto.TrainingSessionRequestDto;
 import com.karate.training_service.domain.model.TrainingSessionEntity;
 import com.karate.training_service.domain.repository.TrainingSessionRepository;
 import com.karate.training_service.domain.service.UpstreamGateway;
+import com.karate.training_service.infrastructure.messaging.TrainingEventProducer;
 import com.karate.training_service.it.config.BaseIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,9 @@ class TrainingEndToEndHappyPathIT extends BaseIntegrationTest {
 
     @MockitoBean
     private UpstreamGateway upstream;
+
+    @MockitoBean
+    TrainingEventProducer trainingEventProducer;
 
     @Test
     @DisplayName("End-to-end: admin creates (club=77) -> user lists (club=77 only) -> internal exists/get -> admin deletes -> user lists empty -> internal exists=false")
@@ -70,8 +74,8 @@ class TrainingEndToEndHappyPathIT extends BaseIntegrationTest {
         // ---------------------------------------------------------
         // 2) Admin creates a training in clubId=77
         // ---------------------------------------------------------
-        var start = LocalDateTime.parse("2025-01-01T10:00:00");
-        var end = LocalDateTime.parse("2025-01-01T11:00:00");
+        var start = LocalDateTime.now().plusDays(1).withSecond(0).withNano(0);
+        var end = start.plusHours(1);
 
         var createReq1 = new TrainingSessionRequestDto(start, end, "kata");
         var createdId = new AtomicReference<Long>();
@@ -97,10 +101,10 @@ class TrainingEndToEndHappyPathIT extends BaseIntegrationTest {
         // ---------------------------------------------------------
         // 3) Second training in a different club (88) — should not appear for John
         // ---------------------------------------------------------
-        var createReq2 = new TrainingSessionRequestDto(
-                LocalDateTime.parse("2025-01-02T10:00:00"),
-                LocalDateTime.parse("2025-01-02T11:00:00"),
-                "kumite");
+        var start2 = LocalDateTime.now().plusDays(2).withSecond(0).withNano(0);
+        var end2 = start2.plusHours(1);
+
+        var createReq2 = new TrainingSessionRequestDto(start2, end2, "kumite");
 
         asBossOtherClub.post()
                 .uri("/trainings/create")

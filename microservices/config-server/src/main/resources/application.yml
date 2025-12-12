@@ -13,6 +13,8 @@ spring:
           uri: https://github.com/Senegalion/karate-config-server-repo
           default-label: main
           clone-on-start: true
+          username: ${GITHUB_USER}
+          password: ${GITHUB_TOKEN}
 
 eureka:
   instance:

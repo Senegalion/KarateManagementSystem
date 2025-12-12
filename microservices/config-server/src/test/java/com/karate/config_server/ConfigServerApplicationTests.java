@@ -9,7 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 		"eureka.client.fetch-registry=false",
 		"spring.cloud.netflix.eureka.enabled=false",
 		"spring.cloud.discovery.enabled=false",
-		"spring.cloud.gateway.enabled=false"
+		"spring.cloud.gateway.enabled=false",
+        "spring.cloud.config.server.git.clone-on-start=false"
 })
 class ConfigServerApplicationTests {
 
