@@ -24,9 +24,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8888:8888"
+    env_file:
+      - .env
     environment:
       JAVA_TOOL_OPTIONS: "-Xms128m -Xmx256m"
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://service-registry:8761/eureka/
+      GITHUB_USER: ${GITHUB_USER}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
     depends_on:
       service-registry:
         condition: service_healthy
