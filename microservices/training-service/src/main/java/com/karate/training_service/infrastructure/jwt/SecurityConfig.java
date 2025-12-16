@@ -32,6 +32,7 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/trainings").hasAnyRole("USER", ADMIN)
                         .requestMatchers("/trainings/create").hasRole(ADMIN)
+                        .requestMatchers("/trainings/create/recurring").hasRole(ADMIN)
                         .requestMatchers("/trainings/{id}").hasRole(ADMIN)
                         .requestMatchers("/internal/trainings/**").permitAll()
                         .anyRequest().authenticated()
