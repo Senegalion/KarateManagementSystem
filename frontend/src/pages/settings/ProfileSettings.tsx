@@ -249,29 +249,32 @@ const ProfileSettings = () => {
         )}
       </div>
 
-      {/* Danger zone */}
       <div className="mt-10 border-t pt-6">
         <h3 className="text-lg font-semibold text-red-600 mb-2">
           {t("dangerZone")}
         </h3>
-        <p className="text-sm text-gray-600 mb-3">
+        <p className="text-sm text-gray-600 mb-4">
           {t("typeUsernameToConfirmDelete")}
         </p>
-        <input
-          className="w-full md:w-1/2 p-2 border rounded-lg mb-3"
-          placeholder={form.username}
-          value={confirmDelete}
-          onChange={(e) => setConfirmDelete(e.target.value)}
-        />
-        <button
-          onClick={handleDelete}
-          disabled={!canDelete}
-          className={`px-4 py-2 rounded-lg text-white ${
-            canDelete ? "bg-red-600 hover:bg-red-700" : "bg-red-300"
-          }`}
-        >
-          {t("deleteAccount")}
-        </button>
+
+        <div className="flex flex-col md:flex-row md:items-center gap-4">
+          <input
+            className="w-full md:w-1/2 p-2 border rounded-lg"
+            placeholder={form.username}
+            value={confirmDelete}
+            onChange={(e) => setConfirmDelete(e.target.value)}
+          />
+
+          <button
+            onClick={handleDelete}
+            disabled={!canDelete}
+            className={`px-4 py-2 rounded-lg text-white md:ml-auto ${
+              canDelete ? "bg-red-600 hover:bg-red-700" : "bg-red-300"
+            }`}
+          >
+            {t("deleteAccount")}
+          </button>
+        </div>
       </div>
     </div>
   );
