@@ -1,5 +1,6 @@
 package com.karate.training_service.api.controller.rest;
 
+import com.karate.training_service.api.dto.TrainingRecurringRequestDto;
 import com.karate.training_service.api.dto.TrainingSessionDto;
 import com.karate.training_service.api.dto.TrainingSessionRequestDto;
 import com.karate.training_service.domain.service.TrainingSessionService;
@@ -59,5 +60,19 @@ public class TrainingRESTController {
         log.info("DELETE /trainings/{}", id);
         trainingSessionService.deleteTrainingSession(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/create/recurring")
+    @Operation(
+            summary = "Create recurring training sessions",
+            description = "Creates multiple trainings in a date range for selected weekdays. Only admins should be able to call this."
+    )
+    @ApiResponse(responseCode = "201", description = "Recurring trainings created")
+    public ResponseEntity<List<TrainingSessionDto>> createRecurring(@RequestBody @Valid TrainingRecurringRequestDto dto) {
+        log.info("POST /trainings/create/recurring from={} to={} days={} {}-{}",
+                dto.fromDate(), dto.toDate(), dto.daysOfWeek(), dto.startTime(), dto.endTime());
+
+        var created = trainingSessionService.createRecurringTrainings(dto);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 }
