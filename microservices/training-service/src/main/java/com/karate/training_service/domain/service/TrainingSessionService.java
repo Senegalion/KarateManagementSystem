@@ -1,5 +1,6 @@
 package com.karate.training_service.domain.service;
 
+import com.karate.training_service.api.dto.TrainingRecurringRequestDto;
 import com.karate.training_service.api.dto.TrainingSessionDto;
 import com.karate.training_service.api.dto.TrainingSessionRequestDto;
 import com.karate.training_service.domain.exception.*;
@@ -125,6 +126,52 @@ public class TrainingSessionService {
         evictTrainingsByClub(userClubId);
 
         log.info("Delete training OK trainingId={}", trainingId);
+    }
+
+    @Transactional
+    public List<TrainingSessionDto> createRecurringTrainings(TrainingRecurringRequestDto dto) {
+        if (!dto.toDate().isAfter(dto.fromDate()) && !dto.toDate().isEqual(dto.fromDate())) {
+            throw new InvalidTrainingTimeRangeException("toDate must be >= fromDate");
+        }
+        if (!dto.endTime().isAfter(dto.startTime())) {
+            throw new InvalidTrainingTimeRangeException("End time must be after start time");
+        }
+
+        Long clubId = currentUserClubId();
+
+        var start = dto.fromDate();
+        var end = dto.toDate();
+
+        var toSave = new java.util.ArrayList<TrainingSessionEntity>();
+
+        for (var d = start; !d.isAfter(end); d = d.plusDays(1)) {
+            if (!dto.daysOfWeek().contains(d.getDayOfWeek())) continue;
+
+            var startDT = d.atTime(dto.startTime());
+            var endDT = d.atTime(dto.endTime());
+
+            boolean exists = trainingSessionRepository.existsByClubIdAndStartTime(clubId, startDT);
+            if (exists) {
+                if (dto.skipConflicts()) continue;
+                throw new TrainingConflictException("Training already exists for: " + startDT);
+            }
+
+            TrainingSessionEntity e = new TrainingSessionEntity();
+            e.setClubId(clubId);
+            e.setStartTime(startDT);
+            e.setEndTime(endDT);
+            e.setDescription(dto.description());
+
+            toSave.add(e);
+        }
+
+        var saved = trainingSessionRepository.saveAll(toSave);
+
+        evictTrainingsByClub(clubId);
+
+        return saved.stream()
+                .map(TrainingSessionMapper::mapToTrainingSessionDto)
+                .toList();
     }
 
     @Cacheable(cacheNames = "trainingExists", key = "#trainingId")
