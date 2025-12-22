@@ -3,6 +3,7 @@ package com.karate.notification_service.infrastructure.messaging;
 import com.karate.notification_service.domain.NotificationService;
 import com.karate.notification_service.infrastructure.messaging.dto.EnrollmentEvent;
 import com.karate.notification_service.infrastructure.messaging.dto.FeedbackEvent;
+import com.karate.notification_service.infrastructure.messaging.dto.TrainingCreatedEvent;
 import com.karate.notification_service.infrastructure.messaging.dto.UserRegisteredEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,5 +49,16 @@ public class NotificationKafkaListeners {
         log.info("Feedback consumed id={} type={} ts={}",
                 event.getEventId(), event.getEventType(), event.getTimestamp());
         notifications.onFeedbackCreated(event);
+    }
+
+    @KafkaListener(
+            topics = "${topics.training-created}",
+            groupId = "notification-service",
+            containerFactory = "trainingCreatedListenerFactory"
+    )
+    public void onTrainingCreated(TrainingCreatedEvent event) {
+        log.info("TrainingCreated consumed eventId={} clubId={} trainingSessionId={} startTime={}",
+                event.eventId(), event.clubId(), event.trainingSessionId(), event.startTime());
+        notifications.onTrainingCreated(event);
     }
 }

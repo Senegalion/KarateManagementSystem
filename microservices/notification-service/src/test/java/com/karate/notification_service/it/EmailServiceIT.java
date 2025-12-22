@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,11 +30,24 @@ import static org.assertj.core.api.Assertions.assertThat;
         "spring.mail.properties.mail.smtp.starttls.enable=false",
 
         "app.mail.from=no-reply@karate.local",
-        "app.mail.fromName=Karate Management System"
+        "app.mail.fromName=Karate Management System",
+
+        "app.web.dashboard-url=http://localhost/dashboard",
+        "app.web.preferences-url=http://localhost/preferences",
+        "app.web.privacy-url=http://localhost/privacy",
+        "app.web.training-url=http://localhost/trainings/{trainingId}",
+
+        "app.userService.baseUrl=http://user-service:8080"
 })
 @ActiveProfiles("test")
 @org.springframework.context.annotation.Import(TestOverrides.class)
 class EmailServiceIT {
+
+    @MockitoBean
+    com.karate.notification_service.infrastructure.user.ClubUsersClient clubUsersClient;
+
+    @MockitoBean
+    org.springframework.cache.CacheManager cacheManager;
 
     @RegisterExtension
     static GreenMailExtension greenMail =

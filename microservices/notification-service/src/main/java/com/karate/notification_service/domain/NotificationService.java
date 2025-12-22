@@ -4,9 +4,12 @@ import com.karate.notification_service.infrastructure.email.EmailService;
 import com.karate.notification_service.infrastructure.email.TemplateRenderer;
 import com.karate.notification_service.infrastructure.messaging.dto.EnrollmentEvent;
 import com.karate.notification_service.infrastructure.messaging.dto.FeedbackEvent;
+import com.karate.notification_service.infrastructure.messaging.dto.TrainingCreatedEvent;
 import com.karate.notification_service.infrastructure.messaging.dto.UserRegisteredEvent;
+import com.karate.notification_service.infrastructure.user.ClubUsersClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +27,8 @@ public class NotificationService {
     private final EmailService email;
     private final TemplateRenderer tpl;
     private final MessageSource messages;
+    private final ClubUsersClient clubUsersClient;;
+    private final CacheManager cacheManager;
 
     @Value("${app.web.dashboard-url}")
     private String dashboardUrl;
@@ -31,6 +36,8 @@ public class NotificationService {
     private String preferencesUrl;
     @Value("${app.web.privacy-url}")
     private String privacyUrl;
+    @Value("${app.web.training-url}")
+    private String trainingUrlTemplate;
 
     private static final ZoneId ZONE = ZoneId.of("Europe/Warsaw");
     private static final DateTimeFormatter DT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZONE);
@@ -87,6 +94,39 @@ public class NotificationService {
         email.sendHtml(p.getUserEmail(), subject, body);
     }
 
+    public void onTrainingCreated(TrainingCreatedEvent ev) {
+        var locale = Locale.ENGLISH;
+
+        // idempotencja
+        if (ev.eventId() != null && !markIfNew(ev.eventId())) {
+            return;
+        }
+
+        var recipients = clubUsersClient.getClubUserEmails(ev.clubId());
+        if (recipients.isEmpty()) return;
+
+        String subject = t("email.training.created.subject", locale);
+
+        String trainingUrl = trainingUrlTemplate.replace("{trainingId}", String.valueOf(ev.trainingSessionId()));
+
+        Map<String, Object> model = ctx(locale)
+                .add("title", t("email.training.created.title", locale))
+                .add("lead", t("email.training.created.lead", locale))
+                .add("description", safe(ev.description()))
+                .add("startTime", ev.startTime() == null ? "" : ev.startTime().atZone(ZONE).format(DT))
+                .add("endTime", ev.endTime() == null ? "" : ev.endTime().atZone(ZONE).format(DT))
+                .add("ctaLabel", t("email.training.created.cta", locale))
+                .add("trainingUrl", trainingUrl)
+                .build();
+
+        String body = tpl.render("templates/email/training-created.html", model);
+
+        for (String to : recipients) {
+            if (to == null || to.isBlank()) continue;
+            email.sendHtml(to, subject, body);
+        }
+    }
+
     // ---------- helpers ----------
 
     private String t(String code, Locale locale, Object... args) {
@@ -105,9 +145,6 @@ public class NotificationService {
                 .add("privacyUrl", privacyUrl);
     }
 
-    /**
-     * Mikro-builder do czytelnego składania modelu template’u.
-     */
     private static final class Params {
         private final Map<String, Object> m = new LinkedHashMap<>();
 
@@ -126,5 +163,14 @@ public class NotificationService {
         Map<String, Object> build() {
             return Collections.unmodifiableMap(m);
         }
+    }
+
+    private boolean markIfNew(String eventId) {
+        var c = cacheManager.getCache("processedEvents");
+        if (c == null) return true;
+        Boolean seen = c.get(eventId, Boolean.class);
+        if (Boolean.TRUE.equals(seen)) return false;
+        c.put(eventId, true);
+        return true;
     }
 }
