@@ -8,6 +8,7 @@ import com.karate.enrollment_service.domain.exception.UserNotFoundException;
 import com.karate.enrollment_service.domain.mapper.EnrollmentMapper;
 import com.karate.enrollment_service.domain.model.EnrollmentEntity;
 import com.karate.enrollment_service.domain.repository.EnrollmentRepository;
+import com.karate.enrollment_service.infrastructure.client.dto.UserPayload;
 import com.karate.enrollment_service.infrastructure.messaging.EnrollmentEventProducer;
 import com.karate.enrollment_service.infrastructure.messaging.event.EnrollmentEvent;
 import lombok.AllArgsConstructor;
@@ -138,5 +139,22 @@ public class EnrollmentService {
         Long id = upstream.getUserIdByUsername(username);
         log.debug("auth-service getUserIdByUsername username='{}' -> {} took={}ms", username, id, System.currentTimeMillis() - t0);
         return id;
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getEnrolledUserEmails(Long trainingId) {
+        var enrollments = enrollmentRepository.findAllByTrainingId(trainingId);
+        if (enrollments.isEmpty()) return List.of();
+
+        var userIds = enrollments.stream()
+                .map(EnrollmentEntity::getUserId)
+                .distinct()
+                .toList();
+
+        return userIds.stream()
+                .map(upstream::getUser)
+                .map(UserPayload::userEmail)
+                .distinct()
+                .toList();
     }
 }

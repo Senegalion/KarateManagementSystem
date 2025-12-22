@@ -5,6 +5,7 @@ import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.karate.notification_service.TestOverrides;
 import com.karate.notification_service.infrastructure.email.EmailService;
+import com.karate.notification_service.infrastructure.feign.UserClient;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -44,7 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class EmailServiceIT {
 
     @MockitoBean
-    com.karate.notification_service.infrastructure.user.ClubUsersClient clubUsersClient;
+    UserClient userClient;
 
     @MockitoBean
     org.springframework.cache.CacheManager cacheManager;

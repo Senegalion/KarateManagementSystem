@@ -1,8 +1,8 @@
 package com.karate.notification_service;
 
+import com.karate.notification_service.infrastructure.feign.UserClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -39,7 +39,7 @@ class NotificationServiceApplicationTests {
     }
 
     @MockitoBean
-    com.karate.notification_service.infrastructure.user.ClubUsersClient clubUsersClient;
+    UserClient userClient;
 
     @MockitoBean
     org.springframework.cache.CacheManager cacheManager;

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Slf4j
 @AllArgsConstructor
 @RestController
@@ -29,5 +31,12 @@ public class InternalEnrollmentController {
         log.debug("GET /internal/enrollments/enrolled/{}/{}", userId, sessionId);
         boolean enrolled = enrollmentService.isUserEnrolledInSession(userId, sessionId);
         return ResponseEntity.ok(enrolled);
+    }
+
+    @GetMapping("/training/{trainingId}/emails")
+    @Operation(summary = "Get emails of users enrolled in training (internal)")
+    public ResponseEntity<List<String>> getEnrolledEmails(@PathVariable Long trainingId) {
+        log.info("GET /internal/enrollments/training/{}/emails", trainingId);
+        return ResponseEntity.ok(enrollmentService.getEnrolledUserEmails(trainingId));
     }
 }

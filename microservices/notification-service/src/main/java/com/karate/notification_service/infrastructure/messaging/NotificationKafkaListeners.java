@@ -1,10 +1,7 @@
 package com.karate.notification_service.infrastructure.messaging;
 
 import com.karate.notification_service.domain.NotificationService;
-import com.karate.notification_service.infrastructure.messaging.dto.EnrollmentEvent;
-import com.karate.notification_service.infrastructure.messaging.dto.FeedbackEvent;
-import com.karate.notification_service.infrastructure.messaging.dto.TrainingCreatedEvent;
-import com.karate.notification_service.infrastructure.messaging.dto.UserRegisteredEvent;
+import com.karate.notification_service.infrastructure.messaging.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,8 +54,27 @@ public class NotificationKafkaListeners {
             containerFactory = "trainingCreatedListenerFactory"
     )
     public void onTrainingCreated(TrainingCreatedEvent event) {
-        log.info("TrainingCreated consumed eventId={} clubId={} trainingSessionId={} startTime={}",
-                event.eventId(), event.clubId(), event.trainingSessionId(), event.startTime());
-        notifications.onTrainingCreated(event);
+        try {
+            log.info("TrainingCreated consumed eventId={} clubId={} trainingSessionId={} startTime={}",
+                    event.eventId(), event.clubId(), event.trainingSessionId(), event.startTime());
+            notifications.onTrainingCreated(event);
+            log.info("TrainingCreated handled OK eventId={}", event.eventId());
+        } catch (Exception e) {
+            log.error("TrainingCreated FAILED eventId={} clubId={} trainingSessionId={}",
+                    event.eventId(), event.clubId(), event.trainingSessionId(), e);
+            throw e;
+        }
     }
+
+    @KafkaListener(
+            topics = "${topics.training-deleted}",
+            groupId = "notification-service",
+            containerFactory = "trainingDeletedListenerFactory"
+    )
+    public void onTrainingDeleted(TrainingDeletedEvent event) {
+        log.info("TrainingDeleted consumed eventId={} clubId={} trainingId={}",
+                event.eventId(), event.clubId(), event.trainingId());
+        notifications.onTrainingDeleted(event);
+    }
+
 }

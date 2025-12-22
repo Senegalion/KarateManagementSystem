@@ -2,11 +2,9 @@ package com.karate.notification_service.domain;
 
 import com.karate.notification_service.infrastructure.email.EmailService;
 import com.karate.notification_service.infrastructure.email.TemplateRenderer;
-import com.karate.notification_service.infrastructure.messaging.dto.EnrollmentEvent;
-import com.karate.notification_service.infrastructure.messaging.dto.FeedbackEvent;
-import com.karate.notification_service.infrastructure.messaging.dto.TrainingCreatedEvent;
-import com.karate.notification_service.infrastructure.messaging.dto.UserRegisteredEvent;
-import com.karate.notification_service.infrastructure.user.ClubUsersClient;
+import com.karate.notification_service.infrastructure.feign.EnrollmentClient;
+import com.karate.notification_service.infrastructure.messaging.dto.*;
+import com.karate.notification_service.infrastructure.feign.UserClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
@@ -15,10 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +22,8 @@ public class NotificationService {
     private final EmailService email;
     private final TemplateRenderer tpl;
     private final MessageSource messages;
-    private final ClubUsersClient clubUsersClient;;
+    private final UserClient userClient;
+    private final EnrollmentClient enrollmentClient;
     private final CacheManager cacheManager;
 
     @Value("${app.web.dashboard-url}")
@@ -97,12 +93,11 @@ public class NotificationService {
     public void onTrainingCreated(TrainingCreatedEvent ev) {
         var locale = Locale.ENGLISH;
 
-        // idempotencja
         if (ev.eventId() != null && !markIfNew(ev.eventId())) {
             return;
         }
 
-        var recipients = clubUsersClient.getClubUserEmails(ev.clubId());
+        var recipients = userClient.getClubUserEmails(ev.clubId());
         if (recipients.isEmpty()) return;
 
         String subject = t("email.training.created.subject", locale);
@@ -123,6 +118,33 @@ public class NotificationService {
 
         for (String to : recipients) {
             if (to == null || to.isBlank()) continue;
+            email.sendHtml(to, subject, body);
+        }
+    }
+
+    public void onTrainingDeleted(com.karate.notification_service.infrastructure.messaging.dto.TrainingDeletedEvent ev) {
+        var locale = Locale.ENGLISH;
+        Long trainingId = ev.trainingId();
+
+        List<String> recipients = enrollmentClient.getEnrolledEmails(trainingId);
+        if (recipients == null || recipients.isEmpty()) {
+            return;
+        }
+
+        String subject = t("email.training.deleted.subject", locale);
+
+        for (String to : recipients) {
+            Map<String, Object> model = ctx(locale)
+                    .add("title", t("email.training.deleted.title", locale))
+                    .add("lead", t("email.training.deleted.lead", locale))
+                    .add("ctaLabel", t("email.training.deleted.cta", locale))
+                    .add("footer", t("email.training.deleted.footer", locale))
+                    .add("preferencesLabel", t("email.common.preferences", locale))
+                    .add("privacyLabel", t("email.common.privacy", locale))
+                    .add("dashboardUrl", dashboardUrl)
+                    .build();
+
+            String body = tpl.render("templates/email/training-deleted.html", model);
             email.sendHtml(to, subject, body);
         }
     }

@@ -1,9 +1,6 @@
 package com.karate.notification_service.infrastructure.messaging.config;
 
-import com.karate.notification_service.infrastructure.messaging.dto.EnrollmentEvent;
-import com.karate.notification_service.infrastructure.messaging.dto.FeedbackEvent;
-import com.karate.notification_service.infrastructure.messaging.dto.TrainingCreatedEvent;
-import com.karate.notification_service.infrastructure.messaging.dto.UserRegisteredEvent;
+import com.karate.notification_service.infrastructure.messaging.dto.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
@@ -74,6 +71,19 @@ public class KafkaConfig {
     public ConcurrentKafkaListenerContainerFactory<String, TrainingCreatedEvent> trainingCreatedListenerFactory(
             ConsumerFactory<String, TrainingCreatedEvent> cf) {
         var f = new ConcurrentKafkaListenerContainerFactory<String, TrainingCreatedEvent>();
+        f.setConsumerFactory(cf);
+        return f;
+    }
+
+    @Bean
+    public ConsumerFactory<String, TrainingDeletedEvent> trainingDeletedConsumerFactory(KafkaProperties props) {
+        return factoryFor(props, TrainingDeletedEvent.class);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, TrainingDeletedEvent> trainingDeletedListenerFactory(
+            ConsumerFactory<String, TrainingDeletedEvent> cf) {
+        var f = new ConcurrentKafkaListenerContainerFactory<String, TrainingDeletedEvent>();
         f.setConsumerFactory(cf);
         return f;
     }

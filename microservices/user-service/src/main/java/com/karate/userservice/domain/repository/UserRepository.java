@@ -3,6 +3,8 @@ package com.karate.userservice.domain.repository;
 import com.karate.userservice.domain.model.UserEntity;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,4 +16,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     @EntityGraph(attributePaths = "addressEntity")
     Optional<UserEntity> findWithAddressByUserId(Long userId);
+
+    @Query("select u.email from UserEntity u where u.karateClubId = :clubId")
+    List<String> findEmailsByKarateClubId(@Param("clubId") Long clubId);
 }
