@@ -108,12 +108,69 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
+
+    finalizedBy(tasks.jacocoTestReport)
 }
 
-jacocoTestReport {
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
     reports {
-        xml.required = false
+        html.required = true
+        xml.required = true
         csv.required = false
-        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+
+        html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
+        xml.outputLocation = layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml")
     }
+
+    classDirectories.setFrom(files(classDirectories.files.collect { dir ->
+        fileTree(dir: dir, exclude: [
+                '**/*Application*',
+                '**/config/**',
+                '**/dto/**',
+                '**/entity/**',
+                '**/model/**',
+                '**/generated/**'
+        ])
+    }))
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.test)
+
+    violationRules {
+        rule {
+            element = 'BUNDLE'
+
+            excludes = [
+                    '**/*Application*',
+                    '**/config/**',
+                    '**/dto/**',
+                    '**/entity/**',
+                    '**/model/**',
+                    '**/generated/**',
+                    '**/*Exception*',
+                    '**/*ExceptionHandler*',
+                    '**/*Config*',
+                    '**/*Security*',
+                    '**/infrastructure/jwt/**'
+            ]
+
+            limit {
+                counter = 'INSTRUCTION'
+                value = 'COVEREDRATIO'
+                minimum = 0.90
+            }
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
+        }
+    }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }
