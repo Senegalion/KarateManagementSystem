@@ -174,4 +174,121 @@ class AuthRESTControllerTest {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.message", containsString("Validation failed")));
     }
+
+    @Test
+    void login_404_whenNoSuchElement_mapsToNotFoundHandler() throws Exception {
+        var tokenReq = TokenRequestDto.builder()
+                .username("john").password("pw").karateClubName("TOKYO")
+                .build();
+
+        doThrow(new java.util.NoSuchElementException("nope"))
+                .when(authService).validateUserForLogin(any(TokenRequestDto.class));
+
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(tokenReq)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value(containsString("nope")));
+    }
+
+    @Test
+    void register_409_whenIllegalState_mapsToConflictHandler() throws Exception {
+        var req = RegisterUserDto.builder()
+                .username("john")
+                .email("j@ex.com")
+                .address(new AddressRequestDto("City", "Street", "1", "00-000"))
+                .karateClubName("TOKYO")
+                .karateRank("KYU_9")
+                .role("USER")
+                .password("plain")
+                .build();
+
+        when(passwordEncoder.encode("plain")).thenReturn("ENC");
+        when(authService.register(any()))
+                .thenThrow(new IllegalStateException("business-conflict"));
+
+        mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.message").value(containsString("business-conflict")));
+    }
+
+    @Test
+    void register_400_whenFeignClientException_mapsToUpstreamClientError() throws Exception {
+        var req = RegisterUserDto.builder()
+                .username("john")
+                .email("j@ex.com")
+                .address(new AddressRequestDto("City", "Street", "1", "00-000"))
+                .karateClubName("TOKYO")
+                .karateRank("KYU_9")
+                .role("USER")
+                .password("plain")
+                .build();
+
+        when(passwordEncoder.encode("plain")).thenReturn("ENC");
+
+        feign.Request feignReq = feign.Request.create(
+                feign.Request.HttpMethod.POST,
+                "/user",
+                java.util.Map.of(),
+                null,
+                java.nio.charset.StandardCharsets.UTF_8,
+                null
+        );
+        feign.FeignException.BadRequest ex =
+                new feign.FeignException.BadRequest("bad", feignReq, null, java.util.Map.of());
+
+        when(authService.register(any())).thenThrow(ex);
+
+        mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value(containsString("Upstream service error")));
+    }
+
+    @Test
+    void register_503_whenUpstreamUnavailable() throws Exception {
+        var req = RegisterUserDto.builder()
+                .username("john")
+                .email("j@ex.com")
+                .address(new AddressRequestDto("City", "Street", "1", "00-000"))
+                .karateClubName("TOKYO")
+                .karateRank("KYU_9")
+                .role("USER")
+                .password("plain")
+                .build();
+
+        when(passwordEncoder.encode("plain")).thenReturn("ENC");
+        when(authService.register(any()))
+                .thenThrow(new com.karate.authservice.domain.exception.UpstreamUnavailableException("down", new RuntimeException("x")));
+
+        mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.status").value(503))
+                .andExpect(jsonPath("$.message").value(containsString("down")));
+    }
+
+    @Test
+    void login_500_whenUnhandledException() throws Exception {
+        var tokenReq = TokenRequestDto.builder()
+                .username("john").password("pw").karateClubName("TOKYO")
+                .build();
+
+        doThrow(new RuntimeException("boom"))
+                .when(authService).validateUserForLogin(any(TokenRequestDto.class));
+
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(tokenReq)))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.message").value(containsString("Unexpected error")));
+    }
 }
