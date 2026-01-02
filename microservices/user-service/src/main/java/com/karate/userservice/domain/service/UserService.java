@@ -233,4 +233,9 @@ public class UserService {
 
         log.info("Delete current user OK userId={}", userId);
     }
+
+    @Transactional(readOnly = true)
+    public List<String> getEmailsByClubId(Long clubId) {
+        return userRepository.findEmailsByKarateClubId(clubId);
+    }
 }

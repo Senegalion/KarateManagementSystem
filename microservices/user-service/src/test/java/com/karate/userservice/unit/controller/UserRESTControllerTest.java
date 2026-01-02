@@ -2,12 +2,12 @@ package com.karate.userservice.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karate.userservice.api.controller.rest.UserRESTController;
-import com.karate.userservice.api.dto.AddressRequestDto;
-import com.karate.userservice.api.dto.UpdateUserRequestDto;
-import com.karate.userservice.api.dto.UserFromClubDto;
-import com.karate.userservice.api.dto.UserInformationDto;
+import com.karate.userservice.api.dto.*;
 import com.karate.userservice.api.exception.GlobalExceptionHandler;
 import com.karate.userservice.domain.service.UserService;
+import feign.FeignException;
+import feign.Request;
+import feign.RequestTemplate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,5 +156,160 @@ class UserRESTControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(userService).deleteCurrentUser("john");
+    }
+
+    @Test
+    @DisplayName("GET /users/me when service throws UserNotFoundException returns 404")
+    void get_me_when_user_not_found_returns_404() throws Exception {
+        when(userService.getCurrentUserInfo("john"))
+                .thenThrow(new com.karate.userservice.domain.exception.UserNotFoundException("no user"));
+
+        mockMvc.perform(get("/users/me")
+                        .principal(new UsernamePasswordAuthenticationToken("john", "pwd")))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("no user"))
+                .andExpect(jsonPath("$.path").value("/users/me"));
+    }
+
+    @Test
+    @DisplayName("GET /users/me when service throws NoSuchElementException returns 404")
+    void get_me_when_no_such_element_returns_404() throws Exception {
+        when(userService.getCurrentUserInfo("john"))
+                .thenThrow(new java.util.NoSuchElementException("missing"));
+
+        mockMvc.perform(get("/users/me")
+                        .principal(new UsernamePasswordAuthenticationToken("john", "pwd")))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("missing"))
+                .andExpect(jsonPath("$.path").value("/users/me"));
+    }
+
+    @Test
+    @DisplayName("GET /users/me when service throws UpstreamUnavailableException returns 503")
+    void get_me_when_upstream_down_returns_503() throws Exception {
+        when(userService.getCurrentUserInfo("john"))
+                .thenThrow(new com.karate.userservice.domain.exception.UpstreamUnavailableException("auth down", new RuntimeException("x")));
+
+        mockMvc.perform(get("/users/me")
+                        .principal(new UsernamePasswordAuthenticationToken("john", "pwd")))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.status").value(503))
+                .andExpect(jsonPath("$.message").value("auth down"))
+                .andExpect(jsonPath("$.path").value("/users/me"));
+    }
+
+    @Test
+    @DisplayName("GET /users/me when service throws RuntimeException returns 500")
+    void get_me_when_generic_exception_returns_500() throws Exception {
+        when(userService.getCurrentUserInfo("john"))
+                .thenThrow(new RuntimeException("boom"));
+
+        mockMvc.perform(get("/users/me")
+                        .principal(new UsernamePasswordAuthenticationToken("john", "pwd")))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Unexpected error: boom")))
+                .andExpect(jsonPath("$.path").value("/users/me"));
+    }
+
+    @Test
+    @DisplayName("PATCH /users/me with malformed JSON returns 400 and ErrorResponse message")
+    void patch_me_with_malformed_json_returns_400() throws Exception {
+        mockMvc.perform(patch("/users/me")
+                        .principal(new UsernamePasswordAuthenticationToken("john", "pwd"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ this-is: not-json }"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Request body is missing or malformed"))
+                .andExpect(jsonPath("$.path").value("/users/me"));
+    }
+
+    @Test
+    @DisplayName("GET /users/me when service throws FeignException.Conflict returns 409 with fixed message")
+    void get_me_when_feign_conflict_returns_409() throws Exception {
+        var req = Request.create(
+                Request.HttpMethod.GET,
+                "http://auth-service/users/me",
+                java.util.Map.of(),
+                null,
+                new RequestTemplate()
+        );
+
+        var ex = new FeignException.Conflict(
+                "conflict",
+                req,
+                null,
+                java.util.Map.of()
+        );
+
+        when(userService.getCurrentUserInfo("john")).thenThrow(ex);
+
+        mockMvc.perform(get("/users/me")
+                        .principal(new UsernamePasswordAuthenticationToken("john", "pwd")))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.message").value("Username or email already exists"))
+                .andExpect(jsonPath("$.path").value("/users/me"));
+    }
+
+    @Test
+    @DisplayName("GET /users/me when service throws FeignClientException 404 returns 404 with upstream prefix")
+    void get_me_when_feign_client_404_returns_404() throws Exception {
+        var req = Request.create(
+                Request.HttpMethod.GET,
+                "http://club-service/whatever",
+                java.util.Map.of(),
+                null,
+                new RequestTemplate()
+        );
+
+        var ex = new FeignException.FeignClientException(
+                404,
+                "not found",
+                req,
+                null,
+                java.util.Map.of()
+        );
+
+        when(userService.getCurrentUserInfo("john")).thenThrow(ex);
+
+        mockMvc.perform(get("/users/me")
+                        .principal(new UsernamePasswordAuthenticationToken("john", "pwd")))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Upstream service error:")))
+                .andExpect(jsonPath("$.path").value("/users/me"));
+    }
+
+    @Test
+    @DisplayName("GET /users/me when service throws FeignClientException with unknown status returns 400")
+    void get_me_when_feign_client_unknown_status_returns_400() throws Exception {
+        var req = Request.create(
+                Request.HttpMethod.GET,
+                "http://x",
+                java.util.Map.of(),
+                null,
+                new RequestTemplate()
+        );
+
+        var ex = new FeignException.FeignClientException(
+                499,
+                "weird",
+                req,
+                null,
+                java.util.Map.of()
+        );
+
+        when(userService.getCurrentUserInfo("john")).thenThrow(ex);
+
+        mockMvc.perform(get("/users/me")
+                        .principal(new UsernamePasswordAuthenticationToken("john", "pwd")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Upstream service error:")))
+                .andExpect(jsonPath("$.path").value("/users/me"));
     }
 }

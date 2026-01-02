@@ -39,3 +39,4 @@ spring:
 
 topics:
   training-deleted: training.deleted
+  training-created: training.created

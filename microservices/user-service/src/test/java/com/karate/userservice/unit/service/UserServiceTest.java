@@ -527,4 +527,52 @@ class UserServiceTest {
         assertThat(ent.getEmail()).isEqualTo("new@ex");
     }
 
+    @Test
+    @DisplayName("getEmailsByClubId delegates to repository")
+    void get_emails_by_club_id_delegates() {
+        when(userRepository.findEmailsByKarateClubId(10L)).thenReturn(List.of("a@ex.com","b@ex.com"));
+
+        var out = service.getEmailsByClubId(10L);
+
+        assertThat(out).containsExactly("a@ex.com","b@ex.com");
+        verify(userRepository).findEmailsByKarateClubId(10L);
+    }
+
+    @Test
+    @DisplayName("patchCurrentUser throws UserNotFoundException when user missing in DB")
+    void patch_current_user_throws_when_user_missing() {
+        when(upstream.getAuthUserByUsername("u"))
+                .thenReturn(new AuthUserDto(1L, "u", Set.of("ROLE_USER")));
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        var req = new UpdateUserRequestDto(null, null, null);
+
+        assertThatThrownBy(() -> service.patchCurrentUser("u", req))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessage(UserService.USER_NOT_FOUND);
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("patchCurrentUser updates street and postalCode when provided")
+    void patch_current_user_updates_street_and_postal_code() {
+        when(upstream.getAuthUserByUsername("u"))
+                .thenReturn(new AuthUserDto(1L, "u", Set.of("ROLE_USER")));
+        var ent = user(1L, "old@ex", 1L, KarateRank.KYU_10);
+        ent.getAddressEntity().setStreet("OLD");
+        ent.getAddressEntity().setPostalCode("00-000");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(ent));
+
+        var req = new UpdateUserRequestDto(
+                null, null,
+                new AddressRequestDto(null, "NEW_STREET", null, "99-999")
+        );
+
+        service.patchCurrentUser("u", req);
+
+        assertThat(ent.getAddressEntity().getStreet()).isEqualTo("NEW_STREET");
+        assertThat(ent.getAddressEntity().getPostalCode()).isEqualTo("99-999");
+        verify(userRepository).save(ent);
+    }
 }

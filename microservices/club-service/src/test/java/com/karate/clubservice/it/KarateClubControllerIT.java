@@ -67,7 +67,7 @@ class KarateClubControllerIT extends BaseIntegrationTest {
                         .queryParam("name", KarateClubName.KLUB_OKINAWA_KARATE_DO_WARSZAWA.name())
                         .build())
                 .exchange()
-                .expectStatus().isNotFound(); // brak kontraktu na JSON body -> nie sprawdzamy treści
+                .expectStatus().isNotFound();
     }
 
     @Test
@@ -79,7 +79,7 @@ class KarateClubControllerIT extends BaseIntegrationTest {
                         .queryParam("name", "NOT_EXISTING_ENUM")
                         .build())
                 .exchange()
-                .expectStatus().isBadRequest(); // domyślny błąd frameworka – bez JSON body
+                .expectStatus().isBadRequest();
     }
 
     @Test
@@ -107,7 +107,7 @@ class KarateClubControllerIT extends BaseIntegrationTest {
         webTestClient.get()
                 .uri("/clubs/by-id/{id}", 999L)
                 .exchange()
-                .expectStatus().isNotFound(); // brak kontraktu na JSON body
+                .expectStatus().isNotFound();
     }
 
     @Test
@@ -123,5 +123,20 @@ class KarateClubControllerIT extends BaseIntegrationTest {
                 .header("X-Correlation-Id", cid)
                 .exchange()
                 .expectHeader().valueEquals("X-Correlation-Id", cid);
+    }
+
+    @Test
+    @DisplayName("CorrelationIdFilter generates new id when header is missing")
+    void correlationIdFilter_generatesNewId_whenMissingHeader() {
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/clubs/by-name")
+                        .queryParam("name", KarateClubName.LUBELSKA_AKADEMIA_SPORTU.name())
+                        .build())
+                .exchange()
+                .expectHeader().exists("X-Correlation-Id")
+                .expectHeader().value("X-Correlation-Id", v -> {
+                    assertThat(v).isNotBlank();
+                });
     }
 }
