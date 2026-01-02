@@ -24,9 +24,7 @@ public class GlobalExceptionHandler {
 
     // 400 - validation errors || invalid JSON / lack of body
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(
-            MethodArgumentNotValidException ex,
-            HttpServletRequest request
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request
     ) {
         log.warn("400 Validation failed path={} msg={}", request.getRequestURI(), ex.getMessage());
         List<ValidationError> errors = ex.getBindingResult()
@@ -51,9 +49,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(
-            org.springframework.http.converter.HttpMessageNotReadableException ex,
-            HttpServletRequest request
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(org.springframework.http.converter.HttpMessageNotReadableException ex, HttpServletRequest request
     ) {
         log.warn("400 Malformed body path={} msg={}", request.getRequestURI(), ex.getMessage());
         ErrorResponse response = new ErrorResponse(
@@ -68,9 +64,7 @@ public class GlobalExceptionHandler {
 
     // 400 - invalid club name
     @ExceptionHandler(InvalidClubNameException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidClubName(
-            InvalidClubNameException ex,
-            HttpServletRequest request
+    public ResponseEntity<ErrorResponse> handleInvalidClubName(InvalidClubNameException ex, HttpServletRequest request
     ) {
         log.warn("400 Invalid club name path={} msg={}", request.getRequestURI(), ex.getMessage());
         ErrorResponse response = new ErrorResponse(
@@ -85,9 +79,7 @@ public class GlobalExceptionHandler {
 
     // 404 - club not found
     @ExceptionHandler(ClubNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(
-            ClubNotFoundException ex,
-            HttpServletRequest request
+    public ResponseEntity<ErrorResponse> handleNotFound(ClubNotFoundException ex, HttpServletRequest request
     ) {
         log.warn("404 Club not found path={} msg={}", request.getRequestURI(), ex.getMessage());
         ErrorResponse response = new ErrorResponse(
@@ -102,9 +94,7 @@ public class GlobalExceptionHandler {
 
     // 404 - not found
     @ExceptionHandler({NoSuchElementException.class, EntityNotFoundException.class})
-    public ResponseEntity<ErrorResponse> handleNotFound(
-            RuntimeException ex,
-            HttpServletRequest request
+    public ResponseEntity<ErrorResponse> handleNotFound(RuntimeException ex, HttpServletRequest request
     ) {
         log.warn("404 Not found path={} msg={}", request.getRequestURI(), ex.getMessage());
         ErrorResponse response = new ErrorResponse(
@@ -120,9 +110,7 @@ public class GlobalExceptionHandler {
 
     // 409 - conflict (business logic conflict)
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ErrorResponse> handleConflict(
-            IllegalStateException ex,
-            HttpServletRequest request
+    public ResponseEntity<ErrorResponse> handleConflict(IllegalStateException ex, HttpServletRequest request
     ) {
         log.warn("409 Conflict path={} msg={}", request.getRequestURI(), ex.getMessage());
         ErrorResponse response = new ErrorResponse(

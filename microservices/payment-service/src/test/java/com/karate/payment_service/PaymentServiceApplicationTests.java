@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(properties = {
-        // ... (Poprzednie właściwości)
         "eureka.client.enabled=false",
         "spring.cloud.discovery.enabled=false",
         "spring.cloud.config.enabled=false",
@@ -25,9 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
         "topics.user-deleted=dummy-user-deleted-topic",
         "topics.user-registered=dummy-user-registered-topic",
 
-        // ROZWIĄZANIE: DODANIE WYRAŻENIA CRON
-        // Używamy prostego wyrażenia lub opcji wyłączającej, jeśli to możliwe
-        "payments.reminder.cron=-" // '-' lub '0 0 1 1 *' (raz w miesiącu)
+        "payments.reminder.cron=-"
 })
 class PaymentServiceApplicationTests {
 
