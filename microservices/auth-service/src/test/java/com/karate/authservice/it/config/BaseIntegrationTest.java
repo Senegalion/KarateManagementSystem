@@ -1,6 +1,5 @@
 package com.karate.authservice.it.config;
 
-import com.karate.authservice.api.exception.GlobalExceptionHandler;
 import com.karate.authservice.infrastructure.jwt.JwtAuthTokenFilter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,7 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.ActiveProfiles;
@@ -43,33 +42,16 @@ import static org.mockito.ArgumentMatchers.any;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
         classes = BaseIntegrationTest.TestApp.class,
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {
-                "spring.cloud.config.enabled=false",
-                "spring.config.import=",
-                "spring.cloud.discovery.enabled=false",
-                "eureka.client.enabled=false",
-                "spring.cloud.bus.enabled=false",
-                "management.tracing.enabled=false",
-
-                "spring.kafka.bootstrap-servers=localhost:0",
-                "spring.kafka.listener.auto-startup=false",
-                "spring.kafka.listener.missing-topics-fatal=false",
-                "spring.rabbitmq.host=localhost",
-                "spring.rabbitmq.port=0",
-                "spring.rabbitmq.listener.simple.auto-startup=false",
-
-                "spring.jpa.open-in-view=false",
-                "spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect",
-                "spring.flyway.enabled=true",
-
-                "spring.main.allow-bean-definition-overriding=true"
-        }
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 @AutoConfigureWebTestClient
 @Testcontainers
-@Import({GlobalExceptionHandler.class, BaseIntegrationTest.TestSecurityConfig.class})
+@Import(BaseIntegrationTest.TestSecurityConfig.class)
 public abstract class BaseIntegrationTest {
+    @MockitoBean
+    protected com.karate.authservice.infrastructure.messaging.UserEventProducer userEventProducer;
+    @MockitoBean
+    protected com.karate.authservice.infrastructure.jwt.JwtAuthenticatorService jwtAuthenticatorService;
 
     @SpringBootApplication(
             scanBasePackages = "com.karate.authservice",
@@ -78,7 +60,7 @@ public abstract class BaseIntegrationTest {
                     RabbitAutoConfiguration.class
             }
     )
-    static class TestApp {
+    public static class TestApp {
     }
 
     @TestConfiguration
@@ -92,8 +74,7 @@ public abstract class BaseIntegrationTest {
 
         @Bean
         PasswordEncoder passwordEncoder() {
-            // Użycie NoOpPasswordEncoder tylko w testach
-            return NoOpPasswordEncoder.getInstance();
+            return new BCryptPasswordEncoder();
         }
     }
 

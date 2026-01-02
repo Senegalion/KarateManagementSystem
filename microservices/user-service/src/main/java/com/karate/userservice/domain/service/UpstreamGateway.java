@@ -32,7 +32,7 @@ public class UpstreamGateway {
         return authClient.getAuthUserByUserId(userId);
     }
 
-    private AuthUserDto getAuthUserByUserIdFallback(Long userId, Throwable ex) {
+    public AuthUserDto getAuthUserByUserIdFallback(Long userId, Throwable ex) {
         log.warn("CB fallback authService.getAuthUserByUserId userId={} reason={}", userId, ex.toString());
         throw new UpstreamUnavailableException("auth-service unavailable", ex);
     }
@@ -44,7 +44,7 @@ public class UpstreamGateway {
         return authClient.getAuthUserByUsername(username);
     }
 
-    private AuthUserDto getAuthUserByUsernameFallback(String username, Throwable ex) {
+    public AuthUserDto getAuthUserByUsernameFallback(String username, Throwable ex) {
         log.warn("CB fallback authService.getAuthUserByUsername username={} reason={}", username, ex.toString());
         throw new UpstreamUnavailableException("auth-service unavailable", ex);
     }
@@ -56,7 +56,7 @@ public class UpstreamGateway {
                 ((java.util.List<Long>) (java.util.stream.StreamSupport.stream(ids.spliterator(), false).toList())));
     }
 
-    private Map<Long, AuthUserDto> getAuthUsersFallback(Iterable<Long> ids, Throwable ex) {
+    public Map<Long, AuthUserDto> getAuthUsersFallback(Iterable<Long> ids, Throwable ex) {
         log.warn("CB fallback authService.getAuthUsers size={} reason={}",
                 (ids instanceof java.util.Collection<?> c ? c.size() : -1), ex.toString());
         throw new UpstreamUnavailableException("auth-service unavailable", ex);
@@ -68,7 +68,7 @@ public class UpstreamGateway {
         return CompletableFuture.runAsync(() -> authClient.updateUsername(userId, newUsername));
     }
 
-    private CompletableFuture<Void> updateUsernameFallback(Long userId, String newUsername, Throwable ex) {
+    public CompletableFuture<Void> updateUsernameFallback(Long userId, String newUsername, Throwable ex) {
         log.error("CB/Timeout fallback authService.updateUsername userId={} reason={}", userId, ex.toString());
         return CompletableFuture.failedFuture(new UpstreamUnavailableException("auth-service timeout", ex));
     }
@@ -79,7 +79,7 @@ public class UpstreamGateway {
         return CompletableFuture.runAsync(() -> authClient.deleteUser(userId));
     }
 
-    private CompletableFuture<Void> deleteUserFallback(Long userId, Throwable ex) {
+    public CompletableFuture<Void> deleteUserFallback(Long userId, Throwable ex) {
         log.error("CB/Timeout fallback authService.deleteUser userId={} reason={}", userId, ex.toString());
         return CompletableFuture.failedFuture(new UpstreamUnavailableException("auth-service timeout", ex));
     }
@@ -92,7 +92,7 @@ public class UpstreamGateway {
         return clubClient.getClubByName(name);
     }
 
-    private KarateClubDto getClubByNameFallback(String name, Throwable ex) {
+    public KarateClubDto getClubByNameFallback(String name, Throwable ex) {
         log.warn("CB fallback clubService.getClubByName name={} reason={}", name, ex.toString());
         throw new UpstreamUnavailableException("club-service unavailable", ex);
     }
@@ -104,7 +104,7 @@ public class UpstreamGateway {
         return clubClient.getClubById(id);
     }
 
-    private KarateClubDto getClubByIdFallback(Long id, Throwable ex) {
+    public KarateClubDto getClubByIdFallback(Long id, Throwable ex) {
         log.warn("CB fallback clubService.getClubById id={} reason={}", id, ex.toString());
         throw new UpstreamUnavailableException("club-service unavailable", ex);
     }

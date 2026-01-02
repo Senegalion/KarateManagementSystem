@@ -18,6 +18,8 @@ import com.karate.authservice.infrastructure.messaging.UserEventProducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -28,6 +30,8 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -334,5 +338,76 @@ class AuthServiceTest {
         when(authUserRepository.findByUserId(8L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.deleteUser(8L))
                 .isInstanceOf(UserNotFoundException.class);
+    }
+
+    @Test
+    void register_throws_whenRoleNotFoundInDb() {
+        var req = RegisterUserDto.builder()
+                .username("john")
+                .email("j@ex.com")
+                .address(new AddressRequestDto("C", "S", "1", "00-000"))
+                .karateClubName("TOKYO")
+                .karateRank("KYU_9")
+                .role("USER")
+                .password("ENC")
+                .build();
+
+        when(upstream.getClubByName("TOKYO")).thenReturn(new KarateClubDto(21L, "TOKYO"));
+        when(roleRepository.findByName(RoleName.ROLE_USER)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.register(req))
+                .isInstanceOf(InvalidUserCredentialsException.class)
+                .hasMessageContaining("Role not found");
+
+        verify(authUserRepository, never()).save(any());
+        verify(userEventProducer, never()).sendUserRegisteredEvent(any());
+    }
+
+    @Test
+    void findByUserId_throws_whenAbsent() {
+        when(authUserRepository.findByUserId(123L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.findByUserId(123L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Auth user not found");
+    }
+
+    static Stream<UnaryOperator<RegisterUserDto.RegisterUserDtoBuilder>> nullMandatoryFields() {
+        return Stream.of(
+                b -> b.username(null),
+                b -> b.email(null),
+                b -> b.password(null),
+                b -> b.karateClubName(null),
+                b -> b.karateRank(null),
+                b -> b.role(null)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("nullMandatoryFields")
+    void register_throws_whenAnyMandatoryFieldNull(UnaryOperator<RegisterUserDto.RegisterUserDtoBuilder> mutator) {
+        var base = RegisterUserDto.builder()
+                .username("john")
+                .email("j@ex.com")
+                .address(new AddressRequestDto("C", "S", "1", "00-000"))
+                .karateClubName("TOKYO")
+                .karateRank("KYU_9")
+                .role("USER")
+                .password("ENC");
+
+        var req = mutator.apply(base).build();
+
+        assertThatThrownBy(() -> service.register(req))
+                .isInstanceOf(InvalidUserCredentialsException.class)
+                .hasMessageContaining("cannot be null");
+    }
+
+    @Test
+    void getAuthUserDtoByUsername_throws_whenUserNotFound() {
+        when(authUserRepository.findByUsername("ghost")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.getAuthUserDtoByUsername("ghost"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("User not found");
     }
 }

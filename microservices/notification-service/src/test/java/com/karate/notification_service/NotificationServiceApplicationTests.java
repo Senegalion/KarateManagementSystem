@@ -1,8 +1,10 @@
 package com.karate.notification_service;
 
+import com.karate.notification_service.infrastructure.feign.UserClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(properties = {
         "spring.cloud.config.enabled=false",
@@ -19,7 +21,14 @@ import org.springframework.test.context.ActiveProfiles;
         "spring.mail.properties.mail.smtp.starttls.enable=false",
 
         "app.mail.from=no-reply@karate.local",
-        "app.mail.fromName=Karate Management System"
+        "app.mail.fromName=Karate Management System",
+
+        "app.web.dashboard-url=http://localhost/dashboard",
+        "app.web.preferences-url=http://localhost/preferences",
+        "app.web.privacy-url=http://localhost/privacy",
+        "app.web.training-url=http://localhost/trainings/{trainingId}",
+
+        "app.userService.baseUrl=http://user-service:8080"
 })
 @ActiveProfiles("test")
 @org.springframework.context.annotation.Import(TestOverrides.class)
@@ -27,6 +36,11 @@ class NotificationServiceApplicationTests {
 
     @Test
     void contextLoads() {
-        // smoke: ma się tylko podnieść kontekst
     }
+
+    @MockitoBean
+    UserClient userClient;
+
+    @MockitoBean
+    org.springframework.cache.CacheManager cacheManager;
 }

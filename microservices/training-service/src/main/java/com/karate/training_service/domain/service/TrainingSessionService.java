@@ -18,6 +18,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -71,10 +73,23 @@ public class TrainingSessionService {
         TrainingSessionEntity saved = trainingSessionRepository.save(trainingSession);
         TrainingSessionDto result = TrainingSessionMapper.mapToTrainingSessionDto(saved);
 
-        // precyzyjne czyszczenie cache
         evictTrainingsByClub(clubId);
         evictTrainingById(saved.getTrainingSessionId());
         evictTrainingExists(saved.getTrainingSessionId());
+
+        afterCommit(() -> {
+            var event = new com.karate.training_service.infrastructure.messaging.event.TrainingCreatedEvent(
+                    UUID.randomUUID().toString(),
+                    "TRAINING_CREATED",
+                    Instant.now(),
+                    saved.getTrainingSessionId(),
+                    saved.getClubId(),
+                    saved.getStartTime(),
+                    saved.getEndTime(),
+                    saved.getDescription()
+            );
+            trainingEventProducer.sendTrainingCreatedEvent(event);
+        });
 
         return result;
     }
@@ -119,7 +134,7 @@ public class TrainingSessionService {
                 trainingId,
                 clubId
         );
-        trainingEventProducer.sendTrainingDeletedEvent(event);
+        afterCommit(() -> trainingEventProducer.sendTrainingDeletedEvent(event));
 
         evictTrainingById(trainingId);
         evictTrainingExists(trainingId);
@@ -169,6 +184,22 @@ public class TrainingSessionService {
 
         evictTrainingsByClub(clubId);
 
+        afterCommit(() -> {
+            for (TrainingSessionEntity s : saved) {
+                var event = new com.karate.training_service.infrastructure.messaging.event.TrainingCreatedEvent(
+                        UUID.randomUUID().toString(),
+                        "TRAINING_CREATED",
+                        Instant.now(),
+                        s.getTrainingSessionId(),
+                        s.getClubId(),
+                        s.getStartTime(),
+                        s.getEndTime(),
+                        s.getDescription()
+                );
+                trainingEventProducer.sendTrainingCreatedEvent(event);
+            }
+        });
+
         return saved.stream()
                 .map(TrainingSessionMapper::mapToTrainingSessionDto)
                 .toList();
@@ -214,5 +245,18 @@ public class TrainingSessionService {
     private void evictTrainingExists(Long trainingId) {
         Cache c = cacheManager.getCache("trainingExists");
         if (c != null) c.evictIfPresent(trainingId);
+    }
+
+    private void afterCommit(Runnable action) {
+        if (!TransactionSynchronizationManager.isActualTransactionActive()) {
+            action.run();
+            return;
+        }
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                action.run();
+            }
+        });
     }
 }

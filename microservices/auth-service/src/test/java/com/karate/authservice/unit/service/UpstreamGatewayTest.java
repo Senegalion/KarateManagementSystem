@@ -1,5 +1,6 @@
 package com.karate.authservice.unit.service;
 
+import com.karate.authservice.domain.exception.UpstreamUnavailableException;
 import com.karate.authservice.domain.service.UpstreamGateway;
 import com.karate.authservice.infrastructure.client.KarateClubClient;
 import com.karate.authservice.infrastructure.client.UserClient;
@@ -147,5 +148,47 @@ class UpstreamGatewayTest {
                 .isInstanceOf(CompletionException.class)
                 .hasCauseInstanceOf(IllegalStateException.class)
                 .hasRootCauseMessage("create-failed");
+    }
+
+    @Test
+    void getUserByIdFallback_throwsUpstreamUnavailable() {
+        var gw = new UpstreamGateway(userClient, clubClient);
+
+        assertThatThrownBy(() -> gw.getUserByIdFallback(10L, new RuntimeException("x")))
+                .isInstanceOf(UpstreamUnavailableException.class)
+                .hasMessageContaining("user-service unavailable");
+    }
+
+    @Test
+    void getClubByIdFallback_throwsUpstreamUnavailable() {
+        var gw = new UpstreamGateway(userClient, clubClient);
+
+        assertThatThrownBy(() -> gw.getClubByIdFallback(21L, new RuntimeException("x")))
+                .isInstanceOf(UpstreamUnavailableException.class)
+                .hasMessageContaining("club-service unavailable");
+    }
+
+    @Test
+    void getClubByNameFallback_throwsUpstreamUnavailable() {
+        var gw = new UpstreamGateway(userClient, clubClient);
+
+        assertThatThrownBy(() -> gw.getClubByNameFallback("TOKYO", new RuntimeException("x")))
+                .isInstanceOf(UpstreamUnavailableException.class)
+                .hasMessageContaining("club-service unavailable");
+    }
+
+    @Test
+    void createUserAsyncFallback_returnsFailedFuture_withUpstreamUnavailable() {
+        var gw = new UpstreamGateway(userClient, clubClient);
+
+        var dto = new NewUserRequestDto(
+                1L, "a@b", 21L, "KYU_9",
+                new AddressDto("C", "S", "1", "00-000")
+        );
+
+        assertThatThrownBy(() -> gw.createUserAsyncFallback(dto, new RuntimeException("timeout")).join())
+                .isInstanceOf(CompletionException.class)
+                .hasCauseInstanceOf(UpstreamUnavailableException.class)
+                .hasMessageContaining("user-service timeout");
     }
 }
