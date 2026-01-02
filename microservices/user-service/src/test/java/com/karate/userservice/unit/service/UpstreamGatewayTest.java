@@ -1,5 +1,6 @@
 package com.karate.userservice.unit.service;
 
+import com.karate.userservice.domain.exception.UpstreamUnavailableException;
 import com.karate.userservice.domain.service.UpstreamGateway;
 import com.karate.userservice.infrastructure.client.AuthClient;
 import com.karate.userservice.infrastructure.client.KarateClubClient;
@@ -15,7 +16,9 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletionException;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class UpstreamGatewayTest {
@@ -129,4 +132,104 @@ class UpstreamGatewayTest {
         // then
         verify(clubClient).getClubById(9L);
     }
+
+    @Test
+    @DisplayName("fallback getAuthUserByUserId throws UpstreamUnavailableException")
+    void fallback_get_auth_user_by_user_id_throws() {
+        var ex = new RuntimeException("down");
+        assertThatThrownBy(() ->
+                gateway.getAuthUserByUserIdFallback(1L, ex)
+        ).isInstanceOf(com.karate.userservice.domain.exception.UpstreamUnavailableException.class)
+                .hasMessageContaining("auth-service unavailable")
+                .hasCause(ex);
+    }
+
+    @Test
+    @DisplayName("fallback getAuthUserByUsername throws UpstreamUnavailableException")
+    void fallback_get_auth_user_by_username_throws() {
+        var ex = new RuntimeException("down");
+
+        assertThatThrownBy(() -> gateway.getAuthUserByUsernameFallback("john", ex))
+                .isInstanceOf(UpstreamUnavailableException.class)
+                .hasMessageContaining("auth-service unavailable")
+                .hasCause(ex);
+    }
+
+    @Test
+    @DisplayName("fallback getAuthUsers throws UpstreamUnavailableException (ids is Collection)")
+    void fallback_get_auth_users_throws_for_collection_ids() {
+        var ex = new RuntimeException("down");
+        var ids = List.of(1L, 2L, 3L);
+
+        assertThatThrownBy(() -> gateway.getAuthUsersFallback(ids, ex))
+                .isInstanceOf(UpstreamUnavailableException.class)
+                .hasMessageContaining("auth-service unavailable")
+                .hasCause(ex);
+    }
+
+    @Test
+    @DisplayName("fallback getAuthUsers throws UpstreamUnavailableException (ids is not Collection)")
+    void fallback_get_auth_users_throws_for_non_collection_ids() {
+        var ex = new RuntimeException("down");
+
+        Iterable<Long> ids = () -> List.of(1L, 2L).iterator();
+
+        assertThatThrownBy(() -> gateway.getAuthUsersFallback(ids, ex))
+                .isInstanceOf(UpstreamUnavailableException.class)
+                .hasMessageContaining("auth-service unavailable")
+                .hasCause(ex);
+    }
+
+    @Test
+    @DisplayName("fallback updateUsername returns failed future with UpstreamUnavailableException")
+    void fallback_update_username_returns_failed_future() {
+        var cause = new RuntimeException("timeout");
+
+        var fut = gateway.updateUsernameFallback(5L, "newName", cause);
+
+        assertThatThrownBy(fut::join)
+                .isInstanceOf(CompletionException.class)
+                .hasCauseInstanceOf(UpstreamUnavailableException.class)
+                .hasMessageContaining("auth-service timeout")
+                .hasRootCause(cause)
+                .hasRootCauseMessage("timeout");
+    }
+
+    @Test
+    @DisplayName("fallback deleteUser returns failed future with UpstreamUnavailableException")
+    void fallback_delete_user_returns_failed_future() {
+        var cause = new RuntimeException("timeout");
+
+        var fut = gateway.deleteUserFallback(7L, cause);
+
+        assertThatThrownBy(fut::join)
+                .isInstanceOf(CompletionException.class)
+                .hasCauseInstanceOf(UpstreamUnavailableException.class)
+                .hasMessageContaining("auth-service timeout")
+                .hasRootCause(cause)
+                .hasRootCauseMessage("timeout");
+    }
+
+    @Test
+    @DisplayName("fallback getClubByName throws UpstreamUnavailableException")
+    void fallback_get_club_by_name_throws() {
+        var ex = new RuntimeException("down");
+
+        assertThatThrownBy(() -> gateway.getClubByNameFallback("TOKYO", ex))
+                .isInstanceOf(UpstreamUnavailableException.class)
+                .hasMessageContaining("club-service unavailable")
+                .hasCause(ex);
+    }
+
+    @Test
+    @DisplayName("fallback getClubById throws UpstreamUnavailableException")
+    void fallback_get_club_by_id_throws() {
+        var ex = new RuntimeException("down");
+
+        assertThatThrownBy(() -> gateway.getClubByIdFallback(9L, ex))
+                .isInstanceOf(UpstreamUnavailableException.class)
+                .hasMessageContaining("club-service unavailable")
+                .hasCause(ex);
+    }
+
 }

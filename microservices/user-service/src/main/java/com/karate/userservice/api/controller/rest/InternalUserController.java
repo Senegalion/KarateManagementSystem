@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/internal/users")
@@ -68,5 +70,16 @@ public class InternalUserController {
         UserPayload userPayload = userService.getUser(userId);
         log.info("200 /internal/users/payload/{} took={}ms", userId, System.currentTimeMillis() - t0);
         return ResponseEntity.ok(userPayload);
+    }
+
+    @GetMapping("/{clubId}/users/emails")
+    @Operation(summary = "Get emails of users in a club (internal)")
+    public ResponseEntity<List<String>> getClubUserEmails(@PathVariable Long clubId) {
+        log.info("GET /internal/clubs/{}/users/emails", clubId);
+        long t0 = System.currentTimeMillis();
+        List<String> emails = userService.getEmailsByClubId(clubId);
+        log.info("200 /internal/clubs/{}/users/emails count={} took={}ms",
+                clubId, emails.size(), System.currentTimeMillis() - t0);
+        return ResponseEntity.ok(emails);
     }
 }

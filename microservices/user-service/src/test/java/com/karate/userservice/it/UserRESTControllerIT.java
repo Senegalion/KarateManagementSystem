@@ -9,6 +9,7 @@ import com.karate.userservice.domain.repository.UserRepository;
 import com.karate.userservice.domain.service.UpstreamGateway;
 import com.karate.userservice.infrastructure.client.dto.AuthUserDto;
 import com.karate.userservice.infrastructure.client.dto.KarateClubDto;
+import com.karate.userservice.infrastructure.messaging.UserEventPublisher;
 import com.karate.userservice.it.config.BaseIntegrationTest;
 import com.karate.userservice.it.config.TestData;
 import org.junit.jupiter.api.DisplayName;
@@ -17,9 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import java.time.Duration;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @DisplayName("UserRESTController – integration (secured endpoints)")
@@ -30,6 +35,9 @@ class UserRESTControllerIT extends BaseIntegrationTest {
 
     @MockitoBean
     private UpstreamGateway upstream;
+
+    @MockitoBean
+    private UserEventPublisher userEventPublisher;
 
     @Test
     @DisplayName("GET /users/me returns current user info (ROLE_USER)")
@@ -137,13 +145,21 @@ class UserRESTControllerIT extends BaseIntegrationTest {
     void delete_users_me_deletes() {
         // given
         userRepository.save(TestData.user(830L, "del@ex", 77L, KarateRank.KYU_7));
-        when(upstream.getAuthUserByUsername("john"))
+
+        doNothing().when(userEventPublisher).publishUserDeleted(anyLong());
+
+        when(upstream.getAuthUserByUsername(anyString()))
                 .thenReturn(new AuthUserDto(830L, "john", Set.of("ROLE_USER")));
-        when(upstream.deleteUser(830L))
+
+        when(upstream.deleteUser(anyLong()))
                 .thenReturn(java.util.concurrent.CompletableFuture.completedFuture(null));
 
+        var client = webTestClient.mutate()
+                .responseTimeout(Duration.ofSeconds(30))
+                .build();
+
         // when / then
-        webTestClient.delete()
+        client.delete()
                 .uri("/users/me")
                 .header("X-Test-User", "john")
                 .header("X-Test-Roles", "USER")

@@ -9,6 +9,7 @@ import com.karate.training_service.domain.exception.InvalidTrainingTimeRangeExce
 import com.karate.training_service.domain.exception.TrainingSessionClubMismatchException;
 import com.karate.training_service.domain.exception.TrainingSessionNotFoundException;
 import com.karate.training_service.domain.service.TrainingSessionService;
+import feign.FeignException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -160,5 +161,155 @@ class TrainingRESTControllerTest {
         mvc.perform(delete("/trainings/{id}", 7L))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message", containsString("another club")));
+    }
+
+    @Test
+    void getAll_whenAuthMissingException_returns401() throws Exception {
+        when(service.getAllTrainingSessionsForCurrentUserClub())
+                .thenThrow(new com.karate.training_service.domain.exception.AuthenticationMissingException("No authenticated user found"));
+
+        mvc.perform(get("/trainings"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void getAll_whenServiceThrowsNoSuchElement_returns404_fromHandleNotFound() throws Exception {
+        when(service.getAllTrainingSessionsForCurrentUserClub())
+                .thenThrow(new java.util.NoSuchElementException("missing"));
+
+        mvc.perform(get("/trainings"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("missing"))
+                .andExpect(jsonPath("$.path").value("/trainings"));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void getAll_whenServiceThrowsEntityNotFound_returns404_fromHandleNotFound() throws Exception {
+        when(service.getAllTrainingSessionsForCurrentUserClub())
+                .thenThrow(new jakarta.persistence.EntityNotFoundException("gone"));
+
+        mvc.perform(get("/trainings"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("gone"))
+                .andExpect(jsonPath("$.path").value("/trainings"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void create_whenServiceThrowsIllegalState_returns409_fromHandleConflict() throws Exception {
+        when(service.createTrainingSession(any()))
+                .thenThrow(new IllegalStateException("conflict"));
+
+        var req = new TrainingSessionRequestDto(
+                LocalDateTime.parse("2025-01-01T10:00:00"),
+                LocalDateTime.parse("2025-01-01T11:00:00"),
+                "x"
+        );
+
+        mvc.perform(post("/trainings/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(req)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.message").value("conflict"))
+                .andExpect(jsonPath("$.path").value("/trainings/create"));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void getAll_whenServiceThrowsFeignBadRequest_returns400_fromHandleFeignClientException() throws Exception {
+        var req = feign.Request.create(
+                feign.Request.HttpMethod.GET,
+                "http://user-service/internal/users/x",
+                java.util.Map.of(),
+                null,
+                feign.Util.UTF_8,
+                null
+        );
+
+        FeignException.FeignClientException ex =
+                new feign.FeignException.BadRequest("bad upstream", req, null, java.util.Map.of());
+
+        when(service.getAllTrainingSessionsForCurrentUserClub()).thenThrow(ex);
+
+        mvc.perform(get("/trainings"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message", containsString("Upstream service error:")))
+                .andExpect(jsonPath("$.path").value("/trainings"));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void getAll_whenServiceThrowsGeneric_returns500_fromHandleGenericException() throws Exception {
+        when(service.getAllTrainingSessionsForCurrentUserClub())
+                .thenThrow(new RuntimeException("boom"));
+
+        mvc.perform(get("/trainings"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.message", containsString("Unexpected error: boom")))
+                .andExpect(jsonPath("$.path").value("/trainings"));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void getAll_whenServiceThrowsUpstreamUnavailable_returns503() throws Exception {
+        when(service.getAllTrainingSessionsForCurrentUserClub())
+                .thenThrow(new com.karate.training_service.domain.exception.UpstreamUnavailableException(
+                        "user-service unavailable", new RuntimeException("x")
+                ));
+
+        mvc.perform(get("/trainings"))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.status").value(503))
+                .andExpect(jsonPath("$.message").value("user-service unavailable"))
+                .andExpect(jsonPath("$.path").value("/trainings"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void createRecurring_created201() throws Exception {
+        var dto = new com.karate.training_service.api.dto.TrainingRecurringRequestDto(
+                java.time.LocalDate.of(2025, 1, 1),
+                java.time.LocalDate.of(2025, 1, 7),
+                java.time.LocalTime.of(10, 0),
+                java.time.LocalTime.of(11, 0),
+                java.util.Set.of(java.time.DayOfWeek.MONDAY),
+                "rec",
+                true
+        );
+
+        when(service.createRecurringTrainings(any())).thenReturn(List.of(
+                TrainingSessionDto.builder()
+                        .trainingSessionId(1L)
+                        .startTime(java.time.LocalDateTime.of(2025,1,6,10,0))
+                        .endTime(java.time.LocalDateTime.of(2025,1,6,11,0))
+                        .description("rec")
+                        .build()
+        ));
+
+        mvc.perform(post("/trainings/create/recurring")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(dto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].trainingSessionId").value(1));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void createRecurring_validation400_whenMissingFields() throws Exception {
+        mvc.perform(post("/trainings/create/recurring")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message", containsString("Validation failed")));
     }
 }

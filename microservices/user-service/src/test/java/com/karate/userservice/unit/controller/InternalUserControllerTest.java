@@ -18,6 +18,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -128,5 +129,38 @@ class InternalUserControllerTest {
                 .andExpect(jsonPath("$.username").value("john"));
 
         verify(userService).getUser(7L);
+    }
+
+    @Test
+    @DisplayName("POST /internal/users when service throws UserAlreadyExistsException returns 409")
+    void post_internal_users_conflict_returns_409() throws Exception {
+        var req = new NewUserRequestDto(
+                100L, "u@ex.com", 5L, "KYU_10",
+                new com.karate.userservice.domain.model.dto.AddressDto("C", "S", "1", "00-001")
+        );
+
+        when(userService.createUser(req))
+                .thenThrow(new com.karate.userservice.domain.exception.UserAlreadyExistsException("exists"));
+
+        mockMvc.perform(post("/internal/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(req)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.message").value("exists"))
+                .andExpect(jsonPath("$.path").value("/internal/users"));
+    }
+
+    @Test
+    @DisplayName("GET /internal/users/{clubId}/users/emails returns list")
+    void get_internal_club_user_emails_returns_list() throws Exception {
+        when(userService.getEmailsByClubId(5L)).thenReturn(List.of("a@ex.com", "b@ex.com"));
+
+        mockMvc.perform(get("/internal/users/5/users/emails"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0]").value("a@ex.com"));
+
+        verify(userService).getEmailsByClubId(5L);
     }
 }

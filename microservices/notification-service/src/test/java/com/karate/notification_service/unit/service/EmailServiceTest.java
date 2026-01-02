@@ -19,7 +19,6 @@ import static org.mockito.Mockito.*;
 class EmailServiceTest {
 
     private static MimeMessage newMime() {
-        // działa bez realnego serwera SMTP
         return new MimeMessage(Session.getInstance(new Properties()));
     }
 
@@ -44,26 +43,20 @@ class EmailServiceTest {
 
         MimeMessage sent = captor.getValue();
 
-        // TO
         Address[] to = sent.getRecipients(Message.RecipientType.TO);
         assertThat(to).hasSize(1);
         assertThat(((InternetAddress) to[0]).getAddress()).isEqualTo("john@ex.com");
 
-        // FROM + personal name
         InternetAddress from = (InternetAddress) sent.getFrom()[0];
         assertThat(from.getAddress()).isEqualTo("noreply@ex.com");
         assertThat(from.getPersonal()).isEqualTo("Karate HQ");
 
-        // SUBJECT
         assertThat(sent.getSubject()).isEqualTo("Hello");
 
-        // BODY (HTML)
         Object content = sent.getContent();
-        // MimeMessageHelper z html=true ustawia "text/html"
         if (content instanceof String s) {
             assertThat(s).contains("Siema").contains("</b>");
         } else {
-            // awaryjnie (gdyby vendor złożył to w multipart)
             String asString = content.toString();
             assertThat(asString).contains("Siema");
         }
@@ -76,7 +69,6 @@ class EmailServiceTest {
         JavaMailSender mailSender = mock(JavaMailSender.class);
         when(mailSender.createMimeMessage()).thenReturn(newMime());
 
-        // brak konfiguracji => null
         EmailProperties props = new EmailProperties();
 
         EmailService emailService = new EmailService(mailSender, props);
@@ -103,7 +95,7 @@ class EmailServiceTest {
         emailService.sendHtml(null, "x", "<b>y</b>");
         emailService.sendHtml("   ", "x", "<b>y</b>");
 
-        // then — nic nie powinno być tworzone ani wysyłane
+        // then
         verify(mailSender, never()).createMimeMessage();
         verify(mailSender, never()).send(any(MimeMessage.class));
     }
@@ -118,11 +110,10 @@ class EmailServiceTest {
 
         EmailService emailService = new EmailService(mailSender, new EmailProperties());
 
-        // when — brak wyjątku mimo awarii wysyłki
+        // when
         emailService.sendHtml("john@ex.com", "S", "<b>B</b>");
 
         // then
         verify(mailSender).send(any(MimeMessage.class));
-        // brak asercji na logi — wystarczy, że nie poleci exception
     }
 }

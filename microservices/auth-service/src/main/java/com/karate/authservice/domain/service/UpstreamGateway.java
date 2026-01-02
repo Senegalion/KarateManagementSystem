@@ -28,7 +28,7 @@ public class UpstreamGateway {
         return userClient.getUserById(userId);
     }
 
-    private UserInfoDto getUserByIdFallback(Long userId, Throwable ex) {
+    public UserInfoDto getUserByIdFallback(Long userId, Throwable ex) {
         log.warn("CB fallback userService.getUserById userId={} reason={}", userId, ex.toString());
         throw new UpstreamUnavailableException("user-service unavailable", ex);
     }
@@ -39,7 +39,7 @@ public class UpstreamGateway {
         return clubClient.getClubById(clubId);
     }
 
-    private KarateClubDto getClubByIdFallback(Long clubId, Throwable ex) {
+    public KarateClubDto getClubByIdFallback(Long clubId, Throwable ex) {
         log.warn("CB fallback clubService.getClubById clubId={} reason={}", clubId, ex.toString());
         throw new UpstreamUnavailableException("club-service unavailable", ex);
     }
@@ -50,7 +50,7 @@ public class UpstreamGateway {
         return clubClient.getClubByName(name);
     }
 
-    private KarateClubDto getClubByNameFallback(String name, Throwable ex) {
+    public KarateClubDto getClubByNameFallback(String name, Throwable ex) {
         log.warn("CB fallback clubService.getClubByName name={} reason={}", name, ex.toString());
         throw new UpstreamUnavailableException("club-service unavailable", ex);
     }
@@ -61,7 +61,7 @@ public class UpstreamGateway {
         return CompletableFuture.supplyAsync(() -> userClient.createUser(dto));
     }
 
-    private CompletableFuture<Long> createUserAsyncFallback(NewUserRequestDto dto, Throwable ex) {
+    public CompletableFuture<Long> createUserAsyncFallback(NewUserRequestDto dto, Throwable ex) {
         log.error("CB/Timeout fallback userService.createUser reason={}", ex.toString());
         return CompletableFuture.failedFuture(new UpstreamUnavailableException("user-service timeout", ex));
     }
