@@ -566,6 +566,31 @@ services:
         condition: service_healthy
     restart: always
 
+  selenium:
+    image: selenium/standalone-chrome:latest
+    shm_size: 2gb
+    ports:
+      - "4444:4444"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:4444/wd/hub/status" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: always
+
+#  e2e-tests:
+#    build:
+#      context: ./e2e-tests
+#      dockerfile: Dockerfile
+#    depends_on:
+#      selenium:
+#        condition: service_healthy
+#      frontend:
+#        condition: service_started
+#    environment:
+#      BASE_URL: http://frontend
+#      SELENIUM_URL: http://selenium:4444/wd/hub
+
   # --- CI/CD Tools ---
 
   jenkins:
@@ -581,19 +606,19 @@ services:
     mem_limit: 1g
     restart: always
 
-  sonarqube:
-    image: sonarqube:community
-    container_name: sonarqube
-    ports:
-      - "9000:9000"
-    environment:
-      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
-    volumes:
-      - sonarqube_data:/opt/sonarqube/data
-      - sonarqube_logs:/opt/sonarqube/logs
-      - sonarqube_extensions:/opt/sonarqube/extensions
-    mem_limit: 1g
-    restart: always
+#  sonarqube:
+#    image: sonarqube:community
+#    container_name: sonarqube
+#    ports:
+#      - "9000:9000"
+#    environment:
+#      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+#    volumes:
+#      - sonarqube_data:/opt/sonarqube/data
+#      - sonarqube_logs:/opt/sonarqube/logs
+#      - sonarqube_extensions:/opt/sonarqube/extensions
+#    mem_limit: 1g
+#    restart: always
 
 volumes:
   redis-club-data:
