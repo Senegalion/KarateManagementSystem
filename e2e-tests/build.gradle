@@ -1,0 +1,52 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '4.0.1'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.karate'
+version = '0.0.1-SNAPSHOT'
+description = 'Demo project for Spring Boot'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.seleniumhq.selenium:selenium-java:4.35.0'
+}
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams true
+    }
+}
+
+tasks.register('e2e', Test) {
+    group = 'verification'
+    description = 'Runs E2E tests against docker-compose environment (RemoteWebDriver)'
+
+    useJUnitPlatform()
+
+    environment 'SELENIUM_URL', System.getenv().getOrDefault('SELENIUM_URL', 'http://localhost:4444/wd/hub')
+    environment 'BASE_URL', System.getenv().getOrDefault('BASE_URL', 'http://localhost:3000')
+}
+
+tasks.register('e2eLocal', Test) {
+    group = 'verification'
+    description = 'Runs E2E tests (placeholder). Prefer docker Selenium.'
+    useJUnitPlatform()
+}
