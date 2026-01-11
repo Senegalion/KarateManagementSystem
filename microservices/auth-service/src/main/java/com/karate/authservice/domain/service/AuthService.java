@@ -138,6 +138,13 @@ public class AuthService {
         log.info("Login validation start user={} club={}", username, tokenRequestDto.karateClubName());
         try {
             UserDto user = findByUsername(username);
+
+            boolean isSystemAdmin = user.roles().contains(RoleName.ROLE_SYSTEM_ADMIN);
+            if (isSystemAdmin) {
+                log.info("Login validation OK (SYSTEM_ADMIN bypass) user={}", username);
+                return;
+            }
+
             boolean clubMatch = user.karateClubName().equalsIgnoreCase(tokenRequestDto.karateClubName());
             log.debug("Login validation user={} clubMatch={}", username, clubMatch);
             if (!clubMatch) {
