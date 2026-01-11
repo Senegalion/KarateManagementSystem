@@ -55,10 +55,10 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/internal/users/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/users/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/success/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/cancel/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SYSTEM_ADMIN")
+                        .requestMatchers("/users/**").hasAnyRole("USER", "ADMIN", "SYSTEM_ADMIN")
+                        .requestMatchers("/success/**").hasAnyRole("USER", "ADMIN", "SYSTEM_ADMIN")
+                        .requestMatchers("/cancel/**").hasAnyRole("USER", "ADMIN", "SYSTEM_ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -66,17 +66,4 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration config = new CorsConfiguration();
-//        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
-//        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-//        config.setAllowedHeaders(List.of("*"));
-//        config.setAllowCredentials(true);
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", config);
-//        return source;
-//    }
 }
