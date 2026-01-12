@@ -6,6 +6,8 @@ public record UserDeletedEvent(
         String eventId,
         String eventType,
         Instant timestamp,
-        Long userId
+        Long userId,
+        String email,
+        String username
 ) {
 }

@@ -8,4 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 interface AuthClient {
     @GetMapping("/internal/users/username/by-id/{username}")
     fun getUserIdByUsername(@PathVariable username: String): Long?
+
+    @GetMapping("/internal/users/payload/{userId}")
+    fun getUsernameById(@PathVariable("userId") userId: Long?): String?
 }
