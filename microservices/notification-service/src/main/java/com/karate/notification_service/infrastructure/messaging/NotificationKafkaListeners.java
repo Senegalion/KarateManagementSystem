@@ -38,17 +38,6 @@ public class NotificationKafkaListeners {
     }
 
     @KafkaListener(
-            topics = "${topics.feedback-created}",
-            groupId = "notification-service",
-            containerFactory = "feedbackListenerFactory"
-    )
-    public void onFeedback(FeedbackEvent event) {
-        log.info("Feedback consumed id={} type={} ts={}",
-                event.getEventId(), event.getEventType(), event.getTimestamp());
-        notifications.onFeedbackCreated(event);
-    }
-
-    @KafkaListener(
             topics = "${topics.training-created}",
             groupId = "notification-service",
             containerFactory = "trainingCreatedListenerFactory"
@@ -77,4 +66,40 @@ public class NotificationKafkaListeners {
         notifications.onTrainingDeleted(event);
     }
 
+    @KafkaListener(
+            topics = "${topics.user-deleted}",
+            groupId = "notification-service",
+            containerFactory = "userDeletedListenerFactory"
+    )
+    public void onUserDeleted(UserDeletedEvent event) {
+        log.info("UserDeleted consumed eventId={} userId={} email={}",
+                event.eventId(), event.userId(), event.email());
+        notifications.onUserDeleted(event);
+    }
+
+    @KafkaListener(
+            topics = "${topics.feedback-created}",
+            groupId = "notification-service",
+            containerFactory = "feedbackListenerFactory"
+    )
+    public void onFeedbackCreated(FeedbackEvent event) {
+        log.info("Feedback CREATED consumed eventId={} userId={} email={}",
+                event.getEventId(),
+                event.getPayload() == null ? null : event.getPayload().getUserId(),
+                event.getPayload() == null ? null : event.getPayload().getUserEmail());
+        notifications.onFeedbackCreated(event);
+    }
+
+    @KafkaListener(
+            topics = "${topics.feedback-updated}",
+            groupId = "notification-service",
+            containerFactory = "feedbackListenerFactory"
+    )
+    public void onFeedbackUpdated(FeedbackEvent event) {
+        log.info("Feedback UPDATED consumed eventId={} userId={} email={}",
+                event.getEventId(),
+                event.getPayload() == null ? null : event.getPayload().getUserId(),
+                event.getPayload() == null ? null : event.getPayload().getUserEmail());
+        notifications.onFeedbackUpdated(event);
+    }
 }
