@@ -18,6 +18,10 @@ public class CorsConfig {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowCredentials(true);
         cfg.setAllowedOrigins(List.of(
+                "https://localhost",
+                "https://localhost:443",
+                "https://karate.local",
+                "https://karate.local:443",
                 "http://localhost:5173",
                 "http://localhost:3000",
                 "http://localhost",
