@@ -146,7 +146,7 @@ class UserRESTControllerIT extends BaseIntegrationTest {
         // given
         userRepository.save(TestData.user(830L, "del@ex", 77L, KarateRank.KYU_7));
 
-        doNothing().when(userEventPublisher).publishUserDeleted(anyLong());
+        doNothing().when(userEventPublisher).publishUserDeleted(anyLong(), anyString(), anyString());
 
         when(upstream.getAuthUserByUsername(anyString()))
                 .thenReturn(new AuthUserDto(830L, "john", Set.of("ROLE_USER")));

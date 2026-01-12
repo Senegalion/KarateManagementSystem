@@ -397,14 +397,14 @@ class UserServiceTest {
                 .thenReturn(new AuthUserDto(77L, "john", Set.of("ROLE_USER")));
         var ent = user(77L, "x@x", 1L, KarateRank.KYU_10);
         when(userRepository.findById(77L)).thenReturn(Optional.of(ent));
-        doNothing().when(userEventPublisher).publishUserDeleted(77L);
+        doNothing().when(userEventPublisher).publishUserDeleted(77L, "x@x", "john");
 
         // when
         service.deleteCurrentUser("john");
 
         // then
         verify(userRepository).delete(ent);
-        verify(userEventPublisher).publishUserDeleted(77L);
+        verify(userEventPublisher).publishUserDeleted(77L, "x@x", "john");
 
         verify(upstream).getAuthUserByUsername("john");
         verifyNoMoreInteractions(upstream);
@@ -424,7 +424,7 @@ class UserServiceTest {
                 .hasMessage(UserService.USER_NOT_FOUND);
         verify(userRepository, never()).delete(any());
         verify(upstream, never()).deleteUser(anyLong());
-        verify(userEventPublisher, never()).publishUserDeleted(anyLong());
+        verify(userEventPublisher, never()).publishUserDeleted(anyLong(), anyString(), anyString());
     }
 
     // --- extra assertions for getUsersFromClubByName mapping ---

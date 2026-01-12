@@ -87,4 +87,17 @@ public class KafkaConfig {
         f.setConsumerFactory(cf);
         return f;
     }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, UserDeletedEvent> userDeletedListenerFactory(
+            ConsumerFactory<String, UserDeletedEvent> cf) {
+        var f = new ConcurrentKafkaListenerContainerFactory<String, UserDeletedEvent>();
+        f.setConsumerFactory(cf);
+        return f;
+    }
+
+    @Bean
+    public ConsumerFactory<String, UserDeletedEvent> userDeletedConsumerFactory(KafkaProperties props) {
+        return factoryFor(props, UserDeletedEvent.class);
+    }
 }

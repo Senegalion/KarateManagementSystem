@@ -18,7 +18,7 @@ class UserEventPublisherTest {
 
         org.springframework.test.util.ReflectionTestUtils.setField(publisher, "userDeletedTopic", "user-deleted-topic");
 
-        publisher.publishUserDeleted(123L);
+        publisher.publishUserDeleted(123L, "userEmail@gmail.com", "username");
 
         var capt = org.mockito.ArgumentCaptor.forClass(com.karate.userservice.infrastructure.messaging.dto.UserDeletedEvent.class);
         verify(kafka).send(eq("user-deleted-topic"), eq("123"), capt.capture());

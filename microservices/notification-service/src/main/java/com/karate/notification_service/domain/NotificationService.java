@@ -90,6 +90,24 @@ public class NotificationService {
         email.sendHtml(p.getUserEmail(), subject, body);
     }
 
+    public void onFeedbackUpdated(com.karate.notification_service.infrastructure.messaging.dto.FeedbackEvent ev) {
+        var p = ev.getPayload();
+        if (p == null) return;
+
+        var locale = Locale.ENGLISH;
+
+        if (ev.getEventId() != null && !markIfNew(ev.getEventId())) return;
+
+        String subject = t("email.feedback.updated.subject", locale);
+        Map<String, Object> model = ctx(locale)
+                .add("username", safe(p.getUsername()))
+                .add("feedback", safe(p.getFeedbackText()))
+                .build();
+
+        String body = tpl.render("templates/email/feedback-updated.html", model);
+        email.sendHtml(p.getUserEmail(), subject, body);
+    }
+
     public void onTrainingCreated(TrainingCreatedEvent ev) {
         var locale = Locale.ENGLISH;
 
@@ -147,6 +165,26 @@ public class NotificationService {
             String body = tpl.render("templates/email/training-deleted.html", model);
             email.sendHtml(to, subject, body);
         }
+    }
+
+    public void onUserDeleted(UserDeletedEvent ev) {
+        var locale = Locale.ENGLISH;
+
+        if (ev.eventId() != null && !markIfNew(ev.eventId())) return;
+
+        String to = ev.email();
+        if (to == null || to.isBlank()) return;
+
+        String subject = t("email.user.deleted.subject", locale);
+
+        Map<String, Object> model = ctx(locale)
+                .add("title", t("email.user.deleted.title", locale))
+                .add("lead", t("email.user.deleted.lead", locale, safe(ev.username())))
+                .add("footer", t("email.user.deleted.footer", locale))
+                .build();
+
+        String body = tpl.render("templates/email/user-deleted.html", model);
+        email.sendHtml(to, subject, body);
     }
 
     // ---------- helpers ----------

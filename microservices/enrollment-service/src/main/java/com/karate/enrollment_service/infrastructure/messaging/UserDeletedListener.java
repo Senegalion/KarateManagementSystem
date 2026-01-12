@@ -1,7 +1,7 @@
 package com.karate.enrollment_service.infrastructure.messaging;
 
 import com.karate.enrollment_service.domain.repository.EnrollmentRepository;
-import com.karate.enrollment_service.infrastructure.messaging.event.UserDeletedEvent;
+import com.karate.userservice.infrastructure.messaging.dto.UserDeletedEvent;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

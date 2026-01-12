@@ -12,6 +12,7 @@ import com.karate.feedback_service.infrastructure.client.AuthClient
 import com.karate.feedback_service.infrastructure.client.EnrollmentClient
 import com.karate.feedback_service.infrastructure.client.TrainingSessionClient
 import com.karate.feedback_service.infrastructure.client.UserClient
+import com.karate.feedback_service.infrastructure.messaging.FeedbackEventPublisher
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
@@ -25,7 +26,8 @@ class FeedbackService(
     private val userClient: UserClient,
     private val trainingSessionClient: TrainingSessionClient,
     private val authClient: AuthClient,
-    private val enrollmentClient: EnrollmentClient
+    private val enrollmentClient: EnrollmentClient,
+    private val feedbackEventPublisher: FeedbackEventPublisher
 ) {
     private val log = LoggerFactory.getLogger(FeedbackService::class.java)
 
@@ -62,7 +64,9 @@ class FeedbackService(
             throw UserNotSignedUpException("User is not enrolled in the specified training session")
         }
 
-        val saved = feedbackRepository.findByUserIdAndTrainingSessionId(userId, trainingSessionId)
+        val existingOpt = feedbackRepository.findByUserIdAndTrainingSessionId(userId, trainingSessionId)
+
+        val saved = existingOpt
             .map { existing ->
                 val updated = existing.copy(
                     comment = feedbackRequestDto.comment,
@@ -79,6 +83,12 @@ class FeedbackService(
                     )
                 )
             }
+
+        if (existingOpt.isPresent) {
+            feedbackEventPublisher.publishUpdated(userId, saved.comment)
+        } else {
+            feedbackEventPublisher.publishCreated(userId, saved.comment)
+        }
 
         log.info("Feedback persisted id={} userId={} trainingId={}", saved.feedbackId, userId, trainingSessionId)
         return toDto(saved)

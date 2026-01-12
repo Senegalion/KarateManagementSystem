@@ -229,7 +229,7 @@ public class UserService {
 
         Long userId = user.getUserId();
         userRepository.delete(user);
-        userEventPublisher.publishUserDeleted(userId);
+        userEventPublisher.publishUserDeleted(userId, user.getEmail(), authUser.username());
 
         log.info("Delete current user OK userId={}", userId);
     }

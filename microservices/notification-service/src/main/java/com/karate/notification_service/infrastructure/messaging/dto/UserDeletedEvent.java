@@ -1,4 +1,4 @@
-package com.karate.userservice.infrastructure.messaging.dto;
+package com.karate.notification_service.infrastructure.messaging.dto;
 
 import java.time.Instant;
 
