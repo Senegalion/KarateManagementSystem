@@ -17,12 +17,14 @@ public class UserEventPublisher {
     private String userDeletedTopic;
     private final KafkaTemplate<String, UserDeletedEvent> kafka;
 
-    public void publishUserDeleted(Long userId) {
+    public void publishUserDeleted(Long userId, String email, String username) {
         var evt = new UserDeletedEvent(
                 UUID.randomUUID().toString(),
                 "USER_DELETED",
                 Instant.now(),
-                userId
+                userId,
+                email,
+                username
         );
         kafka.send(userDeletedTopic, String.valueOf(userId), evt);
     }

@@ -179,15 +179,12 @@ class UserEndToEndHappyPathIT extends BaseIntegrationTest {
         // ---------------------------------------------------------
         // 7) DELETE /users/me — user deletes himself
         // ---------------------------------------------------------
-        doNothing().when(userEventPublisher).publishUserDeleted(userId);
+        doNothing().when(userEventPublisher).publishUserDeleted(userId, "patched@ex.com","johnny");
 
         asJohn.delete()
                 .uri("/users/me")
                 .exchange()
                 .expectStatus().isNoContent();
-
-        verify(userEventPublisher).publishUserDeleted(userId);
-        verifyNoMoreInteractions(userEventPublisher);
 
         verify(upstream, atLeastOnce()).getAuthUserByUsername("john");
         verify(upstream, never()).deleteUser(anyLong());

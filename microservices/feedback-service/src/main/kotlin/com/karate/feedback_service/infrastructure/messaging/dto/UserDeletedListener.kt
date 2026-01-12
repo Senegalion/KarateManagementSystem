@@ -1,5 +1,6 @@
 package com.karate.feedback_service.infrastructure.messaging.dto
 
+import com.karate.userservice.infrastructure.messaging.dto.UserDeletedEvent
 import com.karate.feedback_service.domain.repository.FeedbackRepository
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
