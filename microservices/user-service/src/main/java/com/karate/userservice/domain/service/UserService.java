@@ -238,4 +238,24 @@ public class UserService {
     public List<String> getEmailsByClubId(Long clubId) {
         return userRepository.findEmailsByKarateClubId(clubId);
     }
+
+    @Transactional
+    @CacheEvict(
+            value = {
+                    "currentUserInfo", "userInfoById", "userClubIdByUsername",
+                    "userExists", "userPayloadById", "usersByClubName"
+            },
+            allEntries = true
+    )
+    public void updateUserClubId(Long userId, Long clubId) {
+        log.info("Update user clubId userId={} clubId={}", userId, clubId);
+
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
+
+        user.setKarateClubId(clubId);
+        userRepository.save(user);
+
+        log.info("Update user clubId OK userId={} clubId={}", userId, clubId);
+    }
 }

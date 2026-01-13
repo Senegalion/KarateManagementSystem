@@ -21,5 +21,5 @@ export const getUserRoles = (): string[] => {
 
 export const isAdmin = (): boolean => {
   const roles = getUserRoles();
-  return roles.includes("ROLE_ADMIN");
+  return roles.includes("ROLE_ADMIN") || roles.includes("ROLE_SYSTEM_ADMIN");
 };

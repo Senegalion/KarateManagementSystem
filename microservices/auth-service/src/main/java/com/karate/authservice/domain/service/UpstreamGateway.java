@@ -65,4 +65,8 @@ public class UpstreamGateway {
         log.error("CB/Timeout fallback userService.createUser reason={}", ex.toString());
         return CompletableFuture.failedFuture(new UpstreamUnavailableException("user-service timeout", ex));
     }
+
+    public void updateUserClubId(Long userId, Long clubId) {
+        userClient.updateUserClubId(userId, clubId);
+    }
 }

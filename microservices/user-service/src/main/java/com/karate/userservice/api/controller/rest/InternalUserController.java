@@ -82,4 +82,14 @@ public class InternalUserController {
                 clubId, emails.size(), System.currentTimeMillis() - t0);
         return ResponseEntity.ok(emails);
     }
+
+    @PutMapping("/{userId}/club/{clubId}")
+    @Operation(summary = "Update user club ID (internal)")
+    public ResponseEntity<Void> updateUserClubId(@PathVariable Long userId, @PathVariable Long clubId) {
+        log.info("PUT /internal/users/{}/club/{}", userId, clubId);
+        long t0 = System.currentTimeMillis();
+        userService.updateUserClubId(userId, clubId);
+        log.info("204 /internal/users/{}/club/{} took={}ms", userId, clubId, System.currentTimeMillis() - t0);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.karate.authservice.api.dto.LoginResponseDto;
 import com.karate.authservice.api.dto.TokenRequestDto;
+import com.karate.authservice.domain.service.AuthService;
+import com.karate.authservice.domain.service.UpstreamGateway;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -28,6 +30,12 @@ class JwtAuthenticatorServiceTest {
     @Mock
     AuthenticationManager authenticationManager;
 
+    @Mock
+    AuthService authService;
+
+    @Mock
+    UpstreamGateway upstream;
+
     @Test
     void authenticateAndGenerateToken_buildsJwt_withClaimsAndDates() {
         // given
@@ -40,7 +48,7 @@ class JwtAuthenticatorServiceTest {
                 "my-issuer"
         );
 
-        var svc = new JwtAuthenticatorService(authenticationManager, clock, props);
+        var svc = new JwtAuthenticatorService(authenticationManager, clock, props, authService, upstream);
 
         var principal = new User(
                 "john",

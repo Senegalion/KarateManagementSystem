@@ -37,6 +37,15 @@ public class TrainingSessionService {
 
     public Long currentUserClubId() {
         String username = getCurrentUsername();
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isSystemAdmin = auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_SYSTEM_ADMIN".equals(a.getAuthority()));
+
+        if (isSystemAdmin) {
+            return upstream.getUserClubIdNoCache(username);
+        }
+
         return upstream.getUserClubId(username);
     }
 
