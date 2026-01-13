@@ -27,4 +27,8 @@ public class UpstreamGateway {
         log.warn("CB fallback userService.getUserClubId username={} reason={}", username, ex.toString());
         throw new UpstreamUnavailableException("user-service unavailable", ex);
     }
+
+    public Long getUserClubIdNoCache(String username) {
+        return userClient.getUserClubId(username);
+    }
 }
