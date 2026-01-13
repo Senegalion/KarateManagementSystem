@@ -139,11 +139,16 @@ public class PaymentApplicationService {
             payments.save(payment);
 
             var months = payment.getItems().stream().map(i -> i.getYearMonth().toString()).toList();
-            publisher.publishReceived(PaymentReceivedEvent.builder()
+            var u = users.findById(payment.getUserId())
+                    .orElseThrow(() -> new IllegalStateException("User snapshot missing for userId=" + payment.getUserId()));
+
+            publisher.publishRecorded(com.karate.payment_service.infrastructure.messaging.dto.PaymentRecordedEvent.builder()
                     .eventId(UUID.randomUUID().toString())
-                    .eventType("PAYMENT_RECEIVED")
+                    .eventType("PAYMENT_RECORDED")
                     .timestamp(Instant.now())
                     .userId(payment.getUserId())
+                    .email(u.getEmail())
+                    .username(u.getUsername())
                     .currency(payment.getCurrency())
                     .amount(payment.getAmount())
                     .months(months)
@@ -188,13 +193,15 @@ public class PaymentApplicationService {
         pay.setItems(list);
         payments.save(pay);
 
-        publisher.publishReceived(PaymentReceivedEvent.builder()
+        publisher.publishRecorded(com.karate.payment_service.infrastructure.messaging.dto.PaymentRecordedEvent.builder()
                 .eventId(UUID.randomUUID().toString())
-                .eventType("PAYMENT_RECEIVED")
+                .eventType("PAYMENT_RECORDED")
                 .timestamp(Instant.now())
                 .userId(userId)
-                .currency(cfg.getCurrency())
-                .amount(amount)
+                .email(u.getEmail())
+                .username(u.getUsername())
+                .currency(pay.getCurrency())
+                .amount(pay.getAmount())
                 .months(months.stream().map(YearMonth::toString).toList())
                 .build());
     }
