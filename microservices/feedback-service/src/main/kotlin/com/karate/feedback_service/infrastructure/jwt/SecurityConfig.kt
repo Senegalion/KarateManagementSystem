@@ -25,10 +25,10 @@ class SecurityConfig(
                     "/v3/api-docs*/**", "/v2/api-docs*/**",
                     "/webjars/**", "/swagger-resources/**"
                 ).permitAll()
-                    .requestMatchers("/feedbacks/*").hasAnyRole("USER", "ADMIN")
-                    .requestMatchers("/feedbacks/me").hasAnyRole("USER","ADMIN")
-                    .requestMatchers("/feedbacks/admin/**").hasRole("ADMIN")
-                    .requestMatchers("/feedbacks/*/*").hasRole("ADMIN")
+                    .requestMatchers("/feedbacks/me").hasAnyRole("USER","ADMIN", "SYSTEM_ADMIN")
+                    .requestMatchers("/feedbacks/*").hasAnyRole("USER", "ADMIN", "SYSTEM_ADMIN")
+                    .requestMatchers("/feedbacks/admin/**").hasAnyRole("ADMIN", "SYSTEM_ADMIN")
+                    .requestMatchers("/feedbacks/*/*").hasAnyRole("ADMIN", "SYSTEM_ADMIN")
                     .anyRequest().authenticated()
             }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }

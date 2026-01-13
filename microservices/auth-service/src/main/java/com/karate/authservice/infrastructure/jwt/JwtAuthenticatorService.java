@@ -4,6 +4,10 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.karate.authservice.api.dto.LoginResponseDto;
 import com.karate.authservice.api.dto.TokenRequestDto;
+import com.karate.authservice.domain.model.RoleName;
+import com.karate.authservice.domain.service.AuthService;
+import com.karate.authservice.domain.service.UpstreamGateway;
+import com.karate.authservice.infrastructure.client.dto.KarateClubDto;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,12 +25,24 @@ public class JwtAuthenticatorService {
     private final AuthenticationManager authenticationManager;
     private final Clock clock;
     private final JwtConfigurationProperties jwtConfigurationProperties;
+    private final AuthService authService;
+    private final UpstreamGateway upstream;
 
     public LoginResponseDto authenticateAndGenerateToken(TokenRequestDto tokenRequestDto) {
         Authentication authenticate = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(tokenRequestDto.username(), tokenRequestDto.password())
         );
         User user = (User) authenticate.getPrincipal();
+        boolean isSystemAdmin = user.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals(RoleName.ROLE_SYSTEM_ADMIN.name()));
+        if (isSystemAdmin) {
+            String clubName = tokenRequestDto.karateClubName();
+            KarateClubDto club = upstream.getClubByName(clubName);
+
+            Long userId = authService.getUserIdByUsername(user.getUsername());
+
+            upstream.updateUserClubId(userId, club.karateClubId());
+        }
         String token = createToken(user);
         String username = user.getUsername();
         return LoginResponseDto.builder()
