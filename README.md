@@ -283,14 +283,45 @@ Currently running Docker containers related to the project:
 - Docker
 
 ### 2️⃣ Configuration
-Make sure you have set the environment variables for the critical configurations (or defaults will be used):
+For security reasons, sensitive credentials and private keys are **not included** in this repository.
 
 ```env
-PAYPAL_CLIENT_ID=ATsjDqjpPBHA5ZNFAm4YGLPioWd6e2deYB12kbksjVD5xDROAq0QFIPf32lR5n-3_m4GcenSPsJ1dS_A
-PAYPAL_CLIENT_SECRET=EHsOc_t4LQ4tndkT6iuufi6mWI44buCHZVvhwjZPalykt4XZajmUZhg5JthcFP260iLsrLQQMho9N84g
+PAYPAL_CLIENT_ID=
+PAYPAL_CLIENT_SECRET=
+```
+
+#### 2.1 Create `.env` file
+
+Create a `.env` file in the project root directory with the following variables:
+
+```env
+GITHUB_USER=
+GITHUB_TOKEN=
+MAIL_USERNAME=
+MAIL_PASSWORD=
 ```
 
 If you don't have a PayPal sandbox account yet, please follow the Testing PayPal Payments section below for details.
+
+#### 2.2 Generate TLS certificates
+
+Create a folder named `certs` in the project root and generate self-signed certificates:
+
+```lua
+certs/
+├── karate.local.crt
+└── karate.local.key
+```
+
+Example OpenSSL command:
+
+```sh
+openssl req -x509 -newkey rsa:4096 \
+  -keyout certs/karate.local.key \
+  -out certs/karate.local.crt \
+  -days 365 -nodes \
+  -subj "/CN=karate.local"
+```
 
 ### 3️⃣ Running the Application
 
