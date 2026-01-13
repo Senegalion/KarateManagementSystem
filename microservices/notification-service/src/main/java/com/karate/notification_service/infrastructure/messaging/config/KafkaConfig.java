@@ -100,4 +100,30 @@ public class KafkaConfig {
     public ConsumerFactory<String, UserDeletedEvent> userDeletedConsumerFactory(KafkaProperties props) {
         return factoryFor(props, UserDeletedEvent.class);
     }
+
+    @Bean
+    public ConsumerFactory<String, PaymentRecordedEvent> paymentRecordedConsumerFactory(KafkaProperties props) {
+        return factoryFor(props, PaymentRecordedEvent.class);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, PaymentRecordedEvent> paymentRecordedListenerFactory(
+            ConsumerFactory<String, PaymentRecordedEvent> cf) {
+        var f = new ConcurrentKafkaListenerContainerFactory<String, PaymentRecordedEvent>();
+        f.setConsumerFactory(cf);
+        return f;
+    }
+
+    @Bean
+    public ConsumerFactory<String, PaymentDebtReminderEvent> paymentDebtReminderConsumerFactory(KafkaProperties props) {
+        return factoryFor(props, PaymentDebtReminderEvent.class);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, PaymentDebtReminderEvent> paymentDebtReminderListenerFactory(
+            ConsumerFactory<String, PaymentDebtReminderEvent> cf) {
+        var f = new ConcurrentKafkaListenerContainerFactory<String, PaymentDebtReminderEvent>();
+        f.setConsumerFactory(cf);
+        return f;
+    }
 }

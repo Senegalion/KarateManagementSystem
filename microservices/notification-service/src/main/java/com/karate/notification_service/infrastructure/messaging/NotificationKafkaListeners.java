@@ -102,4 +102,24 @@ public class NotificationKafkaListeners {
                 event.getPayload() == null ? null : event.getPayload().getUserEmail());
         notifications.onFeedbackUpdated(event);
     }
+
+    @KafkaListener(
+            topics = "${topics.payment-recorded}",
+            groupId = "notification-service-payment-recorded",
+            containerFactory = "paymentRecordedListenerFactory"
+    )
+    public void onPaymentRecorded(PaymentRecordedEvent ev) {
+        log.info("Payment RECORDED consumed eventId={} userId={} email={}", ev.eventId(), ev.userId(), ev.email());
+        notifications.onPaymentRecorded(ev);
+    }
+
+    @KafkaListener(
+            topics = "${topics.payment-debt-reminder}",
+            groupId = "notification-service-payment-debt-reminder",
+            containerFactory = "paymentDebtReminderListenerFactory"
+    )
+    public void onPaymentDebtReminder(PaymentDebtReminderEvent ev) {
+        log.info("Payment DEBT REMINDER consumed eventId={} userId={} email={}", ev.eventId(), ev.userId(), ev.email());
+        notifications.onPaymentDebtReminder(ev);
+    }
 }

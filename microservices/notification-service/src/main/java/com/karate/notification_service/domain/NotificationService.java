@@ -3,8 +3,8 @@ package com.karate.notification_service.domain;
 import com.karate.notification_service.infrastructure.email.EmailService;
 import com.karate.notification_service.infrastructure.email.TemplateRenderer;
 import com.karate.notification_service.infrastructure.feign.EnrollmentClient;
-import com.karate.notification_service.infrastructure.messaging.dto.*;
 import com.karate.notification_service.infrastructure.feign.UserClient;
+import com.karate.notification_service.infrastructure.messaging.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
@@ -184,6 +184,58 @@ public class NotificationService {
                 .build();
 
         String body = tpl.render("templates/email/user-deleted.html", model);
+        email.sendHtml(to, subject, body);
+    }
+
+    public void onPaymentRecorded(PaymentRecordedEvent ev) {
+        var locale = Locale.ENGLISH;
+
+        if (ev.eventId() != null && !markIfNew(ev.eventId())) return;
+
+        String to = ev.email();
+        if (to == null || to.isBlank()) return;
+
+        String subject = t("email.payment.recorded.subject", locale);
+
+        Map<String, Object> model = ctx(locale)
+                .add("title", t("email.payment.recorded.title", locale))
+                .add("lead", t("email.payment.recorded.lead", locale))
+                .add("footer", t("email.payment.recorded.footer", locale))
+                .add("username", safe(ev.username()))
+                .add("amount", ev.amount() == null ? "" : ev.amount().toPlainString())
+                .add("currency", safe(ev.currency()))
+                .add("months", ev.months() == null ? "" : String.join(", ", ev.months()))
+                .add("preferencesLabel", t("email.common.preferences", locale))
+                .add("privacyLabel", t("email.common.privacy", locale))
+                .build();
+
+        String body = tpl.render("templates/email/payment-recorded.html", model);
+        email.sendHtml(to, subject, body);
+    }
+
+    public void onPaymentDebtReminder(PaymentDebtReminderEvent ev) {
+        var locale = Locale.ENGLISH;
+
+        if (ev.eventId() != null && !markIfNew(ev.eventId())) return;
+
+        String to = ev.email();
+        if (to == null || to.isBlank()) return;
+
+        String subject = t("email.payment.reminder.subject", locale);
+
+        Map<String, Object> model = ctx(locale)
+                .add("title", t("email.payment.reminder.title", locale))
+                .add("lead", t("email.payment.reminder.lead", locale))
+                .add("ctaLabel", t("email.payment.reminder.cta", locale))
+                .add("footer", t("email.payment.reminder.footer", locale))
+                .add("amount", ev.total() == null ? "" : ev.total().toPlainString())
+                .add("currency", "PLN")
+                .add("months", ev.months() == null ? "" : String.join(", ", ev.months()))
+                .add("preferencesLabel", t("email.common.preferences", locale))
+                .add("privacyLabel", t("email.common.privacy", locale))
+                .build();
+
+        String body = tpl.render("templates/email/payment-debt-reminder.html", model);
         email.sendHtml(to, subject, body);
     }
 
